@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf8f5;
+  --foreground: #1a1814;
+  --muted: #5c574e;
+  --accent: #c45c26;
+  --table-header-bg: #8b3103;
+  /*
+   * Phosphor PawPrint (regular): path is scaled down inside a large ` so the
+   * repeated tile is mostly empty — small paws, wide spacing. Tune spacing with
+   * --paw-print-mask-size; tune size/orientation with scale() / rotate() in the SVG below.
+   */
+  --paw-print-mask-size: 200px;
+  --paw-print-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20420%20420'%3E%3Cg%20transform%3D'translate(210%20210)%20scale(0.3)%20rotate(45)%20translate(-128%20-128)'%3E%3Cpath%20fill%3D'white'%20d%3D'M212%2C80a28%2C28%2C0%2C1%2C0%2C28%2C28A28%2C28%2C0%2C0%2C0%2C212%2C80Zm0%2C40a12%2C12%2C0%2C1%2C1%2C12-12A12%2C12%2C0%2C0%2C1%2C212%2C120ZM72%2C108a28%2C28%2C0%2C1%2C0-28%2C28A28%2C28%2C0%2C0%2C0%2C72%2C108ZM44%2C120a12%2C12%2C0%2C1%2C1%2C12-12A12%2C12%2C0%2C0%2C1%2C44%2C120ZM92%2C88A28%2C28%2C0%2C1%2C0%2C64%2C60%2C28%2C28%2C0%2C0%2C0%2C92%2C88Zm0-40A12%2C12%2C0%2C1%2C1%2C80%2C60%2C12%2C12%2C0%2C0%2C1%2C92%2C48Zm72%2C40a28%2C28%2C0%2C1%2C0-28-28A28%2C28%2C0%2C0%2C0%2C164%2C88Zm0-40a12%2C12%2C0%2C1%2C1-12%2C12A12%2C12%2C0%2C0%2C1%2C164%2C48Zm23.12%2C100.86a35.3%2C35.3%2C0%2C0%2C1-16.87-21.14%2C44%2C44%2C0%2C0%2C0-84.5%2C0A35.25%2C35.25%2C0%2C0%2C1%2C69%2C148.82%2C40%2C40%2C0%2C0%2C0%2C88%2C224a39.48%2C39.48%2C0%2C0%2C0%2C15.52-3.13%2C64.09%2C64.09%2C0%2C0%2C1%2C48.87%2C0%2C40%2C40%2C0%2C0%2C0%2C34.73-72ZM168%2C208a24%2C24%2C0%2C0%2C1-9.45-1.93%2C80.14%2C80.14%2C0%2C0%2C0-61.19%2C0%2C24%2C24%2C0%2C0%2C1-20.71-43.26%2C51.22%2C51.22%2C0%2C0%2C0%2C24.46-30.67%2C28%2C28%2C0%2C0%2C1%2C53.78%2C0%2C51.27%2C51.27%2C0%2C0%2C0%2C24.53%2C30.71A24%2C24%2C0%2C0%2C1%2C168%2C208Z'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}
+
+/* Page backdrop: paw mask + --accent at 20% on body::before. */
+html {
+  background-color: var(--background);
+  min-height: 100%;
+}
+
+body {
+  color: var(--foreground);
+  background-color: transparent;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--accent);
+  opacity: 0.2;
+  -webkit-mask-image: var(--paw-print-mask);
+  -webkit-mask-size: var(--paw-print-mask-size) calc(var(--paw-print-mask-size) * 2);
+  -webkit-mask-repeat: repeat;
+  -webkit-mask-position: 0 0;
+  mask-image: var(--paw-print-mask);
+  mask-size: var(--paw-print-mask-size) calc(var(--paw-print-mask-size) * 2);
+  mask-repeat: repeat;
+  mask-position: 0 0;
+}
+
+/* Leaflet (dog profile hangout map)
+   Tailwind preflight sets img { max-width: 100%; height: auto } which breaks
+   Leaflet’s tile layer (tiles rely on explicit pixel dimensions). */
+.leaflet-container {
+  font-family: inherit;
+  min-height: min(22rem, 55vh);
+  height: min(22rem, 55vh);
+  width: 100%;
+  border-radius: 0.75rem;
+  z-index: 0;
+}
+
+.leaflet-container img.leaflet-tile,
+.leaflet-container img,
+.leaflet-container .leaflet-tile-container img,
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.leaflet-container svg {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.dog-hangout-marker-wrap {
+  background: transparent !important;
+  border: none !important;
+}
+
+.dog-hangout-marker-dot {
+  width: 18px;
+  height: 18px;
+  margin: 2px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+}
