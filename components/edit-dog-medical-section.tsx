@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AddMedicalRecordForm } from "@/app/manage/dogs/add-medical-record-form";
+import { SuperAdminMedicalRecordActions } from "@/components/super-admin-medical-record-actions";
 
 const LIST_SCROLL_AFTER = 5;
 
@@ -35,12 +36,14 @@ export function EditDogMedicalSection({
   dogStatus,
   medicalRows,
   recorderNames,
+  superAdmin,
 }: {
   dogId: string;
   dogSlug: string;
   dogStatus: string;
   medicalRows: MedicalRow[];
   recorderNames: Record<string, string>;
+  superAdmin?: boolean;
 }) {
   const [showAdd, setShowAdd] = useState(false);
   const scroll = medicalRows.length > LIST_SCROLL_AFTER;
@@ -80,6 +83,20 @@ export function EditDogMedicalSection({
                     <span>Next due {formatRecordDate(row.next_due_date)}</span>
                   ) : null}
                 </div>
+                {superAdmin ? (
+                  <SuperAdminMedicalRecordActions
+                    row={{
+                      id: row.id,
+                      event_type: row.event_type,
+                      occurred_on: row.occurred_on,
+                      description: row.description,
+                      next_due_date: row.next_due_date,
+                    }}
+                    dogId={dogId}
+                    dogSlug={dogSlug}
+                    returnTo="edit"
+                  />
+                ) : null}
               </li>
             ))}
           </ul>

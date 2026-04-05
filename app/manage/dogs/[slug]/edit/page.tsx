@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requirePrivileged } from "@/lib/auth/require-privileged";
+import { getSuperAdminViewer } from "@/lib/auth/require-super-admin";
 import { recorderNameMap } from "@/lib/dogs/recorder-name-map";
 import { DogPhotosManager } from "@/components/dog-photos-manager";
 import { isCloudinaryConfigured } from "@/lib/cloudinary/dog-images";
@@ -180,6 +181,8 @@ export default async function EditDogPage({ params }: PageProps) {
     (medicalRows ?? []).map((r) => r.recorded_by),
   );
 
+  const superAdminViewer = await getSuperAdminViewer();
+
   const dogForForm = {
     ...dog,
     welfare_remarks,
@@ -250,6 +253,9 @@ export default async function EditDogPage({ params }: PageProps) {
         </h2>
         <p className="mt-4 text-sm text-[var(--muted)]">
           Visible on the public dog profile. Only admins and super admins can add entries.
+          {superAdminViewer
+            ? " As super admin, you can edit or remove individual records below."
+            : null}
         </p>
 
         <EditDogMedicalSection
@@ -258,6 +264,7 @@ export default async function EditDogPage({ params }: PageProps) {
           dogStatus={dog.status}
           medicalRows={medicalRows ?? []}
           recorderNames={Object.fromEntries(recorderNames)}
+          superAdmin={Boolean(superAdminViewer)}
         />
       </section>
     </main>

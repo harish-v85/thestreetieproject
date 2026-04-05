@@ -6,6 +6,9 @@ import { welfareStatusLabel } from "@/components/dog-badges";
 import { CollapsibleLogFeeding } from "@/components/collapsible-log-feeding";
 import { recorderNameMap } from "@/lib/dogs/recorder-name-map";
 import { getActiveStaffViewer } from "@/lib/auth/require-active-staff";
+import { getSuperAdminViewer } from "@/lib/auth/require-super-admin";
+import { SuperAdminFeedingRecordActions } from "@/components/super-admin-feeding-record-actions";
+import { SuperAdminMedicalRecordActions } from "@/components/super-admin-medical-record-actions";
 import { DogPhotoCarousel } from "@/components/dog-photo-carousel";
 import { FeedingLocationLink } from "@/components/feeding-location-link";
 import {
@@ -66,6 +69,7 @@ export default async function DogProfilePage({ params }: PageProps) {
       colour_tertiary,
       neutering_status,
       welfare_status,
+      welfare_remarks,
       street_name,
       landmark,
       map_lat,
@@ -138,6 +142,7 @@ export default async function DogProfilePage({ params }: PageProps) {
   const recorderNames = await recorderNameMap(supabase, recorderIds);
 
   const staffViewer = await getActiveStaffViewer();
+  const superAdminViewer = await getSuperAdminViewer();
 
   const feedingCount = feedings?.length ?? 0;
   const scrollFeedingList = feedingCount > 5;
@@ -328,14 +333,21 @@ export default async function DogProfilePage({ params }: PageProps) {
             <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
               Welfare check
             </dt>
-            <dd
-              className={
-                dog.welfare_status === "healthy"
-                  ? "mt-0.5 text-sm text-[var(--foreground)]"
-                  : "mt-0.5 text-sm font-medium text-amber-900"
-              }
-            >
-              {welfareStatusLabel(dog.welfare_status)}
+            <dd className="mt-0.5">
+              <span
+                className={
+                  dog.welfare_status === "healthy"
+                    ? "text-sm text-[var(--foreground)]"
+                    : "text-sm font-medium text-amber-900"
+                }
+              >
+                {welfareStatusLabel(dog.welfare_status)}
+              </span>
+              {dog.welfare_remarks?.trim() ? (
+                <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--foreground)]">
+                  {dog.welfare_remarks.trim()}
+                </p>
+              ) : null}
             </dd>
           </div>
         </dl>
@@ -381,6 +393,9 @@ export default async function DogProfilePage({ params }: PageProps) {
         <p className="mt-2 text-sm text-[var(--muted)]">
           Logged by active staff. When a follow-up date is set, it appears on the record and in the
           summary below.
+          {superAdminViewer
+            ? " As super admin, you can edit or remove individual records below."
+            : null}
         </p>
         {upcomingMedical.length > 0 ? (
           <div
@@ -443,6 +458,20 @@ export default async function DogProfilePage({ params }: PageProps) {
                   <p className="mt-2 text-xs text-[var(--muted)]">
                     Recorded by {recorderNames.get(m.recorded_by) ?? "—"}
                   </p>
+                  {superAdminViewer ? (
+                    <SuperAdminMedicalRecordActions
+                      row={{
+                        id: m.id,
+                        event_type: m.event_type,
+                        occurred_on: m.occurred_on,
+                        description: m.description,
+                        next_due_date: m.next_due_date,
+                      }}
+                      dogId={dog.id}
+                      dogSlug={dog.slug}
+                      returnTo="profile"
+                    />
+                  ) : null}
                 </li>
               ))
             ) : (
@@ -464,6 +493,9 @@ export default async function DogProfilePage({ params }: PageProps) {
         <p className="mt-2 text-sm text-amber-900/80">
           This is not an exhaustive or guaranteed record. It only reflects entries made by
           registered dog feeders.
+          {superAdminViewer
+            ? " As super admin, you can edit or remove individual entries below."
+            : null}
         </p>
         {staffViewer ? (
           <CollapsibleLogFeeding dogId={dog.id} dogSlug={dog.slug} />
@@ -523,6 +555,19 @@ export default async function DogProfilePage({ params }: PageProps) {
                         </>
                       ) : null}
                     </p>
+                    {superAdminViewer ? (
+                      <SuperAdminFeedingRecordActions
+                        row={{
+                          id: f.id,
+                          fed_at: f.fed_at,
+                          notes: f.notes,
+                          lat: f.lat,
+                          lng: f.lng,
+                        }}
+                        dogId={dog.id}
+                        dogSlug={dog.slug}
+                      />
+                    ) : null}
                   </li>
                 );
               })

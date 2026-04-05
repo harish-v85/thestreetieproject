@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { redirectWithFlash } from "@/lib/redirect-with-flash";
 import { createClient } from "@/lib/supabase/server";
 import { requireActiveStaff } from "@/lib/auth/require-active-staff";
+import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 
 function optFloat(formData: FormData, key: string): number | null {
   const v = formData.get(key);
@@ -124,4 +126,82 @@ export async function batchLogFeeding(
     revalidatePath(`/dogs/${d.slug}`);
   }
   redirectWithFlash("/dogs/feed", "batch_feeding_logged");
+}
+
+export async function updateFeedingRecord(
+  feedingRecordId: string,
+  dogId: string,
+  dogSlug: string,
+  _prev: LogFeedingFormState,
+  formData: FormData,
+): Promise<LogFeedingFormState> {
+  const nextPath = `/dogs/${dogSlug}#feeding`;
+  await requireSuperAdmin(nextPath);
+  const supabase = await createClient();
+
+  const { data: existing } = await supabase
+    .from("feeding_records")
+    .select("id, dog_id")
+    .eq("id", feedingRecordId)
+    .maybeSingle();
+  if (!existing || existing.dog_id !== dogId) {
+    return { error: "Feeding entry not found for this dog." };
+  }
+
+  const notes = String(formData.get("notes") ?? "").trim() || null;
+  const lat = optFloat(formData, "lat");
+  const lng = optFloat(formData, "lng");
+  const fed_at = fedAtIso(formData);
+
+  const { error } = await supabase
+    .from("feeding_records")
+    .update({
+      fed_at,
+      notes,
+      lat,
+      lng,
+    })
+    .eq("id", feedingRecordId)
+    .eq("dog_id", dogId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/dogs/${dogSlug}`);
+  revalidatePath("/dogs");
+  revalidatePath("/dogs/feed");
+  redirectWithFlash(nextPath, "feeding_record_updated");
+}
+
+export async function deleteFeedingRecord(
+  feedingRecordId: string,
+  dogId: string,
+  dogSlug: string,
+): Promise<void> {
+  const nextPath = `/dogs/${dogSlug}#feeding`;
+  await requireSuperAdmin(nextPath);
+  const supabase = await createClient();
+
+  const { data: existing } = await supabase
+    .from("feeding_records")
+    .select("id, dog_id")
+    .eq("id", feedingRecordId)
+    .maybeSingle();
+  if (!existing || existing.dog_id !== dogId) {
+    redirect(nextPath);
+  }
+
+  const { error } = await supabase
+    .from("feeding_records")
+    .delete()
+    .eq("id", feedingRecordId)
+    .eq("dog_id", dogId);
+
+  if (error) {
+    redirect(nextPath);
+  }
+
+  revalidatePath(`/dogs/${dogSlug}`);
+  revalidatePath("/dogs");
+  revalidatePath("/dogs/feed");
+  redirectWithFlash(nextPath, "feeding_record_deleted");
 }
