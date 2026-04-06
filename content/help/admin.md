@@ -2,7 +2,7 @@
 
 1. Open **Dogs** → **All dogs**, then choose a dog.
 2. On their profile, scroll to **Feeding log**.
-3. Click **Log a new feeding**, fill in when you fed them and any notes, then submit.
+3. Click **Log a feeding**, fill in when you fed them and any notes, then submit.
 
 ## How to log a feeding activity for a group of dogs
 

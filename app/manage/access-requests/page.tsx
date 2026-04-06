@@ -10,7 +10,7 @@ import { ManagePageHeader } from "@/components/manage-page-header";
 import { ManageIconAccessRequests } from "@/components/manage-page-icons";
 
 export const metadata: Metadata = {
-  title: "Access requests — Streetie",
+  title: "Access requests",
 };
 
 export default async function AccessRequestsPage() {
@@ -54,7 +54,8 @@ export default async function AccessRequestsPage() {
         title="Access requests"
         description={
           <>
-            Review applications from the public form. Approving here does not create a login — use{" "}
+            Review requests from people who want to help track and care for dogs in their area.
+            Approving here does not create a login — use{" "}
             <Link href="/manage/users/new" className="font-medium text-[var(--accent)]">
               New user
             </Link>{" "}

@@ -59,9 +59,10 @@ export function EditDogMedicalSection({
       >
         {medicalRows.length === 0 ? (
           <div className="rounded-xl border border-black/5 bg-[var(--background)]/40 px-4 py-6 text-center shadow-sm">
-            <p className="text-sm font-medium text-[var(--foreground)]">No medical records</p>
+            <p className="text-sm font-medium text-[var(--foreground)]">No medical records yet</p>
             <p className="mt-1 text-xs text-[var(--muted)]">
-              Nothing logged yet. Add a record below when you have vaccination or vet visit details.
+              Nothing has been logged so far. Add a record below when you have vaccination or vet
+              visit details.
             </p>
           </div>
         ) : (

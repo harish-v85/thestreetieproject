@@ -22,6 +22,10 @@ export function LogFeedingForm({ dogId, dogSlug }: { dogId: string; dogSlug: str
     >
       <h3 className="text-sm font-semibold text-[var(--foreground)]">Log a feeding</h3>
       <p className="mt-1 text-xs text-[var(--muted)]">
+        Add when you fed them and anything worth noting — what they ate, where, or how they were
+        doing.
+      </p>
+      <p className="mt-1 text-xs text-[var(--muted)]">
         Signed in as active staff. Time defaults to now if left unchanged.
       </p>
       <div className="mt-4 space-y-3">

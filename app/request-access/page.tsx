@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { RequestAccessForm } from "@/app/request-access/request-access-form";
 
 export const metadata: Metadata = {
-  title: "Request access — Streetie",
+  title: "Request access",
   description: "Apply for a Streetie volunteer or admin account.",
 };
 
@@ -30,10 +30,13 @@ export default async function RequestAccessPage() {
       <h1 className="text-2xl font-semibold tracking-tight text-[var(--foreground)]">
         Request access
       </h1>
-      <p className="mt-2 text-sm text-[var(--muted)]">
-        Streetie accounts are invite-only. Submit this form and a super admin will review it. If
-        approved, they&apos;ll create your login and let you know.
-      </p>
+      <div className="mt-2 space-y-3 text-sm text-[var(--muted)]">
+        <p>Thank you for your interest! The Streetie Project is community-driven. If you&apos;d like to help track, care for, or document the dogs in your area, you can
+        request access here.</p>
+        <p>
+        <i>(The Streetie Project is currently Invite-Only. Users will be able to sign up without requesting an invite in the near future.) </i> 
+        </p>
+      </div>
       <div className="mt-8">
         <RequestAccessForm />
       </div>

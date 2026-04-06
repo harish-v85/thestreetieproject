@@ -24,7 +24,7 @@ export function CollapsibleLogFeeding({ dogId, dogSlug }: { dogId: string; dogSl
         >
           <path d="M12 5v14M5 12h14" strokeLinecap="round" />
         </svg>
-        Log a new feeding
+        Log a feeding
       </button>
     );
   }

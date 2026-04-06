@@ -33,7 +33,7 @@ export default async function NewDogPage() {
         Add dog
       </h1>
       <p className="mt-2 text-sm text-[var(--muted)]">
-        Creates an active profile visible on the public directory.
+        Create a new dog profile that will appear in the public directory.
       </p>
       <div className="mt-8 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
         <DogNewForm localities={localities ?? []} neighbourhoods={neighbourhoods ?? []} />

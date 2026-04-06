@@ -176,6 +176,30 @@ export function formatCoatColoursOnly(row: DogCoatRow): string {
   return parts.join(" & ");
 }
 
+/** Primary → secondary → tertiary for profile swatches (same rules as {@link formatCoatColoursOnly}). */
+export function coatColourSwatchStack(row: DogCoatRow): { key: CoatColour; label: string }[] {
+  const p = isCoatPattern(row.coat_pattern) ? row.coat_pattern : "unsure";
+  const c1 = isCoatColour(row.colour_primary) ? row.colour_primary : "unsure";
+  const c2Raw =
+    row.colour_secondary && isCoatColour(row.colour_secondary)
+      ? row.colour_secondary
+      : null;
+  const c3Raw =
+    row.colour_tertiary && isCoatColour(row.colour_tertiary)
+      ? row.colour_tertiary
+      : null;
+  const use2 = needsSecondaryColour(p);
+  const use3 = needsTertiaryColour(p);
+  const c2 = use2 ? c2Raw : null;
+  const c3 = use3 ? c3Raw : null;
+  const out: { key: CoatColour; label: string }[] = [
+    { key: c1, label: COAT_COLOUR_LABEL[c1] },
+  ];
+  if (c2) out.push({ key: c2, label: COAT_COLOUR_LABEL[c2] });
+  if (c3) out.push({ key: c3, label: COAT_COLOUR_LABEL[c3] });
+  return out;
+}
+
 export type ParsedCoat =
   | {
       coat_pattern: CoatPattern;

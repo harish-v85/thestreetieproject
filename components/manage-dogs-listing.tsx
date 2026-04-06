@@ -15,7 +15,7 @@ export function ManageDogsListing({ rows }: { rows: ManageDogTableRow[] }) {
     <ManageListingToolbar
       inputId="manage-dogs-search"
       label="Search"
-      placeholder="Name, slug, location, status…"
+      placeholder="Search by name, location, status…"
       value={q}
       onChange={setQ}
       action={

@@ -92,8 +92,9 @@ export function FeedingLocationLink({
     ? "relative inline-flex align-middle"
     : "relative mt-1 inline-flex";
 
+  /** Inline pin is usually at the end of a line (e.g. feeding log); anchor the trailing edge so the panel grows left and stays visible in narrow side panes. */
   const previewPanelClass = inline
-    ? "pointer-events-auto absolute bottom-full left-0 z-50 mb-2 w-[min(calc(100vw-2rem),18rem)] rounded-xl border border-black/10 bg-white p-2 shadow-lg ring-1 ring-black/5"
+    ? "pointer-events-auto absolute bottom-full right-0 z-[80] mb-2 w-[min(calc(100vw-2rem),18rem)] rounded-xl border border-black/10 bg-white p-2 shadow-lg ring-1 ring-black/5"
     : "pointer-events-auto absolute left-1/2 top-full z-50 mt-2 w-[min(calc(100vw-2rem),18rem)] -translate-x-1/2 rounded-xl border border-black/10 bg-white p-2 shadow-lg ring-1 ring-black/5 sm:left-0 sm:translate-x-0";
 
   const pinBtnClass = inline

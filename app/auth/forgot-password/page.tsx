@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ForgotPasswordForm } from "./forgot-password-form";
 
 export const metadata: Metadata = {
-  title: "Forgot password — Streetie",
+  title: "Forgot password",
 };
 
 export default function ForgotPasswordPage() {
@@ -13,7 +13,7 @@ export default function ForgotPasswordPage() {
         Forgot password
       </h1>
       <p className="mt-2 text-sm text-[var(--muted)]">
-        We&apos;ll email you a link to set a new password.
+        We&apos;ll mail you a link to reset your password.
       </p>
       <div className="mt-8">
         <ForgotPasswordForm />

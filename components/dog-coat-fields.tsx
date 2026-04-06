@@ -117,8 +117,8 @@ export function DogCoatFields({ defaults }: { defaults: DogCoatDefaults }) {
     <div className="sm:col-span-2 space-y-5 rounded-xl border border-black/5 bg-[var(--background)]/50 p-4">
       <h3 className="text-sm font-semibold text-[var(--foreground)]">Coat</h3>
       <p className="text-xs text-[var(--muted)]">
-        Choose the overall pattern first, then the colour(s) that apply. Unsure is available when
-        you&apos;re not certain.
+        Start with the overall pattern, then choose the colour(s) that best match. If unsure, you can
+        mark it as such.
       </p>
 
       <input type="hidden" name="coat_pattern" value={pattern} />

@@ -16,9 +16,12 @@ export type CarouselPhoto = {
 export function DogPhotoCarousel({
   photos,
   dogName,
+  /** When false, omit the built-in “Photos” h2 (parent section already has a title). */
+  showHeading = true,
 }: {
   photos: CarouselPhoto[];
   dogName: string;
+  showHeading?: boolean;
 }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
@@ -66,8 +69,14 @@ export function DogPhotoCarousel({
   if (photos.length === 0) {
     return (
       <section className="mb-10" aria-label={`Photos of ${dogName}`}>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]">Photos</h2>
-        <div className="relative mt-3 aspect-[4/3] w-full overflow-hidden rounded-xl border border-black/10 bg-[var(--background)]">
+        {showHeading ? (
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]">Photos</h2>
+        ) : null}
+        <div
+          className={`relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-black/10 bg-[var(--background)] ${
+            showHeading ? "mt-3" : ""
+          }`}
+        >
           <Image
             src={dogPhotoPlaceholder}
             alt=""
@@ -87,8 +96,10 @@ export function DogPhotoCarousel({
       aria-roledescription="carousel"
       aria-label={`Photos of ${dogName}`}
     >
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]">Photos</h2>
-      <div className="relative mt-3">
+      {showHeading ? (
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]">Photos</h2>
+      ) : null}
+      <div className={showHeading ? "relative mt-3" : "relative"}>
         <div
           ref={scrollerRef}
           className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-xl border border-black/10 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"

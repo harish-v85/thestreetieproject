@@ -6,7 +6,7 @@ import { ManageIconUsers } from "@/components/manage-page-icons";
 import { ManageUsersListing, type UserListRow } from "@/components/manage-users-listing";
 
 export const metadata: Metadata = {
-  title: "Users — Streetie",
+  title: "Users",
 };
 
 export const dynamic = "force-dynamic";
@@ -31,8 +31,9 @@ export default async function ManageUsersPage() {
         title="Users"
         description={
           <>
-            Super Admin only. Create accounts for Dog Feeder, Admin, and Super Admin roles.
-            Requires <code className="rounded bg-black/5 px-1">SUPABASE_SERVICE_ROLE_KEY</code> in{" "}
+            Manage access to the platform and assign roles. Super Admin only. Create accounts for Dog
+            Feeder, Admin, and Super Admin roles. Requires{" "}
+            <code className="rounded bg-black/5 px-1">SUPABASE_SERVICE_ROLE_KEY</code> in{" "}
             <code className="rounded bg-black/5 px-1">.env.local</code>.
           </>
         }

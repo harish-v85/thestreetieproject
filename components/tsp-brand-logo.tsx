@@ -39,7 +39,7 @@ export function TspSiteLogo() {
     <Link
       href="/"
       className={`flex min-w-0 max-w-full shrink-0 items-center gap-1.5 outline-none ring-[var(--accent)] focus-visible:ring-2 sm:gap-2 ${TSP_WORDMARK_TYPOGRAPHY}`}
-      aria-label="Streetie home"
+      aria-label="The Streetie Project home"
     >
       <TspLogoImage className="h-9 w-9 shrink-0 object-contain" width={40} height={40} priority />
       <span className="truncate text-base sm:text-lg md:text-xl">TSP</span>

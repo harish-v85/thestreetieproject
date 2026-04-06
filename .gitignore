@@ -34,3 +34,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# Draft / internal docs — keep out of deploy commits (optional: remove from index with `git rm -r --cached docs/`)
+/docs/

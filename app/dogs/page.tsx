@@ -9,7 +9,7 @@ import { ManagePageHeader } from "@/components/manage-page-header";
 import { DirectoryIconDog } from "@/components/manage-page-icons";
 
 export const metadata: Metadata = {
-  title: "Dogs — Streetie",
+  title: "All Dogs of The Streetie Project",
   description: "Browse street dogs in the locality directory.",
 };
 
@@ -57,12 +57,11 @@ export default async function DogsDirectoryPage() {
         title="Dogs"
         description={
           <>
-            Active profiles in the directory. Search and filter match the home page; each card links
-            to a full profile with medical and feeding history.{" "}
+            Browse active dog profiles in your area. Learn about them, track their care, and follow
+            updates from the community.{" "}
             <Link href="/" className="font-medium text-[var(--accent)] underline-offset-2 hover:underline">
               Back to home
             </Link>
-            .
           </>
         }
       />
@@ -83,11 +82,11 @@ export default async function DogsDirectoryPage() {
 
       {initialDogs.length === 0 ? (
         <div className="rounded-2xl border border-black/5 bg-white p-8 shadow-sm">
-          <p className="text-[var(--foreground)]">No dogs in the directory yet.</p>
+          <p className="text-[var(--foreground)]">No dogs have been added yet.</p>
           <p className="mt-3 text-sm text-[var(--muted)]">
-            The list only shows dogs whose <strong>status</strong> is <strong>active</strong>. If you
-            created a dog as <strong>archived</strong>, switch it to active under{" "}
-            <strong>Manage dogs → Edit</strong>.
+            Start by adding a familiar face from your area. The list only shows dogs whose{" "}
+            <strong>status</strong> is <strong>active</strong>. If you created a dog as{" "}
+            <strong>archived</strong>, switch it to active under <strong>Manage dogs → Edit</strong>.
           </p>
           {isAdmin ? (
             <p className="mt-6">
@@ -104,8 +103,7 @@ export default async function DogsDirectoryPage() {
             </p>
           ) : (
             <p className="mt-4 text-sm text-[var(--muted)]">
-              Ask an <strong>Admin</strong> to add profiles. (Dog Feeder accounts cannot open Manage
-              dogs.)
+              Ask an <strong>Admin</strong> to add profiles.
             </p>
           )}
         </div>

@@ -165,6 +165,10 @@ export function DogNewForm({
               />
             </div>
           </div>
+          <p className="mt-4 text-xs text-[var(--muted)]">
+            Add an approximate location where this dog is usually seen. This helps others recognise
+            and find them.
+          </p>
         </div>
         <div className="sm:col-span-2 rounded-lg border border-black/5 bg-[var(--background)] px-3 py-3">
           <label className="flex cursor-pointer items-start gap-3 text-sm">

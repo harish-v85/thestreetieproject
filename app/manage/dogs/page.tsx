@@ -10,7 +10,7 @@ import { formatDogLocationLine } from "@/lib/dogs/location-line";
 import { pickCardPhoto } from "@/lib/dogs/photo-focal";
 
 export const metadata: Metadata = {
-  title: "Manage dogs — Streetie",
+  title: "Manage dogs",
 };
 
 type DogRow = {
@@ -98,7 +98,12 @@ export default async function ManageDogsPage() {
       <ManagePageHeader
         icon={<ManageIconDogs />}
         title="Manage dogs"
-        description="Active and archived profiles. Public visitors only see active dogs."
+        description={
+          <>
+            These are the dogs documented in your area. Only active profiles are visible to the
+            public.
+          </>
+        }
       />
 
       {error ? (

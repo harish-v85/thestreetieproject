@@ -144,7 +144,7 @@ export function ManageDogsTable({
       {filtered.length === 0 ? (
         <p className="px-4 py-8 text-center text-[var(--muted)] sm:px-5">
           {rows.length === 0
-            ? "No dogs yet. Use Add dog to create the first profile."
+            ? "No dogs yet. Start by adding the first dog from your area"
             : "No dogs match this search."}
         </p>
       ) : (

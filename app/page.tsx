@@ -11,8 +11,9 @@ import { TspLogoImage, TSP_WORDMARK_TYPOGRAPHY } from "@/components/tsp-brand-lo
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Home — Streetie",
-  description: "Browse street dogs by locality — featured profile and searchable directory.",
+  title: "Home — The Streetie Project",
+  description:
+    "Get to know the street dogs in your area — explore by locality, follow their stories, and see how they’re cared for.",
   icons: {
     icon: [{ url: tspLogoAsset.src, type: "image/svg+xml" }],
     apple: [{ url: tspLogoAsset.src, type: "image/svg+xml" }],
@@ -95,16 +96,19 @@ export default async function Home({
           <h1 className={`text-3xl sm:text-4xl ${TSP_WORDMARK_TYPOGRAPHY}`}>
             The Streetie Project
           </h1>
-          <p className="mt-3 text-[var(--muted)]">
-          A locality-first directory of community dogs. Explore the featured profile below, filter the grid, or open the{" "}
-          <Link
-            href="/dogs"
-            className="font-medium text-[var(--accent)] underline-offset-2 hover:underline"
-          >
-            full directory
-          </Link>
-          .
-        </p>
+          <div className="mt-3 space-y-3 text-[var(--muted)]">
+            <p>Every street has its regulars. This is a shared record of the dogs in your neighbourhood - who they are, where
+              they&apos;re seen, and how they&apos;re cared for. 
+            </p>
+            <p>
+              <Link
+                href="/dogs"
+                className="font-medium text-[var(--accent)] underline-offset-2 hover:underline"
+              >
+                Browse the full directory →
+              </Link>
+            </p>
+          </div>
         </div>
       </header>
 
@@ -135,10 +139,7 @@ export default async function Home({
 
       <h2 className="mb-2 text-lg font-semibold text-[var(--foreground)]">All dogs</h2>
       <p className="mb-6 text-sm text-[var(--muted)]">
-        Search by name, locality, neighbourhood, or street/landmark text.
-        {featured
-          ? " The dog in the banner above is omitted here so it does not appear twice."
-          : null}
+        Search and filter to find dogs by name, area, or characteristics.
       </p>
 
       <HomeDirectoryClient
@@ -151,7 +152,8 @@ export default async function Home({
       />
 
       <footer className="mt-16 border-t border-black/5 pt-8 text-center text-xs text-[var(--muted)]">
-        Next.js + Supabase · Streetie
+        The Streetie Project · Built to help communities live alongside their street dogs with
+        understanding and care.
       </footer>
     </main>
   );

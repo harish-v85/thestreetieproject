@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { LoginForm } from "@/components/login-form";
 
 export const metadata: Metadata = {
-  title: "Sign in — Streetie",
+  title: "Sign in",
   description: "Sign in to manage dogs and feeding logs.",
 };
 
@@ -51,7 +51,7 @@ export default async function LoginPage({
         Sign in
       </h1>
       <p className="mt-2 text-sm text-[var(--muted)]">
-        Use the email and password for your Streetie account.
+        Sign in to update dog profiles, log feeding, and track care.
       </p>
       {q.reset === "success" && (
         <p

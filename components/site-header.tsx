@@ -18,7 +18,7 @@ function AuthLinks({ variant }: { variant: "mobile" | "desktop" }) {
   return (
     <>
       <Link href="/request-access" className={linkMuted}>
-        {isMobile ? "Access" : "Request access"}
+        Request access
       </Link>
       <Link href="/login" className={linkAccent}>
         Sign in

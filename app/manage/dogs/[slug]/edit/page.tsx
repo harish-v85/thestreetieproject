@@ -34,7 +34,7 @@ type PageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  return { title: `Edit ${slug} — Streetie` };
+  return { title: `Edit ${slug}` };
 }
 
 export default async function EditDogPage({ params }: PageProps) {

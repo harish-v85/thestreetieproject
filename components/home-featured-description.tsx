@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 
 export function HomeFeaturedDescription({
+  dogName,
   excerpt,
   descriptionPlain,
 }: {
+  dogName: string;
   excerpt: string;
   descriptionPlain: string;
 }) {
@@ -29,7 +31,11 @@ export function HomeFeaturedDescription({
   }, [descriptionPlain, expanded]);
 
   if (!descriptionPlain.trim()) {
-    return <p className="mt-4 text-sm italic text-[var(--muted)]">No description yet.</p>;
+    return (
+      <p className="mt-4 text-sm italic text-[var(--muted)]">
+        We don&apos;t know enough about {dogName} yet. But we&apos;d love to learn more if you do!
+      </p>
+    );
   }
 
   const excerptDiffers =

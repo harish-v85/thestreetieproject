@@ -75,25 +75,27 @@ export function BatchLogFeedingForm({
           </div>
         </div>
         <p className="mt-1 text-sm text-[var(--muted)]">
-          One feeding entry will be created for each selected dog (same time, notes, and optional
-          coordinates).
+          This creates one entry per selected dog using the same time and notes.
         </p>
-        <label htmlFor="batch_dog_search" className="mt-4 block text-sm font-medium">
-          Search dogs
-        </label>
-        <input
-          id="batch_dog_search"
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Name or location…"
-          autoComplete="off"
-          className="mt-1 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-[var(--accent)] focus:ring-2"
-        />
-        <ul
+        <div
+          className="mt-4 flex max-h-[min(30rem,58vh)] flex-col overflow-hidden rounded-xl border border-black/5 bg-[var(--background)]/50"
           key={idsKey}
-          className="mt-4 max-h-[min(24rem,50vh)] space-y-1 overflow-y-auto rounded-xl border border-black/5 bg-[var(--background)]/50 p-2"
         >
+          <div className="shrink-0 border-b border-black/[0.06] bg-white/90 px-3 py-3">
+            <label htmlFor="batch_dog_search" className="block text-sm font-medium">
+              Search dogs
+            </label>
+            <input
+              id="batch_dog_search"
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name or location…"
+              autoComplete="off"
+              className="mt-1.5 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-[var(--accent)] focus:ring-2"
+            />
+          </div>
+          <ul className="min-h-0 flex-1 space-y-1 overflow-y-auto [scrollbar-gutter:stable] p-2">
           {filteredDogs.length === 0 ? (
             <li className="px-2 py-4 text-center text-sm text-[var(--muted)]">No matches.</li>
           ) : null}
@@ -120,7 +122,8 @@ export function BatchLogFeedingForm({
               </label>
             </li>
           ))}
-        </ul>
+          </ul>
+        </div>
         <p className="mt-2 text-xs text-[var(--muted)]">{selected.size} dog(s) selected</p>
       </div>
 

@@ -5,9 +5,15 @@ import { objectPositionFromFocal } from "@/lib/dogs/photo-focal";
 import { HomeFeaturedDescription } from "@/components/home-featured-description";
 import { dogPhotoPlaceholder } from "@/lib/dogs/photo-placeholder";
 
+/** Same warm gradient as the featured block on the home page (reuse e.g. dog profile v2 sidebar). */
+export const homeFeaturedSurfaceClass =
+  "bg-gradient-to-br from-[#fff5ef] to-[#f0ebe3]";
+
 export function HomeFeatured({ dog }: { dog: FeaturedDogPayload }) {
   return (
-    <section className="mb-12 overflow-hidden rounded-3xl border border-black/5 bg-gradient-to-br from-[#fff5ef] to-[#f0ebe3] shadow-sm">
+    <section
+      className={`mb-12 overflow-hidden rounded-3xl border border-black/5 shadow-sm ${homeFeaturedSurfaceClass}`}
+    >
       <div className="grid gap-0 md:grid-cols-2 md:items-stretch">
         <div className="relative aspect-[4/3] min-h-[220px] bg-[var(--background)] md:aspect-auto md:min-h-[280px]">
           {dog.imageUrl ? (
@@ -36,13 +42,17 @@ export function HomeFeatured({ dog }: { dog: FeaturedDogPayload }) {
         </div>
         <div className="flex flex-col justify-center p-6 sm:p-8 md:p-10">
           <p className="text-xs font-semibold uppercase tracking-widest text-[var(--accent)]">
-            Featured dog
+            In the spotlight
           </p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--foreground)] sm:text-3xl md:text-4xl">
             {dog.name}
           </h2>
           <p className="mt-2 text-sm text-[var(--muted)]">{dog.locationLine}</p>
-          <HomeFeaturedDescription excerpt={dog.excerpt} descriptionPlain={dog.descriptionPlain} />
+          <HomeFeaturedDescription
+            dogName={dog.name}
+            excerpt={dog.excerpt}
+            descriptionPlain={dog.descriptionPlain}
+          />
           <div className="mt-8">
             <Link
               href={`/dogs/${dog.slug}`}

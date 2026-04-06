@@ -105,7 +105,7 @@ function HangoutBuddyChip({ buddy }: { buddy: HangoutBuddyPreview }) {
                   <NeuterBadge status={buddy.neutering_status} />
                   <WelfareBadge status={buddy.welfare_status} />
                 </div>
-                <p className="pt-0.5 text-[10px] text-[var(--muted)]">Click chip to open profile</p>
+                <p className="pt-0.5 text-[10px] text-[var(--muted)]">Click to view profile</p>
               </div>
             </div>
           </div>
@@ -115,13 +115,25 @@ function HangoutBuddyChip({ buddy }: { buddy: HangoutBuddyPreview }) {
   );
 }
 
-export function HangoutBuddyChips({ buddies }: { buddies: HangoutBuddyPreview[] }) {
+const defaultHangoutHeadingClass =
+  "text-sm font-semibold uppercase tracking-wide text-[var(--muted)]";
+
+export function HangoutBuddyChips({
+  buddies,
+  sectionClassName = "mb-10",
+  headingClassName,
+}: {
+  buddies: HangoutBuddyPreview[];
+  /** Override default bottom margin for tighter stacked layouts (e.g. dog profile v2). */
+  sectionClassName?: string;
+  /** e.g. match dog profile v2 section titles (Profile, Photos). */
+  headingClassName?: string;
+}) {
   if (buddies.length === 0) return null;
+  const titleClass = headingClassName ?? defaultHangoutHeadingClass;
   return (
-    <section className="mb-10">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]">
-        Usually hangs out with
-      </h2>
+    <section className={sectionClassName}>
+      <h2 className={titleClass}>Usually seen hanging out with</h2>
       <ul className="mt-3 flex flex-wrap gap-2">
         {buddies.map((b) => (
           <HangoutBuddyChip key={b.slug} buddy={b} />

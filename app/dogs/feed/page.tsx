@@ -9,7 +9,7 @@ import { formatDogLocationLine } from "@/lib/dogs/location-line";
 import { thumbForDogId } from "@/lib/dogs/photo-focal";
 
 export const metadata: Metadata = {
-  title: "Feeding Activity — Streetie",
+  title: "Feeding Activity",
 };
 
 type DogRow = {
@@ -75,19 +75,14 @@ export default async function BatchFeedPage() {
     <main className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
       <nav className="mb-8 text-sm">
         <Link href="/dogs" className="font-medium text-[var(--accent)]">
-          ← All dogs
+          ← Back to All Dogs
         </Link>
       </nav>
 
       <ManagePageHeader
         icon={<FeedIconDogFood />}
-        title="Feeding Activity (Group)"
-        description={
-          <>
-            Use this when the same visit applies to multiple dogs. For a single dog you can still use
-            the form on that dog&apos;s profile.
-          </>
-        }
+        title="Feeding Activity"
+        description={<>Log a feeding for multiple dogs from the same visit.</>}
       />
 
       {error ? (

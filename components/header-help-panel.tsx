@@ -161,7 +161,7 @@ export function HeaderHelpPanel({ variant }: { variant: HelpVariant }) {
           <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
             {loadState === "error" ? (
               <div className="space-y-3">
-                <p className="text-sm text-red-700">Could not load help. Try again.</p>
+                <p className="text-sm text-red-700">Ruh roh. Could not load help. Try again.</p>
                 <button
                   type="button"
                   className="rounded-lg border border-black/15 px-3 py-1.5 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--background)]"

@@ -256,14 +256,14 @@ export function HomeDirectoryClient({
         <div className="flex flex-col gap-3">
           <div className="w-full">
             <label htmlFor="home-search" className="mb-1 block text-xs font-medium text-[var(--muted)]">
-              Search (name, locality, neighbourhood, street…)
+              Search
             </label>
             <input
               id="home-search"
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search…"
+              placeholder="Search by name, locality, neighbourhood, or street…"
               className={DIRECTORY_FILTER_SEARCH_CLASS}
             />
           </div>
@@ -287,7 +287,7 @@ export function HomeDirectoryClient({
                 disabled={neighbourhoodOptions.length === 0}
                 hint={
                   localityIds.length > 0
-                    ? "Options limited by selected localities."
+                    ? "Filtered by selected localities."
                     : undefined
                 }
               />
@@ -426,7 +426,7 @@ export function HomeDirectoryClient({
 
       <p className="mt-6 text-center text-xs text-[var(--muted)]">
         Showing {dogs.length} dog{dogs.length !== 1 ? "s" : ""}
-        {hasMore ? " · Scroll for more" : dogs.length > 0 ? " · End of list" : ""}
+        {hasMore ? " · Scroll to load more" : dogs.length > 0 ? " · End of list" : ""}
       </p>
     </section>
   );

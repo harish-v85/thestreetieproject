@@ -11,8 +11,9 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Streetie — Street dogs in your locality",
-  description: "Local directory of street dogs, feeding and medical records.",
+  title: "The Streetie Project - Street dogs in your locality",
+  description:
+    "A living directory of street dogs — who they are, where they spend time, and how they’re cared for.",
 };
 
 export const viewport: Viewport = {
