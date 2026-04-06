@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { reviewAccessRequest } from "@/app/manage/access-requests/actions";
+import {
+  approveAccessRequestAndAddUser,
+  reviewAccessRequest,
+} from "@/app/manage/access-requests/actions";
 import { emitStreetieFlash } from "@/components/emit-streetie-flash";
 
 export function ReviewButtons({ requestId }: { requestId: string }) {
@@ -18,6 +21,14 @@ export function ReviewButtons({ requestId }: { requestId: string }) {
     });
   }
 
+  function runApproveAndAdd() {
+    setError(null);
+    startTransition(async () => {
+      const r = await approveAccessRequestAndAddUser(requestId);
+      if (r.error) setError(r.error);
+    });
+  }
+
   return (
     <div className="flex flex-col items-end gap-1">
       {error ? (
@@ -26,14 +37,25 @@ export function ReviewButtons({ requestId }: { requestId: string }) {
         </p>
       ) : null}
       <div className="flex flex-wrap justify-end gap-2">
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => run("approved")}
-          className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:opacity-60"
-        >
-          {pending ? "…" : "Approve"}
-        </button>
+        <div className="inline-flex overflow-hidden rounded-lg shadow-sm ring-1 ring-emerald-700/25">
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => run("approved")}
+            className="bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:opacity-60"
+          >
+            {pending ? "…" : "Approve"}
+          </button>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={runApproveAndAdd}
+            className="border-l border-emerald-700/40 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-950 transition hover:bg-emerald-100 disabled:opacity-60"
+            title="Approve this request and open Add user with fields filled from the request"
+          >
+            {pending ? "…" : "Approve and Add"}
+          </button>
+        </div>
         <button
           type="button"
           disabled={pending}

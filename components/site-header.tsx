@@ -97,7 +97,7 @@ export async function SiteHeader() {
   };
 
   return (
-    <header className="border-b border-black/5 bg-white/80 backdrop-blur-sm">
+    <header className="relative z-50 border-b border-black/5 bg-white/80 backdrop-blur-sm">
       <div className="mx-auto w-full max-w-6xl px-4 py-3 sm:px-6 sm:py-4">
         {/* Mobile: hamburger | centered logo | account */}
         <SiteHeaderMobileBar

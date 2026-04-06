@@ -7,6 +7,7 @@ import { ManagePageHeader } from "@/components/manage-page-header";
 import { ManageIconDogs } from "@/components/manage-page-icons";
 import type { ManageDogTableRow } from "@/components/manage-dogs-table";
 import { formatDogLocationLine } from "@/lib/dogs/location-line";
+import { coerceNameAliases } from "@/lib/dogs/name-aliases";
 import { pickCardPhoto } from "@/lib/dogs/photo-focal";
 
 export const metadata: Metadata = {
@@ -50,6 +51,7 @@ export default async function ManageDogsPage() {
       gender,
       neutering_status,
       street_name,
+      name_aliases,
       localities ( name ),
       neighbourhoods ( name )
     `,
@@ -82,6 +84,7 @@ export default async function ManageDogsPage() {
       id: d.id,
       slug: d.slug,
       name: d.name,
+      name_aliases: coerceNameAliases((d as { name_aliases?: unknown }).name_aliases),
       status: d.status,
       updated_at: d.updated_at,
       locationLine: locLabel(d),

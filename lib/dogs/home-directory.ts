@@ -15,6 +15,8 @@ export type HomeDogCard = {
   id: string;
   slug: string;
   name: string;
+  /** Alternate names (also searchable). */
+  name_aliases: string[];
   gender: string;
   neutering_status: string;
   welfare_status: string;

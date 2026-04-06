@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 export type AccessRequestFormState = { error: string | null; success: boolean };
@@ -39,6 +40,8 @@ export async function submitAccessRequest(
   if (error) {
     return { error: error.message, success: false };
   }
+
+  revalidatePath("/");
 
   return { error: null, success: true };
 }

@@ -2,15 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
+import { DogCardInlineNameWithAliases } from "@/components/dog-aliases-strip";
 import { GenderBadge, NeuterBadge } from "@/components/dog-badges";
 import { objectPositionFromFocal } from "@/lib/dogs/photo-focal";
 import { dogPhotoPlaceholder } from "@/lib/dogs/photo-placeholder";
+import { useHoverPreviewDismiss } from "@/lib/hooks/use-hover-preview-dismiss";
 
 export type ManageDogTableRow = {
   id: string;
   slug: string;
   name: string;
+  name_aliases: string[];
   status: string;
   updated_at: string;
   locationLine: string;
@@ -22,47 +25,31 @@ export type ManageDogTableRow = {
 };
 
 function ManageDogNameCell({ row }: { row: ManageDogTableRow }) {
-  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    return () => {
-      if (leaveTimer.current) clearTimeout(leaveTimer.current);
-    };
-  }, []);
-
-  function clearLeave() {
-    if (leaveTimer.current) {
-      clearTimeout(leaveTimer.current);
-      leaveTimer.current = null;
-    }
-  }
-
-  function onEnter() {
-    clearLeave();
-    setOpen(true);
-  }
-
-  function onLeave() {
-    clearLeave();
-    leaveTimer.current = setTimeout(() => setOpen(false), 200);
-  }
+  const { visible, panelClassName, onOpen, onClose } = useHoverPreviewDismiss();
 
   return (
     <td className="px-4 py-3 font-medium text-[var(--foreground)]">
-      <div className="relative inline-block" onMouseEnter={onEnter} onMouseLeave={onLeave}>
+      <div
+        className="relative inline-block"
+        onMouseEnter={onOpen}
+        onMouseLeave={onClose}
+      >
         <Link
           href={`/manage/dogs/${row.slug}/edit`}
           className="text-[var(--foreground)] underline-offset-2 hover:text-[var(--accent)] hover:underline"
+          onFocus={onOpen}
+          onBlur={onClose}
         >
           {row.name}
         </Link>
-        {open ? (
+        {visible ? (
           <div
             className="absolute left-0 top-full z-50 -mt-2 w-[min(calc(100vw-2rem),16rem)] pt-2"
             aria-hidden
           >
-            <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg ring-1 ring-black/5">
+            <div
+              className={`overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg ring-1 ring-black/5 ${panelClassName}`}
+            >
               <div className="relative aspect-[4/3] bg-[var(--background)]">
                 {row.thumb_url ? (
                   <Image
@@ -90,7 +77,14 @@ function ManageDogNameCell({ row }: { row: ManageDogTableRow }) {
                 )}
               </div>
               <div className="space-y-1.5 p-3">
-                <p className="text-sm font-semibold text-[var(--foreground)]">{row.name}</p>
+                <div className="min-w-0">
+                  <DogCardInlineNameWithAliases
+                    name={row.name}
+                    aliases={row.name_aliases}
+                    variant="preview"
+                    nameClassName="text-sm font-semibold text-[var(--foreground)]"
+                  />
+                </div>
                 <p className="text-[11px] leading-snug text-[var(--muted)]">{row.locationLine}</p>
                 <div className="flex flex-wrap items-center gap-1.5 text-xs">
                   <GenderBadge gender={row.gender} />
@@ -131,7 +125,8 @@ export function ManageDogsTable({
         r.locationLine.toLowerCase().includes(s) ||
         r.status.toLowerCase().includes(s) ||
         r.gender.toLowerCase().includes(s) ||
-        r.neutering_status.toLowerCase().includes(s),
+        r.neutering_status.toLowerCase().includes(s) ||
+        r.name_aliases.some((a) => a.toLowerCase().includes(s)),
     );
   }, [rows, filterQuery]);
 
@@ -155,7 +150,7 @@ export function ManageDogsTable({
                 key={d.id}
                 className="grid grid-cols-[4.5rem_1fr] gap-x-3 gap-y-2 rounded-2xl border border-black/5 bg-white p-4 shadow-sm"
               >
-                <div className="relative col-start-1 row-start-1 row-span-2 aspect-square w-full min-h-0 self-start overflow-hidden rounded-lg bg-[var(--background)]">
+                <div className="relative col-start-1 row-start-1 row-span-3 aspect-square w-full min-h-0 self-start overflow-hidden rounded-lg bg-[var(--background)]">
                   {d.thumb_url ? (
                     <Image
                       src={d.thumb_url}
@@ -181,18 +176,24 @@ export function ManageDogsTable({
                     />
                   )}
                 </div>
-                <Link
-                  href={`/manage/dogs/${d.slug}/edit`}
-                  className="col-start-2 row-start-1 min-w-0 self-center truncate text-base font-semibold text-[var(--foreground)] hover:text-[var(--accent)]"
-                >
-                  {d.name}
-                </Link>
-                <p
-                  className="col-start-2 row-start-2 min-w-0 self-start text-[11px] leading-snug text-[var(--muted)]"
-                  title={d.locationLine}
-                >
-                  {d.locationLine}
-                </p>
+                <div className="col-start-2 row-start-1 row-span-2 flex min-w-0 flex-col justify-center gap-1.5">
+                  <Link
+                    href={`/manage/dogs/${d.slug}/edit`}
+                    className="block min-w-0 text-base font-semibold text-[var(--foreground)] hover:text-[var(--accent)]"
+                  >
+                    <DogCardInlineNameWithAliases
+                      name={d.name}
+                      aliases={d.name_aliases}
+                      variant="card"
+                    />
+                  </Link>
+                  <p
+                    className="text-[11px] leading-snug text-[var(--muted)]"
+                    title={d.locationLine}
+                  >
+                    {d.locationLine}
+                  </p>
+                </div>
                 <div className="col-span-2 col-start-1 row-start-3 grid grid-cols-3 gap-x-3">
                   <div className="flex min-w-0 items-center justify-start">
                     <GenderBadge gender={d.gender} />

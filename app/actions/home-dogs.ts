@@ -6,6 +6,7 @@ import {
   type HomeDogCard,
   type HomeDogFilters,
 } from "@/lib/dogs/home-directory";
+import { coerceNameAliases } from "@/lib/dogs/name-aliases";
 import { pickCardPhoto } from "@/lib/dogs/photo-focal";
 
 export async function fetchHomeDogsPage(
@@ -19,7 +20,7 @@ export async function fetchHomeDogsPage(
   let q = supabase
     .from("dogs")
     .select(
-      "id, slug, name, gender, neutering_status, welfare_status, coat_pattern, colour_primary, colour_secondary, colour_tertiary, locality_id, neighbourhood_id, street_name, created_at",
+      "id, slug, name, name_aliases, gender, neutering_status, welfare_status, coat_pattern, colour_primary, colour_secondary, colour_tertiary, locality_id, neighbourhood_id, street_name, created_at",
     )
     .eq("status", "active")
     .order("created_at", { ascending: false });
@@ -118,10 +119,14 @@ export async function fetchHomeDogsPage(
   const dogs: HomeDogCard[] = list.map((d) => {
     const thumb = thumbFor(d.id);
     const street = (d as { street_name?: string | null }).street_name ?? null;
+    const name_aliases = coerceNameAliases(
+      (d as { name_aliases?: unknown }).name_aliases,
+    );
     return {
       id: d.id,
       slug: d.slug,
       name: d.name,
+      name_aliases,
       gender: d.gender,
       neutering_status: d.neutering_status,
       welfare_status: d.welfare_status,
@@ -195,6 +200,14 @@ async function resolveSearchDogIds(
     byNb = data ?? [];
   }
 
+  const aliasRes = await supabase.rpc("dog_ids_matching_alias_ilike", {
+    search_pattern: pattern,
+  });
+  const byAlias: { id: string }[] =
+    !aliasRes.error && aliasRes.data != null
+      ? (Array.isArray(aliasRes.data) ? aliasRes.data : [])
+      : [];
+
   return [
     ...new Set([
       ...(nameRows ?? []).map((r) => r.id),
@@ -202,6 +215,7 @@ async function resolveSearchDogIds(
       ...(landmarkRows ?? []).map((r) => r.id),
       ...byLoc.map((r) => r.id),
       ...byNb.map((r) => r.id),
+      ...byAlias.map((r) => r.id),
     ]),
   ];
 }

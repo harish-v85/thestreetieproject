@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { welfareStatusLabel } from "@/components/dog-badges";
+import { DogAliasesStrip } from "@/components/dog-aliases-strip";
 import { DogPhotoCarousel } from "@/components/dog-photo-carousel";
 import { DogHangoutMapSection } from "@/components/dog-hangout-map-section";
 import { HangoutBuddyChips } from "@/components/hangout-buddy-chips";
@@ -30,7 +31,14 @@ export function DogProfileClassic({ data }: { data: DogProfileData }) {
         <h1 className="text-2xl font-semibold tracking-tight text-[var(--foreground)] sm:text-3xl">
           {dog.name}
         </h1>
-        <p className="mt-2 text-[var(--muted)]">{locationHeadline}</p>
+        {dog.name_aliases.length > 0 ? (
+          <div className="mt-3">
+            <DogAliasesStrip aliases={dog.name_aliases} variant="profile" />
+          </div>
+        ) : null}
+        <p className={`text-[var(--muted)] ${dog.name_aliases.length > 0 ? "mt-3" : "mt-2"}`}>
+          {locationHeadline}
+        </p>
         <div className="mt-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
             Landmark

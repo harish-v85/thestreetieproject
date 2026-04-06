@@ -10,6 +10,7 @@ import { isCloudinaryConfigured } from "@/lib/cloudinary/dog-images";
 import { EditDogMedicalSection } from "@/components/edit-dog-medical-section";
 import { dogRowToCoatDefaults } from "@/lib/dogs/coat";
 import { formatDogLocationLine } from "@/lib/dogs/location-line";
+import { coerceNameAliases } from "@/lib/dogs/name-aliases";
 import { thumbForDogId } from "@/lib/dogs/photo-focal";
 import { DogEditForm } from "../../dog-edit-form";
 
@@ -66,7 +67,8 @@ export default async function EditDogPage({ params }: PageProps) {
       map_lat,
       map_lng,
       status,
-      featured
+      featured,
+      name_aliases
     `,
     )
     .eq("slug", slug)
@@ -186,6 +188,7 @@ export default async function EditDogPage({ params }: PageProps) {
   const dogForForm = {
     ...dog,
     welfare_remarks,
+    name_aliases: coerceNameAliases((dog as { name_aliases?: unknown }).name_aliases),
     neighbourhood_id: dog.neighbourhood_id ?? "",
     street_name: dog.street_name ?? null,
     landmark: dog.landmark ?? null,

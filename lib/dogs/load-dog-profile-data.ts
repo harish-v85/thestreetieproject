@@ -7,6 +7,7 @@ import {
   isCoatPattern,
 } from "@/lib/dogs/coat";
 import { formatDogLocationLine } from "@/lib/dogs/location-line";
+import { coerceNameAliases } from "@/lib/dogs/name-aliases";
 import { pickCardPhoto } from "@/lib/dogs/photo-focal";
 import { recorderNameMap } from "@/lib/dogs/recorder-name-map";
 import type { HangoutBuddyPreview } from "@/components/hangout-buddy-chips";
@@ -80,6 +81,7 @@ export type DogProfileData = {
     created_at: string;
     updated_at: string;
     welfare_status_updated_at: string | null;
+    name_aliases: string[];
   };
   locationHeadline: string;
   carouselPhotos: DogProfileCarouselPhoto[];
@@ -134,6 +136,7 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
       created_at,
       updated_at,
       welfare_status_updated_at,
+      name_aliases,
       localities ( name, slug ),
       neighbourhoods ( name ),
       dog_photos ( id, url, is_primary, sort_order, caption, focal_x, focal_y, uploaded_at )
@@ -278,6 +281,7 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
     id: string;
     slug: string;
     name: string;
+    name_aliases: string[] | null;
     gender: string;
     neutering_status: string;
     welfare_status: string;
@@ -301,7 +305,7 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
     const { data: buddyDogs } = await supabase
       .from("dogs")
       .select(
-        "id, slug, name, gender, neutering_status, welfare_status, locality_id, neighbourhood_id, street_name",
+        "id, slug, name, name_aliases, gender, neutering_status, welfare_status, locality_id, neighbourhood_id, street_name",
       )
       .in("id", hangoutCompanionIds)
       .eq("status", "active")
@@ -342,6 +346,7 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
       return {
         slug: d.slug,
         name: d.name,
+        name_aliases: coerceNameAliases(d.name_aliases),
         gender: d.gender,
         neutering_status: d.neutering_status,
         welfare_status: d.welfare_status,
@@ -376,6 +381,9 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
       created_at: dog.created_at,
       updated_at: dog.updated_at,
       welfare_status_updated_at: dog.welfare_status_updated_at ?? null,
+      name_aliases: coerceNameAliases(
+        (dog as { name_aliases?: unknown }).name_aliases,
+      ),
     },
     locationHeadline,
     carouselPhotos,

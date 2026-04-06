@@ -6,10 +6,21 @@ import { createUserAdmin, type UserFormState } from "./actions";
 
 const initial: UserFormState = { error: null };
 
+export type UserNewPrefill = {
+  email: string;
+  full_name: string;
+  phone: string | null;
+  role: "dog_feeder" | "admin";
+  locality_id: string | null;
+  defaultPassword: string;
+};
+
 export function UserNewForm({
   localities,
+  prefill,
 }: {
   localities: { id: string; name: string }[];
+  prefill?: UserNewPrefill | null;
 }) {
   const [state, formAction, pending] = useActionState(createUserAdmin, initial);
 
@@ -26,6 +37,7 @@ export function UserNewForm({
             type="email"
             required
             autoComplete="off"
+            defaultValue={prefill?.email ?? ""}
             className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
           />
         </div>
@@ -40,6 +52,7 @@ export function UserNewForm({
             required
             minLength={8}
             autoComplete="new-password"
+            defaultValue={prefill?.defaultPassword ?? ""}
             className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
           />
         </div>
@@ -51,6 +64,7 @@ export function UserNewForm({
             id="full_name"
             name="full_name"
             required
+            defaultValue={prefill?.full_name ?? ""}
             className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
           />
         </div>
@@ -62,6 +76,7 @@ export function UserNewForm({
             id="phone"
             name="phone"
             type="tel"
+            defaultValue={prefill?.phone ?? ""}
             className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
           />
         </div>
@@ -73,7 +88,7 @@ export function UserNewForm({
             id="role"
             name="role"
             required
-            defaultValue="dog_feeder"
+            defaultValue={prefill?.role ?? "dog_feeder"}
             className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
           >
             <option value="dog_feeder">Dog Feeder</option>
@@ -88,6 +103,7 @@ export function UserNewForm({
           <select
             id="locality_id"
             name="locality_id"
+            defaultValue={prefill?.locality_id ?? ""}
             className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
           >
             <option value="">—</option>

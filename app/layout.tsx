@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import { Suspense } from "react";
+import { AccessRequestsPendingRibbon } from "@/components/access-requests-pending-ribbon";
 import { AuthHashHandler } from "@/components/auth-hash-handler";
 import { FlashRibbon } from "@/components/flash-ribbon";
 import { SiteHeader } from "@/components/site-header";
+import { TimezoneCookieSetter } from "@/components/timezone-cookie-setter";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -34,7 +36,11 @@ export default function RootLayout({
         className={`${dmSans.className} min-h-screen overflow-x-hidden antialiased [padding:env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]`}
       >
         <AuthHashHandler />
+        <TimezoneCookieSetter />
         <SiteHeader />
+        <Suspense fallback={null}>
+          <AccessRequestsPendingRibbon />
+        </Suspense>
         <Suspense fallback={null}>
           <FlashRibbon />
         </Suspense>

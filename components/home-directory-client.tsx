@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchHomeDogsPage } from "@/app/actions/home-dogs";
 import type { HomeDogCard, HomeDogFilters } from "@/lib/dogs/home-directory";
+import { DogCardInlineNameWithAliases } from "@/components/dog-aliases-strip";
 import { GenderBadge, NeuterBadge, WelfareBadge } from "@/components/dog-badges";
 import { MultiSelectDropdown } from "@/components/multi-select-dropdown";
 import { SingleSelectDropdown } from "@/components/single-select-dropdown";
@@ -60,8 +61,13 @@ function DogMiniCard({ dog }: { dog: HomeDogCard }) {
         )}
       </div>
       <div className="space-y-2 p-4">
-        <h3 className="text-base font-semibold text-[var(--foreground)] group-hover:text-[var(--accent)]">
-          {dog.name}
+        <h3 className="min-w-0 text-base font-semibold">
+          <DogCardInlineNameWithAliases
+            name={dog.name}
+            aliases={dog.name_aliases}
+            variant="card"
+            nameClassName="text-[var(--foreground)] group-hover:text-[var(--accent)]"
+          />
         </h3>
         <p className="text-xs text-[var(--muted)]">
           {formatDogLocationLine(

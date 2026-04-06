@@ -5,6 +5,7 @@ import { redirectWithFlash } from "@/lib/redirect-with-flash";
 import { createClient } from "@/lib/supabase/server";
 import { requirePrivileged } from "@/lib/auth/require-privileged";
 import { parseCoatFromFormData } from "@/lib/dogs/coat";
+import { normalizeNameAliasesJson } from "@/lib/dogs/name-aliases";
 import { slugify } from "@/lib/dogs/slugify";
 
 const UUID_RE =
@@ -13,6 +14,10 @@ const UUID_RE =
 /** PostgREST/Postgres error when `welfare_remarks` column is not migrated yet. */
 function missingWelfareRemarksColumn(err: { message?: string }): boolean {
   return (err.message ?? "").toLowerCase().includes("welfare_remarks");
+}
+
+function missingNameAliasesColumn(err: { message?: string }): boolean {
+  return (err.message ?? "").toLowerCase().includes("name_aliases");
 }
 
 function parseHangoutCompanionIds(formData: FormData, dogId: string): string[] {
@@ -104,9 +109,12 @@ export async function createDog(
   const primary_photo_url = String(formData.get("primary_photo_url") ?? "").trim();
   const wantFeatured = formData.get("featured") === "on";
 
+  const name_aliases = normalizeNameAliasesJson(String(formData.get("name_aliases_json") ?? ""));
+
   const insertBase = {
     slug,
     name,
+    name_aliases,
     description,
     gender,
     coat_pattern: coatParsed.coat_pattern,
@@ -135,6 +143,25 @@ export async function createDog(
     ({ data: dog, error } = await supabase
       .from("dogs")
       .insert(insertBase)
+      .select("id, slug")
+      .single());
+  }
+
+  if (error && missingNameAliasesColumn(error)) {
+    const { name_aliases, ...withoutAliases } = insertBase;
+    void name_aliases;
+    ({ data: dog, error } = await supabase
+      .from("dogs")
+      .insert({ ...withoutAliases, welfare_remarks })
+      .select("id, slug")
+      .single());
+  }
+  if (error && missingNameAliasesColumn(error)) {
+    const { name_aliases, ...withoutAliases } = insertBase;
+    void name_aliases;
+    ({ data: dog, error } = await supabase
+      .from("dogs")
+      .insert(withoutAliases)
       .select("id, slug")
       .single());
   }
@@ -219,9 +246,12 @@ export async function updateDog(
     await supabase.from("dogs").update({ featured: false }).neq("id", dogId);
   }
 
+  const name_aliases = normalizeNameAliasesJson(String(formData.get("name_aliases_json") ?? ""));
+
   const updateBase = {
     slug,
     name,
+    name_aliases,
     description,
     gender,
     coat_pattern: coatParsed.coat_pattern,
@@ -246,6 +276,20 @@ export async function updateDog(
 
   if (error && missingWelfareRemarksColumn(error)) {
     ({ error } = await supabase.from("dogs").update(updateBase).eq("id", dogId));
+  }
+
+  if (error && missingNameAliasesColumn(error)) {
+    const { name_aliases, ...withoutAliases } = updateBase;
+    void name_aliases;
+    ({ error } = await supabase
+      .from("dogs")
+      .update({ ...withoutAliases, welfare_remarks })
+      .eq("id", dogId));
+  }
+  if (error && missingNameAliasesColumn(error)) {
+    const { name_aliases, ...withoutAliases } = updateBase;
+    void name_aliases;
+    ({ error } = await supabase.from("dogs").update(withoutAliases).eq("id", dogId));
   }
 
   if (error) return { error: error.message };

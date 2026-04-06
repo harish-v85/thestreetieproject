@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 function computeInitials(displayName: string, email: string): string {
@@ -99,6 +100,14 @@ export function HeaderUserMenu({
             ) : null}
           </div>
           <div className="p-2">
+            <Link
+              href="/profile"
+              className="mb-1 block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--background)]"
+              role="menuitem"
+              onClick={close}
+            >
+              My profile
+            </Link>
             <form action="/auth/signout" method="post">
               <button
                 type="submit"

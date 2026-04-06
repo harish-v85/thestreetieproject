@@ -2,15 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { DogCardInlineNameWithAliases } from "@/components/dog-aliases-strip";
 import { GenderBadge, NeuterBadge, WelfareBadge } from "@/components/dog-badges";
 import { formatDogLocationLine } from "@/lib/dogs/location-line";
 import { objectPositionFromFocal } from "@/lib/dogs/photo-focal";
 import { dogPhotoPlaceholder } from "@/lib/dogs/photo-placeholder";
+import { useHoverPreviewDismiss } from "@/lib/hooks/use-hover-preview-dismiss";
 
 export type HangoutBuddyPreview = {
   slug: string;
   name: string;
+  name_aliases: string[];
   gender: string;
   neutering_status: string;
   welfare_status: string;
@@ -23,31 +25,7 @@ export type HangoutBuddyPreview = {
 };
 
 function HangoutBuddyChip({ buddy }: { buddy: HangoutBuddyPreview }) {
-  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    return () => {
-      if (leaveTimer.current) clearTimeout(leaveTimer.current);
-    };
-  }, []);
-
-  function clearLeave() {
-    if (leaveTimer.current) {
-      clearTimeout(leaveTimer.current);
-      leaveTimer.current = null;
-    }
-  }
-
-  function onEnter() {
-    clearLeave();
-    setOpen(true);
-  }
-
-  function onLeave() {
-    clearLeave();
-    leaveTimer.current = setTimeout(() => setOpen(false), 200);
-  }
+  const { visible, panelClassName, onOpen, onClose } = useHoverPreviewDismiss();
 
   const nb =
     buddy.neighbourhood_name && buddy.neighbourhood_name !== "—"
@@ -57,20 +35,28 @@ function HangoutBuddyChip({ buddy }: { buddy: HangoutBuddyPreview }) {
 
   return (
     <li>
-      <div className="relative inline-block" onMouseEnter={onEnter} onMouseLeave={onLeave}>
+      <div
+        className="relative inline-block"
+        onMouseEnter={onOpen}
+        onMouseLeave={onClose}
+      >
         <Link
           href={`/dogs/${buddy.slug}`}
           className="inline-flex rounded-full border border-black/10 bg-white px-3 py-1 text-sm font-medium text-[var(--foreground)] shadow-sm transition hover:border-[var(--accent)]/40 hover:text-[var(--accent)]"
+          onFocus={onOpen}
+          onBlur={onClose}
         >
           {buddy.name}
         </Link>
 
-        {open ? (
+        {visible ? (
           <div
             className="absolute left-1/2 top-full z-50 -mt-2 w-[min(calc(100vw-2rem),16rem)] -translate-x-1/2 pt-2 sm:left-0 sm:translate-x-0"
             aria-hidden
           >
-            <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg ring-1 ring-black/5">
+            <div
+              className={`overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg ring-1 ring-black/5 ${panelClassName}`}
+            >
               <div className="relative aspect-[4/3] bg-[var(--background)]">
                 {buddy.thumb_url ? (
                   <Image
@@ -98,7 +84,14 @@ function HangoutBuddyChip({ buddy }: { buddy: HangoutBuddyPreview }) {
                 )}
               </div>
               <div className="space-y-1.5 p-3">
-                <p className="text-sm font-semibold text-[var(--foreground)]">{buddy.name}</p>
+                <div className="min-w-0">
+                  <DogCardInlineNameWithAliases
+                    name={buddy.name}
+                    aliases={buddy.name_aliases}
+                    variant="preview"
+                    nameClassName="text-sm font-semibold text-[var(--foreground)]"
+                  />
+                </div>
                 <p className="text-[11px] leading-snug text-[var(--muted)]">{locLine}</p>
                 <div className="flex flex-wrap items-center gap-1.5 text-xs">
                   <GenderBadge gender={buddy.gender} />

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { DogCardInlineNameWithAliases } from "@/components/dog-aliases-strip";
 import type { FeaturedDogPayload } from "@/lib/dogs/load-featured";
 import { objectPositionFromFocal } from "@/lib/dogs/photo-focal";
 import { HomeFeaturedDescription } from "@/components/home-featured-description";
@@ -44,8 +45,8 @@ export function HomeFeatured({ dog }: { dog: FeaturedDogPayload }) {
           <p className="text-xs font-semibold uppercase tracking-widest text-[var(--accent)]">
             In the spotlight
           </p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--foreground)] sm:text-3xl md:text-4xl">
-            {dog.name}
+          <h2 className="mt-2 min-w-0 text-2xl font-semibold tracking-tight text-[var(--foreground)] sm:text-3xl md:text-4xl">
+            <DogCardInlineNameWithAliases name={dog.name} aliases={dog.name_aliases} variant="featured" />
           </h2>
           <p className="mt-2 text-sm text-[var(--muted)]">{dog.locationLine}</p>
           <HomeFeaturedDescription

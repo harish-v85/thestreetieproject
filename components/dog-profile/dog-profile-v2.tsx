@@ -1,4 +1,5 @@
 import { CompassIcon } from "@phosphor-icons/react/ssr";
+import { DogAliasesStrip } from "@/components/dog-aliases-strip";
 import Image from "next/image";
 import Link from "next/link";
 import { welfareStatusLabel } from "@/components/dog-badges";
@@ -113,7 +114,19 @@ export function DogProfileV2({ data }: { data: DogProfileData }) {
             >
               {dog.name}
             </h1>
-            <p className={`mt-2 text-base sm:text-lg ${heroText.location}`}>{locationHeadline}</p>
+            {dog.name_aliases.length > 0 ? (
+              <div className="mt-3 max-w-2xl">
+                <DogAliasesStrip
+                  aliases={dog.name_aliases}
+                  variant={useLightText ? "heroLight" : "profile"}
+                />
+              </div>
+            ) : null}
+            <p
+              className={`text-base sm:text-lg ${heroText.location} ${dog.name_aliases.length > 0 ? "mt-3" : "mt-2"}`}
+            >
+              {locationHeadline}
+            </p>
             {dog.description ? (
               <div
                 className={`mt-5 max-w-2xl whitespace-pre-wrap text-sm leading-relaxed sm:text-base ${heroText.body}`}

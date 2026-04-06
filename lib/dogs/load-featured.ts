@@ -1,12 +1,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { excerptFromDescription, plainTextFromDescription } from "@/lib/dogs/excerpt";
 import { formatDogLocationLine } from "@/lib/dogs/location-line";
+import { coerceNameAliases } from "@/lib/dogs/name-aliases";
 import { pickCardPhoto } from "@/lib/dogs/photo-focal";
 
 export type FeaturedDogPayload = {
   id: string;
   slug: string;
   name: string;
+  name_aliases: string[];
   excerpt: string;
   /** Full plain description (same cleaning as excerpt, not truncated). */
   descriptionPlain: string;
@@ -30,7 +32,7 @@ export async function loadFeaturedDogPayload(
   const { data: featured, error: feErr } = await supabase
     .from("dogs")
     .select(
-      "id, slug, name, description, street_name, neighbourhoods ( name ), localities ( name )",
+      "id, slug, name, name_aliases, description, street_name, neighbourhoods ( name ), localities ( name )",
     )
     .eq("status", "active")
     .eq("featured", true)
@@ -47,7 +49,7 @@ export async function loadFeaturedDogPayload(
     : await supabase
         .from("dogs")
         .select(
-          "id, slug, name, description, street_name, neighbourhoods ( name ), localities ( name )",
+          "id, slug, name, name_aliases, description, street_name, neighbourhoods ( name ), localities ( name )",
         )
         .eq("status", "active")
         .order("created_at", { ascending: false })
@@ -77,10 +79,15 @@ export async function loadFeaturedDogPayload(
 
   const descriptionPlain = plainTextFromDescription(row.description);
 
+  const name_aliases = coerceNameAliases(
+    (row as { name_aliases?: unknown }).name_aliases,
+  );
+
   return {
     id: row.id,
     slug: row.slug,
     name: row.name,
+    name_aliases,
     excerpt: excerptFromDescription(row.description),
     descriptionPlain,
     locationLine,

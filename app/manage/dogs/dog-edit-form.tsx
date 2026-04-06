@@ -8,6 +8,7 @@ import {
   type HangoutOption,
 } from "@/components/hangout-companions-field";
 import { DogCoatFields } from "@/components/dog-coat-fields";
+import { DogNameAliasField } from "@/components/dog-name-alias-field";
 import { HangoutCoordsField } from "@/components/hangout-coords-field";
 import type { DogCoatDefaults } from "@/lib/dogs/coat";
 import { updateDog, type DogFormState } from "./actions";
@@ -42,6 +43,7 @@ type DogRow = {
   map_lng: number | null;
   status: string;
   featured: boolean;
+  name_aliases: string[];
 };
 
 export function DogEditForm({
@@ -79,6 +81,7 @@ export function DogEditForm({
               className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
             />
           </div>
+          <DogNameAliasField initialAliases={dog.name_aliases} idPrefix="edit_dog_alias" />
           <div>
             <label htmlFor="gender" className="mb-1 block text-sm font-medium">
               Gender

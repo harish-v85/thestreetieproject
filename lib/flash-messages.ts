@@ -27,6 +27,7 @@ export const FLASH_MESSAGES = {
   user_updated: { message: "User updated." },
   access_request_approved: { message: "Access request approved." },
   access_request_rejected: { message: "Access request rejected." },
+  profile_saved: { message: "Profile saved." },
 } as const;
 
 export type FlashKey = keyof typeof FLASH_MESSAGES;

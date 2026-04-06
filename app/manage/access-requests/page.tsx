@@ -6,6 +6,10 @@ import {
   ManageAccessRequestsListing,
   type AccessRequestListRow,
 } from "@/components/manage-access-requests-listing";
+import { ManageAccessRequestsStats } from "@/components/manage-access-requests-stats";
+import { formatTimeZoneAbbreviation } from "@/lib/timezone/format-timezone-display";
+import { getRequestTimeZone } from "@/lib/timezone/request-timezone";
+import { startOfZonedDayISO, startOfZonedMonthISO } from "@/lib/timezone/zoned-bounds";
 import { ManagePageHeader } from "@/components/manage-page-header";
 import { ManageIconAccessRequests } from "@/components/manage-page-icons";
 
@@ -36,6 +40,43 @@ export default async function AccessRequestsPage() {
     reviewed_at: r.reviewed_at,
     created_at: r.created_at,
   }));
+
+  const timeZone = await getRequestTimeZone();
+  const now = new Date();
+  const timeZoneAbbrev = formatTimeZoneAbbreviation(timeZone, now);
+  const monthStart = startOfZonedMonthISO(timeZone, now);
+  const dayStart = startOfZonedDayISO(timeZone, now);
+
+  const [totalRes, monthRes, todayRes, pendingRes, approvedRes, rejectedRes] = await Promise.all([
+    supabase.from("access_requests").select("id", { count: "exact", head: true }),
+    supabase
+      .from("access_requests")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", monthStart),
+    supabase
+      .from("access_requests")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", dayStart),
+    supabase
+      .from("access_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending"),
+    supabase
+      .from("access_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "approved"),
+    supabase
+      .from("access_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "rejected"),
+  ]);
+
+  const totalAllTime = totalRes.error ? 0 : (totalRes.count ?? 0);
+  const totalThisMonth = monthRes.error ? 0 : (monthRes.count ?? 0);
+  const totalToday = todayRes.error ? 0 : (todayRes.count ?? 0);
+  const countPending = pendingRes.error ? 0 : (pendingRes.count ?? 0);
+  const countApproved = approvedRes.error ? 0 : (approvedRes.count ?? 0);
+  const countRejected = rejectedRes.error ? 0 : (rejectedRes.count ?? 0);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
@@ -70,7 +111,18 @@ export default async function AccessRequestsPage() {
           {error.message}
         </p>
       ) : (
-        <ManageAccessRequestsListing rows={listRows} />
+        <>
+          <ManageAccessRequestsStats
+            totalAllTime={totalAllTime}
+            totalThisMonth={totalThisMonth}
+            totalToday={totalToday}
+            countPending={countPending}
+            countApproved={countApproved}
+            countRejected={countRejected}
+            timeZoneLabel={timeZoneAbbrev}
+          />
+          <ManageAccessRequestsListing rows={listRows} />
+        </>
       )}
     </main>
   );
