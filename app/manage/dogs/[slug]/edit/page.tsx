@@ -12,6 +12,7 @@ import { dogRowToCoatDefaults } from "@/lib/dogs/coat";
 import { formatDogLocationLine } from "@/lib/dogs/location-line";
 import { coerceNameAliases } from "@/lib/dogs/name-aliases";
 import { thumbForDogId } from "@/lib/dogs/photo-focal";
+import { loadDistinctStreetNames } from "@/lib/dogs/load-street-suggestions";
 import { DogEditForm } from "../../dog-edit-form";
 
 type HangoutDogRow = {
@@ -127,6 +128,8 @@ export default async function EditDogPage({ params }: PageProps) {
     .select("id, locality_id, name")
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
+
+  const streetSuggestions = await loadDistinctStreetNames();
 
   const { data: hangoutPairRows } = await supabase
     .from("dog_hangout_pairs")
@@ -247,6 +250,7 @@ export default async function EditDogPage({ params }: PageProps) {
           neighbourhoods={neighbourhoods ?? []}
           hangoutOptions={hangoutOptions}
           defaultHangoutCompanionIds={defaultHangoutCompanionIds}
+          streetSuggestions={streetSuggestions}
         />
       </div>
 

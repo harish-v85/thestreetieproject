@@ -60,6 +60,7 @@ export function DogEditForm({
   neighbourhoods,
   hangoutOptions,
   defaultHangoutCompanionIds,
+  streetSuggestions,
 }: {
   dog: DogRow;
   coatDefaults: DogCoatDefaults;
@@ -67,6 +68,7 @@ export function DogEditForm({
   neighbourhoods: { id: string; locality_id: string; name: string }[];
   hangoutOptions: HangoutOption[];
   defaultHangoutCompanionIds: string[];
+  streetSuggestions: string[];
 }) {
   const boundUpdate = updateDog.bind(null, dog.id, dog.slug);
   const [state, formAction, pending] = useActionState(boundUpdate, initial);
@@ -240,6 +242,7 @@ export function DogEditForm({
               defaultNeighbourhoodId={dog.neighbourhood_id}
               defaultStreetName={dog.street_name ?? ""}
               defaultLandmark={dog.landmark ?? ""}
+              streetSuggestions={streetSuggestions}
             />
           </div>
           <HangoutCoordsField

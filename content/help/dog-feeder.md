@@ -11,7 +11,7 @@
 1. In the top navigation, open **Dogs**, then **Feeding Activity**.
 2. Under **Select dogs**, tick each dog you fed (use **Select all** or **Clear** if that helps).
 3. Optionally use **Search dogs** to narrow the list.
-4. Fill in **When**, **Notes**, and any optional location fields for this visit.
+4. Fill in **When**, **Notes**, and optionally **Feeding location** using **Add map location** or **Add coordinates** (same as logging for one dog). You can leave location empty.
 5. Click **Save feeding for selected dogs** — one entry is stored per selected dog for the same time and notes.
 
 ## How to update welfare check status from a dog’s profile page

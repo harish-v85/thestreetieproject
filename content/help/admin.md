@@ -9,7 +9,7 @@
 
 1. Open **Dogs** → **Feeding Activity**.
 2. Under **Select dogs**, tick each dog you fed.
-3. Set **When**, **Notes**, and any optional coordinates for this visit.
+3. Set **When**, **Notes**, and optionally **Feeding location** using **Add map location** or **Add coordinates** (same as on a dog profile). You can leave location empty.
 4. Click **Save feeding for selected dogs** so each selected dog gets one entry for that visit.
 
 ## How to add a new dog

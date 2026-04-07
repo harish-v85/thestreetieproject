@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { StreetNameCombobox } from "@/components/street-name-combobox";
 
 export type NeighbourhoodOption = { id: string; locality_id: string; name: string };
 
@@ -11,6 +12,7 @@ export function DogLocationFields({
   defaultNeighbourhoodId,
   defaultStreetName = "",
   defaultLandmark = "",
+  streetSuggestions = [],
 }: {
   localities: { id: string; name: string }[];
   neighbourhoods: NeighbourhoodOption[];
@@ -18,6 +20,8 @@ export function DogLocationFields({
   defaultNeighbourhoodId: string;
   defaultStreetName?: string;
   defaultLandmark?: string;
+  /** Distinct street names already used on dogs — powers autocomplete; free text still allowed. */
+  streetSuggestions?: string[];
 }) {
   const [localityId, setLocalityId] = useState(
     defaultLocalityId || localities[0]?.id || "",
@@ -88,19 +92,19 @@ export function DogLocationFields({
           ))}
         </select>
       </div>
-      <div>
+      <div className="sm:col-span-2">
         <label htmlFor="street_name" className="mb-1 block text-sm font-medium">
-          Street name <span className="text-[var(--muted)]">(free text)</span>
+          Street name
         </label>
-        <input
+        <StreetNameCombobox
           id="street_name"
           name="street_name"
           defaultValue={defaultStreetName}
+          suggestions={streetSuggestions}
           placeholder="e.g. Museum Road, Lane 4 behind Amrita Hospital"
-          className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
         />
       </div>
-      <div>
+      <div className="sm:col-span-2">
         <label htmlFor="landmark" className="mb-1 block text-sm font-medium">
           Landmark <span className="text-[var(--muted)]">(optional)</span>
         </label>

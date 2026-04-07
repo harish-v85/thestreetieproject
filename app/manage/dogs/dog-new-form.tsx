@@ -33,10 +33,12 @@ export function DogNewForm({
   localities,
   neighbourhoods,
   hangoutOptions,
+  streetSuggestions,
 }: {
   localities: { id: string; name: string }[];
   neighbourhoods: { id: string; locality_id: string; name: string }[];
   hangoutOptions: HangoutOption[];
+  streetSuggestions: string[];
 }) {
   const [state, formAction, pending] = useActionState(createDog, initial);
 
@@ -205,6 +207,7 @@ export function DogNewForm({
               defaultNeighbourhoodId={
                 neighbourhoods.find((n) => n.locality_id === localities[0]?.id)?.id ?? ""
               }
+              streetSuggestions={streetSuggestions}
             />
           </div>
           <HangoutCoordsField defaultLat={null} defaultLng={null} dogName="the new dog" />

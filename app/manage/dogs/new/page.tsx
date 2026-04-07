@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requirePrivileged } from "@/lib/auth/require-privileged";
 import { formatDogLocationLine } from "@/lib/dogs/location-line";
 import { thumbForDogId } from "@/lib/dogs/photo-focal";
+import { loadDistinctStreetNames } from "@/lib/dogs/load-street-suggestions";
 import { DogNewForm } from "../dog-new-form";
 
 export const metadata: Metadata = {
@@ -41,6 +42,8 @@ export default async function NewDogPage() {
     .select("id, locality_id, name")
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
+
+  const streetSuggestions = await loadDistinctStreetNames();
 
   const { data: hangoutOptionRows } = await supabase
     .from("dogs")
@@ -117,6 +120,7 @@ export default async function NewDogPage() {
           localities={localities ?? []}
           neighbourhoods={neighbourhoods ?? []}
           hangoutOptions={hangoutOptions}
+          streetSuggestions={streetSuggestions}
         />
       </div>
     </main>
