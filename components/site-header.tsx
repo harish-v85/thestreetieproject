@@ -98,18 +98,22 @@ export async function SiteHeader() {
 
   return (
     <header className="relative z-50 border-b border-black/5 bg-white/80 backdrop-blur-sm">
-      <div className="mx-auto w-full max-w-6xl px-4 py-3 sm:px-6 sm:py-4">
-        {/* Mobile: hamburger | centered logo | account */}
+      <div className="mx-auto w-full max-w-6xl px-4 py-2 sm:px-6 sm:py-3">
+        {/* Mobile: hamburger | logo | help or sign-in (account lives in the drawer) */}
         <SiteHeaderMobileBar
           navProps={navProps}
-          authSlot={
+          signedInAccount={
+            user
+              ? {
+                  displayName: (profile?.full_name ?? "").trim() || user.email || "Account",
+                  email: user.email ?? "",
+                  roleLabel,
+                }
+              : null
+          }
+          mobileTopBarRight={
             user ? (
-              <SignedInActions
-                helpVariant={helpVariant}
-                profile={profile}
-                user={user}
-                roleLabel={roleLabel}
-              />
+              helpVariant ? <HeaderHelpPanel variant={helpVariant} /> : null
             ) : (
               <AuthLinks variant="mobile" />
             )

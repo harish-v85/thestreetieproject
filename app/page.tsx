@@ -6,8 +6,7 @@ import { HomeDirectoryClient } from "@/components/home-directory-client";
 import { HomeFeatured } from "@/components/home-featured";
 import { loadFeaturedDogPayload } from "@/lib/dogs/load-featured";
 import { loadDirectoryFilterOptions } from "@/lib/dogs/load-directory-filter-options";
-import tspLogoAsset from "@/content/tsp-logo.svg";
-import { TspLogoImage, TSP_WORDMARK_TYPOGRAPHY } from "@/components/tsp-brand-logo";
+import { getFaviconSrc, TspLogoImage, TSP_WORDMARK_TYPOGRAPHY } from "@/components/tsp-brand-logo";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -15,8 +14,8 @@ export const metadata: Metadata = {
   description:
     "Get to know the street dogs in your area — explore by locality, follow their stories, and see how they’re cared for.",
   icons: {
-    icon: [{ url: tspLogoAsset.src, type: "image/svg+xml" }],
-    apple: [{ url: tspLogoAsset.src, type: "image/svg+xml" }],
+    icon: [{ url: getFaviconSrc().src, type: "image/svg+xml" }],
+    apple: [{ url: getFaviconSrc().src, type: "image/svg+xml" }],
   },
 };
 
@@ -83,19 +82,20 @@ export default async function Home({
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
-      <header className="mb-10 flex flex-col items-center gap-5 text-center sm:flex-row sm:items-start sm:gap-6 sm:text-left">
+      <header className="mb-10 flex flex-col items-center gap-5 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left">
         <TspLogoImage
-          className="h-20 w-20 shrink-0 object-contain sm:h-24 sm:w-24"
-          width={192}
-          height={192}
+          className="h-32 w-32 shrink-0 object-contain"
+          width={256}
+          height={256}
         />
-        <div className="min-w-0">
-          <h1 className={`text-3xl sm:text-4xl ${TSP_WORDMARK_TYPOGRAPHY}`}>
+        <div className="min-w-0 flex-1">
+          <h1 className={`text-2xl sm:text-3xl lg:text-4xl ${TSP_WORDMARK_TYPOGRAPHY}`}>
             The Streetie Project
           </h1>
-          <div className="mt-3 space-y-3 text-[var(--muted)]">
-            <p>Every street has its regulars. This is a shared record of the dogs in your neighbourhood - who they are, where
-              they&apos;re seen, and how they&apos;re cared for. 
+          <div className="mt-2.5 space-y-2.5 text-sm leading-relaxed text-[var(--muted)] sm:mt-3 sm:space-y-3 sm:text-base sm:leading-relaxed">
+            <p>
+              Every street has its regulars. This is a shared record of the dogs in your neighbourhood
+              - who they are, where they&apos;re seen, and how they&apos;re cared for.
             </p>
             <p>
               <Link

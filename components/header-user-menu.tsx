@@ -1,10 +1,11 @@
 "use client";
 
+import { SignOut } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HoverTooltip } from "@/components/ui/hover-tooltip";
 
-function computeInitials(displayName: string, email: string): string {
+export function computeHeaderAccountInitials(displayName: string, email: string): string {
   const s = displayName.trim();
   if (s) {
     const parts = s.split(/\s+/).filter(Boolean);
@@ -55,7 +56,7 @@ export function HeaderUserMenu({
   }, [open, close]);
 
   const initials = useMemo(
-    () => computeInitials(displayName, email),
+    () => computeHeaderAccountInitials(displayName, email),
     [displayName, email],
   );
 
@@ -113,10 +114,11 @@ export function HeaderUserMenu({
             <form action="/auth/signout" method="post">
               <button
                 type="submit"
-                className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-left text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--background)]"
+                className="flex w-full items-center justify-between gap-2 rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/10 px-3 py-2 text-left text-sm font-medium text-[var(--accent)] transition hover:bg-[var(--accent)]/20"
                 role="menuitem"
               >
-                Sign out
+                <span>Sign out</span>
+                <SignOut className="h-5 w-5 shrink-0 opacity-90" weight="regular" aria-hidden />
               </button>
             </form>
           </div>
