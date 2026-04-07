@@ -1,4 +1,5 @@
 import { formatAliasesAkaLine } from "@/lib/dogs/name-aliases";
+import { HoverTooltip } from "@/components/ui/hover-tooltip";
 
 const cardAkaChipClass =
   "rounded-md border border-amber-200/60 bg-amber-50/80 px-2 py-0.5 text-[11px] leading-snug text-amber-950";
@@ -35,12 +36,9 @@ export function DogCardInlineNameWithAliases({
         .join(" ")}
     >
       <span className={nameCn}>{name}</span>
-      <span
-        className={`min-w-0 flex-1 truncate ${akaChipClass}`}
-        title={line}
-      >
-        {line}
-      </span>
+      <HoverTooltip content={line} className={`min-w-0 flex-1 ${akaChipClass}`}>
+        <span className="block truncate">{line}</span>
+      </HoverTooltip>
     </div>
   );
 }

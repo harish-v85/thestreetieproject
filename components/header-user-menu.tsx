@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { HoverTooltip } from "@/components/ui/hover-tooltip";
 
 function computeInitials(displayName: string, email: string): string {
   const s = displayName.trim();
@@ -73,17 +74,18 @@ export function HeaderUserMenu({
       className="relative flex shrink-0 items-center"
       onBlur={onMenuBlur}
     >
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        aria-haspopup="true"
-        aria-label={`Account menu for ${displayName}`}
-        title={displayName}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-semibold text-white shadow-sm outline-none ring-offset-2 transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-      >
-        {initials}
-      </button>
+      <HoverTooltip content={displayName} className="inline-flex">
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-haspopup="true"
+          aria-label={`Account menu for ${displayName}`}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-semibold text-white shadow-sm outline-none ring-offset-2 transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+        >
+          {initials}
+        </button>
+      </HoverTooltip>
 
       {open ? (
         <div

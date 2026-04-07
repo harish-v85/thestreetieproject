@@ -68,7 +68,12 @@ export default async function EditDogPage({ params }: PageProps) {
       map_lng,
       status,
       featured,
-      name_aliases
+      name_aliases,
+      estimated_birth_year,
+      age_estimated_on,
+      age_confidence,
+      has_collar,
+      collar_description
     `,
     )
     .eq("slug", slug)
@@ -192,6 +197,13 @@ export default async function EditDogPage({ params }: PageProps) {
     neighbourhood_id: dog.neighbourhood_id ?? "",
     street_name: dog.street_name ?? null,
     landmark: dog.landmark ?? null,
+    estimated_birth_year:
+      (dog as { estimated_birth_year?: number | null }).estimated_birth_year ?? null,
+    age_estimated_on: (dog as { age_estimated_on?: string | null }).age_estimated_on ?? null,
+    age_confidence: (dog as { age_confidence?: string }).age_confidence ?? "unknown",
+    has_collar: (dog as { has_collar?: string }).has_collar ?? "unsure",
+    collar_description:
+      (dog as { collar_description?: string | null }).collar_description ?? null,
   };
 
   return (

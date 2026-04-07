@@ -1,14 +1,9 @@
+import { formatDisplayDateTime, formatDisplayIsoDateOnly } from "@/lib/date/format-display-date";
+
 export function formatDogProfileRecordDate(isoDate: string): string {
-  return new Date(`${isoDate}T12:00:00`).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  return formatDisplayIsoDateOnly(isoDate);
 }
 
 export function formatWelfareEventWhen(iso: string): string {
-  return new Date(iso).toLocaleString(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
+  return formatDisplayDateTime(iso);
 }

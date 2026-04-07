@@ -1,7 +1,7 @@
 /**
- * Dog profile UI: `classic` (default) or `v2` (two-column + hero).
+ * Dog profile UI: `v2` (default: two-column + hero) or `classic` (single column).
  *
- * Set `NEXT_PUBLIC_DOG_PROFILE_TEMPLATE=v2` to default to v2 everywhere.
+ * Set `NEXT_PUBLIC_DOG_PROFILE_TEMPLATE=classic` to default to classic site-wide.
  * Per-request override (no redeploy): `?profile=v2` or `?profile=classic`.
  */
 export type DogProfileTemplateId = "classic" | "v2";
@@ -16,9 +16,9 @@ export function resolveDogProfileTemplate(
   }
 
   const env = process.env.NEXT_PUBLIC_DOG_PROFILE_TEMPLATE?.trim().toLowerCase();
-  if (env === "v2") {
-    return "v2";
+  if (env === "classic") {
+    return "classic";
   }
 
-  return "classic";
+  return "v2";
 }

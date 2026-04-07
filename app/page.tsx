@@ -52,9 +52,6 @@ export default async function Home({
             <code className="rounded bg-amber-100 px-1">npm run dev</code>.
           </p>
         </section>
-        <footer className="mt-12 text-center text-xs text-[var(--muted)]">
-          Next.js + Supabase · Streetie
-        </footer>
       </main>
     );
   }
@@ -150,11 +147,6 @@ export default async function Home({
         initialDogs={initialDogs}
         initialHasMore={initialHasMore}
       />
-
-      <footer className="mt-16 border-t border-black/5 pt-8 text-center text-xs text-[var(--muted)]">
-        The Streetie Project · Built to help communities live alongside their street dogs with
-        understanding and care.
-      </footer>
     </main>
   );
 }

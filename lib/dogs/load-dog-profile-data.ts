@@ -82,6 +82,13 @@ export type DogProfileData = {
     updated_at: string;
     welfare_status_updated_at: string | null;
     name_aliases: string[];
+    /** Approximate birth year; displayed age is ~(current year − this). */
+    estimated_birth_year: number | null;
+    /** Date the birth-year estimate was recorded. */
+    age_estimated_on: string | null;
+    age_confidence: string;
+    has_collar: string;
+    collar_description: string | null;
   };
   locationHeadline: string;
   carouselPhotos: DogProfileCarouselPhoto[];
@@ -137,6 +144,11 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
       updated_at,
       welfare_status_updated_at,
       name_aliases,
+      estimated_birth_year,
+      age_estimated_on,
+      age_confidence,
+      has_collar,
+      collar_description,
       localities ( name, slug ),
       neighbourhoods ( name ),
       dog_photos ( id, url, is_primary, sort_order, caption, focal_x, focal_y, uploaded_at )
@@ -384,6 +396,15 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
       name_aliases: coerceNameAliases(
         (dog as { name_aliases?: unknown }).name_aliases,
       ),
+      estimated_birth_year:
+        (dog as { estimated_birth_year?: number | null }).estimated_birth_year ?? null,
+      age_estimated_on:
+        (dog as { age_estimated_on?: string | null }).age_estimated_on ?? null,
+      age_confidence:
+        (dog as { age_confidence?: string }).age_confidence ?? "unknown",
+      has_collar: (dog as { has_collar?: string }).has_collar ?? "unsure",
+      collar_description:
+        (dog as { collar_description?: string | null }).collar_description ?? null,
     },
     locationHeadline,
     carouselPhotos,

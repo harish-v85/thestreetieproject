@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useId, useRef, useState } from "react";
+import { HoverTooltip } from "@/components/ui/hover-tooltip";
 
 const LeafletPointMap = dynamic(
   () => import("@/components/leaflet-point-map").then((m) => m.LeafletPointMap),
@@ -110,15 +111,19 @@ export function FeedingLocationLink({
         onMouseEnter={onWrapperEnter}
         onMouseLeave={onWrapperLeave}
       >
-        <button
-          type="button"
-          onClick={open}
-          className={pinBtnClass}
-          aria-label={`Open map for feeding location (${lat.toFixed(5)}, ${lng.toFixed(5)})`}
-          title={`${lat.toFixed(5)}, ${lng.toFixed(5)} — click for full map`}
+        <HoverTooltip
+          content={`${lat.toFixed(5)}, ${lng.toFixed(5)} — click for full map`}
+          className="inline-flex"
         >
-          <MapPinIcon className={iconClass} />
-        </button>
+          <button
+            type="button"
+            onClick={open}
+            className={pinBtnClass}
+            aria-label={`Open map for feeding location (${lat.toFixed(5)}, ${lng.toFixed(5)})`}
+          >
+            <MapPinIcon className={iconClass} />
+          </button>
+        </HoverTooltip>
 
         {hoverPreview ? (
           <div

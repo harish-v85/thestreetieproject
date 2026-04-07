@@ -4,6 +4,7 @@ import { SuperAdminMedicalRecordActions } from "@/components/super-admin-medical
 import { FeedingLocationLink } from "@/components/feeding-location-link";
 import type { DogProfileData } from "@/lib/dogs/load-dog-profile-data";
 import { formatDogProfileRecordDate } from "@/lib/dogs/dog-profile-dates";
+import { formatDisplayDateTime } from "@/lib/date/format-display-date";
 
 const eventLabel: Record<string, string> = {
   vaccination: "Vaccination",
@@ -209,10 +210,7 @@ export function DogProfileFeedingSection({
                     className="block text-base font-semibold tracking-tight text-[var(--foreground)]"
                     dateTime={f.fed_at}
                   >
-                    {new Date(f.fed_at).toLocaleString(undefined, {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                    })}
+                    {formatDisplayDateTime(f.fed_at)}
                   </time>
                   <p className="mt-2 text-sm leading-snug text-[var(--foreground)]">
                     {notesTrimmed ? (

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ManageListingToolbar } from "@/components/manage-listing-toolbar";
+import { formatDisplayDate } from "@/lib/date/format-display-date";
 
 export type UserListRow = {
   id: string;
@@ -91,7 +92,7 @@ export function ManageUsersListing({ rows }: { rows: UserListRow[] }) {
                   </p>
                   <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]">
                     <span className={userStatusClass(u.status)}>{u.status}</span>
-                    <span>Joined {new Date(u.created_at).toLocaleDateString()}</span>
+                    <span>Joined {formatDisplayDate(u.created_at)}</span>
                   </div>
                   <Link
                     href={`/manage/users/${u.id}/edit`}
@@ -129,7 +130,7 @@ export function ManageUsersListing({ rows }: { rows: UserListRow[] }) {
                         <span className={userStatusClass(u.status)}>{u.status}</span>
                       </td>
                       <td className="px-4 py-3 text-[var(--muted)]">
-                        {new Date(u.created_at).toLocaleDateString()}
+                        {formatDisplayDate(u.created_at)}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <Link

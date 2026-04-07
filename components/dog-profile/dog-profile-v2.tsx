@@ -17,12 +17,19 @@ import {
 } from "@/components/dog-profile/dog-profile-activity";
 import { dogProfileHeroAccent } from "@/lib/dogs/dog-profile-hero-accent";
 import { homeFeaturedSurfaceClass } from "@/components/home-featured";
+import { formatDisplayDate } from "@/lib/date/format-display-date";
 
 /** Match medical / feeding log column headings */
 const profileSectionHeading =
   "text-sm font-semibold uppercase tracking-wide text-[var(--foreground)] sm:text-[0.95rem]";
 
-export function DogProfileV2({ data }: { data: DogProfileData }) {
+export function DogProfileV2({
+  data,
+  canEditDogProfile = false,
+}: {
+  data: DogProfileData;
+  canEditDogProfile?: boolean;
+}) {
   const { dog, locationHeadline, carouselPhotos, hasMap, welfareEvents } = data;
   const { solid, useLightText, heroOverlayGradientCss, photoTintCss } =
     dogProfileHeroAccent(dog.colour_primary);
@@ -30,11 +37,7 @@ export function DogProfileV2({ data }: { data: DogProfileData }) {
   const welfareLastUpdatedDisplay =
     dog.welfare_status_updated_at != null
       ? formatWelfareEventWhen(dog.welfare_status_updated_at)
-      : new Date(dog.updated_at).toLocaleDateString(undefined, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        });
+      : formatDisplayDate(dog.updated_at);
 
   const heroText = useLightText
     ? {
@@ -56,12 +59,22 @@ export function DogProfileV2({ data }: { data: DogProfileData }) {
         <Link href="/dogs" className="font-medium text-[var(--accent)]">
           ← All dogs
         </Link>
-        <Link
-          href={`/dogs/${dog.slug}?profile=classic`}
-          className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[var(--muted)] shadow-sm hover:border-[var(--accent)]/30 hover:text-[var(--accent)]"
-        >
-          View Profile in Classic layout
-        </Link>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {canEditDogProfile ? (
+            <Link
+              href={`/manage/dogs/${dog.slug}/edit`}
+              className="rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:opacity-90"
+            >
+              Edit profile
+            </Link>
+          ) : null}
+          <Link
+            href={`/dogs/${dog.slug}?profile=classic`}
+            className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[var(--muted)] shadow-sm hover:border-[var(--accent)]/30 hover:text-[var(--accent)]"
+          >
+            View Profile in Classic layout
+          </Link>
+        </div>
       </nav>
 
       <article className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-md ring-1 ring-black/[0.03]">
@@ -277,7 +290,7 @@ export function DogProfileV2({ data }: { data: DogProfileData }) {
             ) : null}
 
             <footer className="border-t border-zinc-200/80 pt-8 text-xs text-zinc-500 lg:hidden">
-              <p>Last updated at {new Date(dog.updated_at).toLocaleDateString()}</p>
+              <p>Last updated at {formatDisplayDate(dog.updated_at)}</p>
             </footer>
           </div>
 
@@ -291,11 +304,7 @@ export function DogProfileV2({ data }: { data: DogProfileData }) {
             <footer className="mt-auto hidden border-t border-black/10 pt-8 text-xs text-zinc-600 lg:block">
               <p>
                 Last updated at{" "}
-                {new Date(dog.updated_at).toLocaleDateString("en-GB", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
+                {formatDisplayDate(dog.updated_at)}
               </p>
             </footer>
           </aside>

@@ -31,9 +31,25 @@ export default async function DogProfilePage({ params, searchParams }: PageProps
   const data = await loadDogProfileData(slug);
   if (!data) notFound();
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let canEditDogProfile = false;
+  if (user) {
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("role, status")
+      .eq("id", user.id)
+      .maybeSingle();
+    canEditDogProfile =
+      prof?.status === "active" &&
+      (prof?.role === "admin" || prof?.role === "super_admin");
+  }
+
   const template = resolveDogProfileTemplate(sp);
   if (template === "v2") {
-    return <DogProfileV2 data={data} />;
+    return <DogProfileV2 data={data} canEditDogProfile={canEditDogProfile} />;
   }
-  return <DogProfileClassic data={data} />;
+  return <DogProfileClassic data={data} canEditDogProfile={canEditDogProfile} />;
 }

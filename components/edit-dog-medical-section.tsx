@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AddMedicalRecordForm } from "@/app/manage/dogs/add-medical-record-form";
 import { SuperAdminMedicalRecordActions } from "@/components/super-admin-medical-record-actions";
+import { formatDisplayIsoDateOnly } from "@/lib/date/format-display-date";
 
 const LIST_SCROLL_AFTER = 5;
 
@@ -14,11 +15,7 @@ const eventLabel: Record<string, string> = {
 };
 
 function formatRecordDate(isoDate: string) {
-  return new Date(`${isoDate}T12:00:00`).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  return formatDisplayIsoDateOnly(isoDate);
 }
 
 type MedicalRow = {

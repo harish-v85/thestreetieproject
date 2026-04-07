@@ -29,4 +29,5 @@ export type HomeDogCard = {
   /** Meaningful when thumb_url is set; defaults 0.5 for center. */
   thumb_focal_x: number;
   thumb_focal_y: number;
+  estimated_birth_year: number | null;
 };

@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
 import { DogCardInlineNameWithAliases } from "@/components/dog-aliases-strip";
+import { HoverTooltip } from "@/components/ui/hover-tooltip";
+import { formatDisplayDate } from "@/lib/date/format-display-date";
 import { GenderBadge, NeuterBadge } from "@/components/dog-badges";
 import { objectPositionFromFocal } from "@/lib/dogs/photo-focal";
 import { dogPhotoPlaceholder } from "@/lib/dogs/photo-placeholder";
@@ -187,12 +189,9 @@ export function ManageDogsTable({
                       variant="card"
                     />
                   </Link>
-                  <p
-                    className="text-[11px] leading-snug text-[var(--muted)]"
-                    title={d.locationLine}
-                  >
-                    {d.locationLine}
-                  </p>
+                  <HoverTooltip content={d.locationLine} className="inline-block max-w-full">
+                    <span className="text-[11px] leading-snug text-[var(--muted)]">{d.locationLine}</span>
+                  </HoverTooltip>
                 </div>
                 <div className="col-span-2 col-start-1 row-start-3 grid grid-cols-3 gap-x-3">
                   <div className="flex min-w-0 items-center justify-start">
@@ -206,7 +205,7 @@ export function ManageDogsTable({
                   </div>
                 </div>
                 <p className="col-span-2 col-start-1 row-start-4 text-xs text-[var(--muted)]">
-                  Updated {new Date(d.updated_at).toLocaleDateString()}
+                  Updated {formatDisplayDate(d.updated_at)}
                 </p>
                 <Link
                   href={`/manage/dogs/${d.slug}/edit`}
@@ -247,7 +246,7 @@ export function ManageDogsTable({
                         <span className={dogStatusClass(d.status)}>{d.status}</span>
                       </td>
                       <td className="px-4 py-3 text-[var(--muted)]">
-                        {new Date(d.updated_at).toLocaleDateString()}
+                        {formatDisplayDate(d.updated_at)}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <Link

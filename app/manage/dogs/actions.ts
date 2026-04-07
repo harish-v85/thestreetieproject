@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { requirePrivileged } from "@/lib/auth/require-privileged";
 import { parseCoatFromFormData } from "@/lib/dogs/coat";
 import { normalizeNameAliasesJson } from "@/lib/dogs/name-aliases";
+import { resolveAgeEstimatedOnForSave } from "@/lib/dogs/dog-age";
+import { isHasCollar, resolveCollarDescriptionForSave } from "@/lib/dogs/collar";
 import { slugify } from "@/lib/dogs/slugify";
 
 const UUID_RE =
@@ -50,6 +52,31 @@ function optFloat(formData: FormData, key: string): number | null {
   if (v == null || String(v).trim() === "") return null;
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
+}
+
+function optBirthYear(formData: FormData): number | null {
+  const v = formData.get("estimated_birth_year");
+  if (v == null || String(v).trim() === "") return null;
+  const n = parseInt(String(v), 10);
+  return Number.isFinite(n) ? n : null;
+}
+
+function optDateString(formData: FormData, key: string): string | null {
+  const v = String(formData.get(key) ?? "").trim();
+  return v || null;
+}
+
+function parseAgeConfidence(formData: FormData): string {
+  return String(formData.get("age_confidence") ?? "unknown");
+}
+
+function parseHasCollar(formData: FormData): string {
+  return String(formData.get("has_collar") ?? "unsure");
+}
+
+function parseCollarDescriptionRaw(formData: FormData): string | null {
+  const v = String(formData.get("collar_description") ?? "").trim();
+  return v || null;
 }
 
 async function uniqueSlug(supabase: Awaited<ReturnType<typeof createClient>>, base: string) {
@@ -106,10 +133,38 @@ export async function createDog(
   if ("error" in coatParsed) return { error: coatParsed.error };
   const map_lat = optFloat(formData, "map_lat");
   const map_lng = optFloat(formData, "map_lng");
-  const primary_photo_url = String(formData.get("primary_photo_url") ?? "").trim();
   const wantFeatured = formData.get("featured") === "on";
+  const status = String(formData.get("status") ?? "active");
+  if (!["active", "archived"].includes(status)) return { error: "Invalid status." };
+  const featuredValue = wantFeatured && status === "active";
 
   const name_aliases = normalizeNameAliasesJson(String(formData.get("name_aliases_json") ?? ""));
+
+  const estimated_birth_year = optBirthYear(formData);
+  const age_estimated_on = resolveAgeEstimatedOnForSave(
+    estimated_birth_year,
+    optDateString(formData, "age_estimated_on"),
+  );
+  const age_confidence = parseAgeConfidence(formData);
+  if (!["vet_assessed", "best_guess", "unknown"].includes(age_confidence)) {
+    return { error: "Invalid age confidence." };
+  }
+  const currentYear = new Date().getFullYear();
+  if (estimated_birth_year != null) {
+    if (estimated_birth_year < 1980 || estimated_birth_year > currentYear) {
+      return {
+        error: "Estimated birth year must be between 1980 and the current year.",
+      };
+    }
+  }
+
+  const has_collarRaw = parseHasCollar(formData);
+  if (!isHasCollar(has_collarRaw)) return { error: "Invalid collar value." };
+  const has_collar = has_collarRaw;
+  const collar_description = resolveCollarDescriptionForSave(
+    has_collar,
+    parseCollarDescriptionRaw(formData),
+  );
 
   const insertBase = {
     slug,
@@ -128,9 +183,14 @@ export async function createDog(
     map_lat,
     map_lng,
     welfare_status,
-    status: "active" as const,
-    featured: wantFeatured,
+    status: status as "active" | "archived",
+    featured: featuredValue,
     created_by: userId,
+    estimated_birth_year,
+    age_estimated_on,
+    age_confidence,
+    has_collar,
+    collar_description,
   };
 
   let { data: dog, error } = await supabase
@@ -169,18 +229,28 @@ export async function createDog(
   if (error) return { error: error.message };
   if (!dog) return { error: "Could not create dog." };
 
-  if (wantFeatured) {
+  if (featuredValue) {
     await supabase.from("dogs").update({ featured: false }).neq("id", dog.id);
   }
 
-  if (primary_photo_url) {
-    await supabase.from("dog_photos").insert({
-      dog_id: dog.id,
-      url: primary_photo_url,
-      is_primary: false,
-      sort_order: 0,
-      uploaded_by: userId,
-    });
+  const hangoutCompanionIds = parseHangoutCompanionIds(formData, dog.id);
+
+  const { error: hangoutErr } = await supabase.rpc("sync_dog_hangout_clique", {
+    p_dog_id: dog.id,
+    p_companion_ids: hangoutCompanionIds,
+  });
+
+  if (hangoutErr) return { error: hangoutErr.message };
+
+  const revalidateIds = new Set<string>([dog.id, ...hangoutCompanionIds]);
+  const { data: slugRows } = await supabase
+    .from("dogs")
+    .select("slug")
+    .in("id", [...revalidateIds]);
+
+  for (const row of slugRows ?? []) {
+    revalidatePath(`/dogs/${row.slug}`);
+    revalidatePath(`/manage/dogs/${row.slug}/edit`);
   }
 
   revalidatePath("/");
@@ -248,6 +318,32 @@ export async function updateDog(
 
   const name_aliases = normalizeNameAliasesJson(String(formData.get("name_aliases_json") ?? ""));
 
+  const estimated_birth_year = optBirthYear(formData);
+  const age_estimated_on = resolveAgeEstimatedOnForSave(
+    estimated_birth_year,
+    optDateString(formData, "age_estimated_on"),
+  );
+  const age_confidence = parseAgeConfidence(formData);
+  if (!["vet_assessed", "best_guess", "unknown"].includes(age_confidence)) {
+    return { error: "Invalid age confidence." };
+  }
+  const currentYear = new Date().getFullYear();
+  if (estimated_birth_year != null) {
+    if (estimated_birth_year < 1980 || estimated_birth_year > currentYear) {
+      return {
+        error: "Estimated birth year must be between 1980 and the current year.",
+      };
+    }
+  }
+
+  const has_collarRaw = parseHasCollar(formData);
+  if (!isHasCollar(has_collarRaw)) return { error: "Invalid collar value." };
+  const has_collar = has_collarRaw;
+  const collar_description = resolveCollarDescriptionForSave(
+    has_collar,
+    parseCollarDescriptionRaw(formData),
+  );
+
   const updateBase = {
     slug,
     name,
@@ -267,6 +363,11 @@ export async function updateDog(
     welfare_status,
     status,
     featured: featuredValue,
+    estimated_birth_year,
+    age_estimated_on,
+    age_confidence,
+    has_collar,
+    collar_description,
   };
 
   let { error } = await supabase

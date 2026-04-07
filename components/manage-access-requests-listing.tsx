@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ReviewButtons } from "@/app/manage/access-requests/review-buttons";
 import { ManageListingToolbar } from "@/components/manage-listing-toolbar";
+import { formatDisplayDateTime } from "@/lib/date/format-display-date";
 
 export type AccessRequestListRow = {
   id: string;
@@ -113,9 +114,9 @@ export function ManageAccessRequestsListing({ rows }: { rows: AccessRequestListR
                     </p>
                   ) : null}
                   <p className="text-xs text-[var(--muted)]">
-                    Submitted {new Date(r.created_at).toLocaleString()}
+                    Submitted {formatDisplayDateTime(r.created_at)}
                     {r.reviewed_at ? (
-                      <> · Reviewed {new Date(r.reviewed_at).toLocaleString()}</>
+                      <> · Reviewed {formatDisplayDateTime(r.reviewed_at)}</>
                     ) : null}
                   </p>
                 </div>

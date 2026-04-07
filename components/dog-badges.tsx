@@ -1,3 +1,6 @@
+import { formatTentativeAgeYearsLabel } from "@/lib/dogs/dog-age";
+import { HoverTooltip } from "@/components/ui/hover-tooltip";
+
 function MaleIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -56,18 +59,30 @@ function NeuterUnknownIcon({ className }: { className?: string }) {
   );
 }
 
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function Badge({
   children,
   tone,
   icon,
   title,
   className,
+  chipShape = "rect",
 }: {
   children: React.ReactNode;
   tone: "neutral" | "accent" | "success" | "danger" | "custom";
   icon?: React.ReactNode;
   title?: string;
   className?: string;
+  /** `pill` = fully rounded; `rect` = rectangle with rounded corners. */
+  chipShape?: "pill" | "rect";
 }) {
   const toneClass =
     tone === "custom" && className
@@ -79,14 +94,19 @@ function Badge({
           : tone === "danger"
             ? "bg-red-100/90 text-red-900"
             : "bg-black/5 text-[var(--muted)]";
-  return (
+  const roundClass = chipShape === "pill" ? "rounded-full" : "rounded-md";
+  const content = (
     <span
-      title={title}
-      className={`inline-flex cursor-default items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition ${toneClass} hover:brightness-110 hover:ring-2 hover:ring-black/10`}
+      className={`inline-flex cursor-default items-center gap-1 px-2 py-0.5 text-xs font-medium transition ${roundClass} ${toneClass} hover:brightness-110 hover:ring-2 hover:ring-black/10`}
     >
       {icon ? <span className="shrink-0 [&>svg]:h-3.5 [&>svg]:w-3.5">{icon}</span> : null}
       {children}
     </span>
+  );
+  return (
+    <HoverTooltip content={title} className="inline-flex">
+      {content}
+    </HoverTooltip>
   );
 }
 
@@ -109,7 +129,7 @@ export function GenderBadge({ gender }: { gender: string }) {
         ? "bg-[#C06C4E] text-white"
         : "bg-black/5 text-[var(--muted)]";
   return (
-    <Badge tone="custom" className={palette} icon={icon} title={title}>
+    <Badge tone="custom" className={palette} icon={icon} title={title} chipShape="rect">
       {label}
     </Badge>
   );
@@ -139,7 +159,25 @@ export function NeuterBadge({ status }: { status: string }) {
       <NeuterUnknownIcon />
     );
   return (
-    <Badge tone={tone} icon={icon} title={title}>
+    <Badge tone={tone} icon={icon} title={title} chipShape="rect">
+      {label}
+    </Badge>
+  );
+}
+
+export function AgeBadge({ estimatedBirthYear }: { estimatedBirthYear: number | null }) {
+  const cy = new Date().getFullYear();
+  const y =
+    estimatedBirthYear != null && Number.isFinite(estimatedBirthYear)
+      ? cy - estimatedBirthYear
+      : null;
+  const label = y == null ? "N/A" : formatTentativeAgeYearsLabel(y);
+  const title =
+    y == null
+      ? "Age unknown — no estimated birth year"
+      : `Approximate age: ${formatTentativeAgeYearsLabel(y)} (from estimated birth year)`;
+  return (
+    <Badge tone="neutral" icon={<CalendarIcon />} title={title} chipShape="rect">
       {label}
     </Badge>
   );
@@ -153,11 +191,48 @@ const welfareLabels: Record<string, string> = {
   deceased: "Deceased",
 };
 
+/** Solid bright backgrounds so the chip stays readable on top of photos. */
+function welfareBadgeClass(status: string): string {
+  switch (status) {
+    case "needs_attention":
+      return "bg-amber-500 text-white shadow-sm";
+    case "injured":
+      return "bg-red-500 text-white shadow-sm";
+    case "missing":
+      return "bg-orange-500 text-white shadow-sm";
+    case "deceased":
+      return "bg-slate-600 text-white shadow-sm";
+    default:
+      return "bg-amber-500 text-white shadow-sm";
+  }
+}
+
+/** Matching hues for photo tint overlays. */
+export function welfareImageTintColor(status: string): string {
+  switch (status) {
+    case "needs_attention":
+      return "245, 158, 11";
+    case "injured":
+      return "239, 68, 68";
+    case "missing":
+      return "249, 115, 22";
+    case "deceased":
+      return "71, 85, 105";
+    default:
+      return "0, 0, 0";
+  }
+}
+
 export function WelfareBadge({ status }: { status: string }) {
   if (status === "healthy") return null;
   const label = welfareLabels[status] ?? status;
   return (
-    <Badge tone="accent" title={`Welfare check — ${label}`}>
+    <Badge
+      tone="custom"
+      className={`font-semibold ${welfareBadgeClass(status)}`}
+      title={`Welfare check — ${label}`}
+      chipShape="pill"
+    >
       {label}
     </Badge>
   );

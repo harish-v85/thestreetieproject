@@ -9,8 +9,17 @@ import {
   DogProfileFeedingSection,
   DogProfileMedicalSection,
 } from "@/components/dog-profile/dog-profile-activity";
+import { DogProfileAgeClassicRow } from "@/components/dog-profile/dog-profile-age";
+import { DogProfileCollarValue } from "@/components/dog-profile/dog-profile-collar";
+import { formatDisplayDate } from "@/lib/date/format-display-date";
 
-export function DogProfileClassic({ data }: { data: DogProfileData }) {
+export function DogProfileClassic({
+  data,
+  canEditDogProfile = false,
+}: {
+  data: DogProfileData;
+  canEditDogProfile?: boolean;
+}) {
   const { dog, locationHeadline, carouselPhotos, hasMap } = data;
 
   return (
@@ -19,12 +28,22 @@ export function DogProfileClassic({ data }: { data: DogProfileData }) {
         <Link href="/dogs" className="font-medium text-[var(--accent)]">
           ← All dogs
         </Link>
-        <Link
-          href={`/dogs/${dog.slug}?profile=v2`}
-          className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[var(--muted)] shadow-sm hover:border-[var(--accent)]/30 hover:text-[var(--accent)]"
-        >
-          View Profile in New layout (beta)
-        </Link>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {canEditDogProfile ? (
+            <Link
+              href={`/manage/dogs/${dog.slug}/edit`}
+              className="rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:opacity-90"
+            >
+              Edit profile
+            </Link>
+          ) : null}
+          <Link
+            href={`/dogs/${dog.slug}`}
+            className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[var(--muted)] shadow-sm hover:border-[var(--accent)]/30 hover:text-[var(--accent)]"
+          >
+            View Profile in New Layout
+          </Link>
+        </div>
       </nav>
 
       <header className="mb-8">
@@ -47,32 +66,45 @@ export function DogProfileClassic({ data }: { data: DogProfileData }) {
             {dog.landmark?.trim() ? dog.landmark : "No landmark noted"}
           </p>
         </div>
-        <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-          <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
-              Gender
-            </dt>
-            <dd className="mt-0.5 text-sm text-[var(--foreground)]">{data.genderLabel}</dd>
+        <dl className="mt-4 space-y-3">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+                Gender
+              </dt>
+              <dd className="mt-0.5 text-sm text-[var(--foreground)]">{data.genderLabel}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+                Sterilisation status
+              </dt>
+              <dd className="mt-0.5 text-sm text-[var(--foreground)]">{data.sterilisationLabel}</dd>
+            </div>
+            <DogProfileAgeClassicRow data={data} />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+                Coat pattern
+              </dt>
+              <dd className="mt-0.5 text-sm text-[var(--foreground)]">{data.patternLabel}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+                Colour
+              </dt>
+              <dd className="mt-0.5 text-sm text-[var(--foreground)]">{data.coloursLine}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+                Collar
+              </dt>
+              <dd className="mt-0.5 text-sm text-[var(--foreground)]">
+                <DogProfileCollarValue dog={dog} plain />
+              </dd>
+            </div>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
-              Sterilisation status
-            </dt>
-            <dd className="mt-0.5 text-sm text-[var(--foreground)]">{data.sterilisationLabel}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
-              Coat pattern
-            </dt>
-            <dd className="mt-0.5 text-sm text-[var(--foreground)]">{data.patternLabel}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
-              Colour
-            </dt>
-            <dd className="mt-0.5 text-sm text-[var(--foreground)]">{data.coloursLine}</dd>
-          </div>
-          <div className="sm:col-span-2">
             <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
               Current Welfare Status
             </dt>
@@ -138,7 +170,7 @@ export function DogProfileClassic({ data }: { data: DogProfileData }) {
       <DogProfileFeedingSection data={data} variant="classic" />
 
       <footer className="border-t border-black/5 pt-6 text-xs text-[var(--muted)]">
-        <p>Last updated at {new Date(dog.updated_at).toLocaleDateString()}</p>
+        <p>Last updated at {formatDisplayDate(dog.updated_at)}</p>
       </footer>
     </main>
   );

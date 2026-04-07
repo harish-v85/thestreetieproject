@@ -8,11 +8,17 @@ import {
   WarningCircleIcon,
 } from "@phosphor-icons/react/ssr";
 import type { DogProfileData } from "@/lib/dogs/load-dog-profile-data";
+import { DogProfileAgeStatCard } from "@/components/dog-profile/dog-profile-age";
+import {
+  DogProfileCollarCornerIcon,
+  DogProfileCollarValue,
+} from "@/components/dog-profile/dog-profile-collar";
 import {
   COAT_COLOUR_SWATCH,
   coatColourSwatchStack,
   type CoatColour,
 } from "@/lib/dogs/coat";
+import { HoverTooltip } from "@/components/ui/hover-tooltip";
 
 const statBoxClass =
   "relative rounded-xl border border-black/5 bg-white px-4 py-3.5 shadow-sm";
@@ -72,14 +78,15 @@ function ColourSwatchStack({ colours }: { colours: { key: CoatColour; label: str
         const needsEdge =
           key === "white" || key === "cream" || key === "fawn" || key === "unsure";
         return (
-          <span
-            key={`${i}-${key}`}
-            title={label}
-            className={`h-3 w-3 shrink-0 rounded-sm shadow-sm ring-1 ring-inset ${
-              needsEdge ? "ring-black/20" : "ring-black/10"
-            }`}
-            style={{ backgroundColor: bg }}
-          />
+          <HoverTooltip key={`${i}-${key}`} content={label} className="inline-flex">
+            <span
+              className={`h-3 w-3 shrink-0 rounded-sm shadow-sm ring-1 ring-inset ${
+                needsEdge ? "ring-black/20" : "ring-black/10"
+              }`}
+              style={{ backgroundColor: bg }}
+              aria-label={label}
+            />
+          </HoverTooltip>
         );
       })}
     </div>
@@ -100,43 +107,57 @@ export function DogProfileDetailsDl({ data }: { data: DogProfileData }) {
 
   return (
     <dl className="grid gap-3 sm:grid-cols-2">
-      <div className={statBoxClass}>
-        <GenderCornerIcon gender={dog.gender} />
-        <dt className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
-          Gender
-        </dt>
-        <dd className="mt-1.5 pr-9 text-base font-semibold tracking-tight text-[var(--foreground)]">
-          {genderLabel}
-        </dd>
+      <div className="col-span-full grid gap-3 sm:grid-cols-3">
+        <div className={statBoxClass}>
+          <GenderCornerIcon gender={dog.gender} />
+          <dt className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+            Gender
+          </dt>
+          <dd className="mt-1.5 pr-9 text-base font-semibold tracking-tight text-[var(--foreground)]">
+            {genderLabel}
+          </dd>
+        </div>
+        <div className={statBoxClass}>
+          <SterilisationCornerIcon status={dog.neutering_status} />
+          <dt className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+            Sterilisation status
+          </dt>
+          <dd className="mt-1.5 pr-9 text-base font-semibold tracking-tight text-[var(--foreground)]">
+            {sterilisationLabel}
+          </dd>
+        </div>
+        <DogProfileAgeStatCard data={data} />
       </div>
-      <div className={statBoxClass}>
-        <SterilisationCornerIcon status={dog.neutering_status} />
-        <dt className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
-          Sterilisation status
-        </dt>
-        <dd className="mt-1.5 pr-9 text-base font-semibold tracking-tight text-[var(--foreground)]">
-          {sterilisationLabel}
-        </dd>
-      </div>
-      <div className={statBoxClass}>
-        <span className={cornerIconClass} aria-hidden>
-          <DiamondsFourIcon weight="regular" />
-        </span>
-        <dt className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
-          Coat pattern
-        </dt>
-        <dd className="mt-1.5 pr-9 text-base font-semibold tracking-tight text-[var(--foreground)]">
-          {patternLabel}
-        </dd>
-      </div>
-      <div className={statBoxClass}>
-        <ColourSwatchStack colours={swatchColours} />
-        <dt className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
-          Colour
-        </dt>
-        <dd className="mt-1.5 pr-7 text-base font-semibold tracking-tight text-[var(--foreground)]">
-          {swatchSummary}
-        </dd>
+      <div className="col-span-full grid gap-3 sm:grid-cols-3">
+        <div className={statBoxClass}>
+          <span className={cornerIconClass} aria-hidden>
+            <DiamondsFourIcon weight="regular" />
+          </span>
+          <dt className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+            Coat pattern
+          </dt>
+          <dd className="mt-1.5 pr-9 text-base font-semibold tracking-tight text-[var(--foreground)]">
+            {patternLabel}
+          </dd>
+        </div>
+        <div className={statBoxClass}>
+          <ColourSwatchStack colours={swatchColours} />
+          <dt className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+            Colour
+          </dt>
+          <dd className="mt-1.5 pr-7 text-base font-semibold tracking-tight text-[var(--foreground)]">
+            {swatchSummary}
+          </dd>
+        </div>
+        <div className={statBoxClass}>
+          <DogProfileCollarCornerIcon />
+          <dt className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+            Collar
+          </dt>
+          <dd className="mt-1.5 pr-9 text-base font-semibold tracking-tight text-[var(--foreground)]">
+            <DogProfileCollarValue dog={dog} />
+          </dd>
+        </div>
       </div>
       <div className={`sm:col-span-2 ${statBoxClass}`}>
         <span className={cornerIconClass} aria-hidden>

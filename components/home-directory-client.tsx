@@ -6,7 +6,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchHomeDogsPage } from "@/app/actions/home-dogs";
 import type { HomeDogCard, HomeDogFilters } from "@/lib/dogs/home-directory";
 import { DogCardInlineNameWithAliases } from "@/components/dog-aliases-strip";
-import { GenderBadge, NeuterBadge, WelfareBadge } from "@/components/dog-badges";
+import {
+  AgeBadge,
+  GenderBadge,
+  NeuterBadge,
+  WelfareBadge,
+  welfareImageTintColor,
+} from "@/components/dog-badges";
 import { MultiSelectDropdown } from "@/components/multi-select-dropdown";
 import { SingleSelectDropdown } from "@/components/single-select-dropdown";
 import { objectPositionFromFocal } from "@/lib/dogs/photo-focal";
@@ -32,6 +38,8 @@ const NEUTERING_FILTER_OPTIONS = [
 ];
 
 function DogMiniCard({ dog }: { dog: HomeDogCard }) {
+  const hasWelfareFlag = dog.welfare_status !== "healthy";
+  const welfareTintRgb = welfareImageTintColor(dog.welfare_status);
   return (
     <Link
       href={`/dogs/${dog.slug}`}
@@ -59,6 +67,20 @@ function DogMiniCard({ dog }: { dog: HomeDogCard }) {
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         )}
+        {hasWelfareFlag ? (
+          <div
+            className="pointer-events-none absolute inset-0 z-[1] opacity-100 transition-opacity duration-200 group-hover:opacity-0"
+            style={{
+              background: `radial-gradient(circle at center, rgba(${welfareTintRgb}, 0) 42%, rgba(${welfareTintRgb}, 0.5) 86%)`,
+            }}
+            aria-hidden
+          />
+        ) : null}
+        {hasWelfareFlag ? (
+          <div className="pointer-events-none absolute right-2 top-2 z-10 max-w-[min(100%-1rem,11rem)]">
+            <WelfareBadge status={dog.welfare_status} />
+          </div>
+        ) : null}
       </div>
       <div className="space-y-2 p-4">
         <h3 className="min-w-0 text-base font-semibold">
@@ -79,7 +101,7 @@ function DogMiniCard({ dog }: { dog: HomeDogCard }) {
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <GenderBadge gender={dog.gender} />
           <NeuterBadge status={dog.neutering_status} />
-          <WelfareBadge status={dog.welfare_status} />
+          <AgeBadge estimatedBirthYear={dog.estimated_birth_year} />
         </div>
       </div>
     </Link>

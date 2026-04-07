@@ -9,8 +9,10 @@ import {
 } from "@/components/hangout-companions-field";
 import { DogCoatFields } from "@/components/dog-coat-fields";
 import { DogNameAliasField } from "@/components/dog-name-alias-field";
+import { DogCollarFields } from "@/components/dog-collar-fields";
 import { HangoutCoordsField } from "@/components/hangout-coords-field";
 import type { DogCoatDefaults } from "@/lib/dogs/coat";
+import { todayIsoDateLocal } from "@/lib/dogs/dog-age";
 import { updateDog, type DogFormState } from "./actions";
 
 const initial: DogFormState = { error: null };
@@ -44,6 +46,11 @@ type DogRow = {
   status: string;
   featured: boolean;
   name_aliases: string[];
+  estimated_birth_year: number | null;
+  age_estimated_on: string | null;
+  age_confidence: string;
+  has_collar: string;
+  collar_description: string | null;
 };
 
 export function DogEditForm({
@@ -112,6 +119,62 @@ export function DogEditForm({
               <option value="not_neutered">Not neutered</option>
             </select>
           </div>
+          <div className="sm:col-span-2 rounded-xl border border-black/5 bg-[var(--background)]/50 p-4">
+            <h3 className="text-sm font-semibold text-[var(--foreground)]">Age (estimate)</h3>
+            <p className="mt-1 text-xs text-[var(--muted)]">
+              We note an estimated year of birth and when it was last assessed. From this, the age
+              is calculated automatically, so it updates over time rather than being stored as a
+              fixed number.
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+              <div>
+                <label
+                  htmlFor="estimated_birth_year"
+                  className="mb-1 block text-sm font-medium"
+                >
+                  Estimated birth year
+                </label>
+                <input
+                  id="estimated_birth_year"
+                  name="estimated_birth_year"
+                  type="number"
+                  min={1980}
+                  max={new Date().getFullYear()}
+                  step={1}
+                  placeholder="e.g. 2020"
+                  defaultValue={dog.estimated_birth_year ?? ""}
+                  className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 font-mono text-sm outline-none ring-[var(--accent)] focus:ring-2"
+                />
+              </div>
+              <div>
+                <label htmlFor="age_estimated_on" className="mb-1 block text-sm font-medium">
+                  Age estimated on
+                </label>
+                <input
+                  id="age_estimated_on"
+                  name="age_estimated_on"
+                  type="date"
+                  defaultValue={dog.age_estimated_on ?? todayIsoDateLocal()}
+                  className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 font-mono text-sm outline-none ring-[var(--accent)] focus:ring-2"
+                />
+              </div>
+              <div>
+                <label htmlFor="age_confidence" className="mb-1 block text-sm font-medium">
+                  Age confidence
+                </label>
+                <select
+                  id="age_confidence"
+                  name="age_confidence"
+                  defaultValue={dog.age_confidence}
+                  className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
+                >
+                  <option value="vet_assessed">Vet-assessed</option>
+                  <option value="best_guess">Best guess</option>
+                  <option value="unknown">Unknown</option>
+                </select>
+              </div>
+            </div>
+          </div>
           <div className="sm:col-span-2">
             <label htmlFor="description" className="mb-1 block text-sm font-medium">
               Description
@@ -155,6 +218,11 @@ export function DogEditForm({
             />
           </div>
           <DogCoatFields defaults={coatDefaults} />
+          <DogCollarFields
+            defaultHasCollar={dog.has_collar}
+            defaultCollarDescription={dog.collar_description}
+            idPrefix="edit_dog_collar"
+          />
         </div>
       </section>
 

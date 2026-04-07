@@ -5,6 +5,7 @@ import { useCallback, useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import ReactMarkdown from "react-markdown";
 import { splitHelpSections } from "@/lib/help/split-help-sections";
+import { HoverTooltip } from "@/components/ui/hover-tooltip";
 
 export type HelpVariant = "dog_feeder" | "admin";
 
@@ -182,17 +183,18 @@ export function HeaderHelpPanel({ variant }: { variant: HelpVariant }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-expanded={open}
-        aria-haspopup="dialog"
-        title="Open help"
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/10 bg-white text-[var(--foreground)] shadow-sm outline-none transition hover:bg-[var(--background)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-      >
-        <Question className="h-5 w-5" weight="regular" aria-hidden />
-        <span className="sr-only">Help</span>
-      </button>
+      <HoverTooltip content="Open help" className="inline-flex">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-expanded={open}
+          aria-haspopup="dialog"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/10 bg-white text-[var(--foreground)] shadow-sm outline-none transition hover:bg-[var(--background)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+        >
+          <Question className="h-5 w-5" weight="regular" aria-hidden />
+          <span className="sr-only">Help</span>
+        </button>
+      </HoverTooltip>
       {mounted && portal ? createPortal(portal, document.body) : null}
     </>
   );
