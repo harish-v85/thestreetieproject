@@ -1,3 +1,4 @@
+import { CollapsibleAddMedicalRecord } from "@/components/collapsible-add-medical-record";
 import { CollapsibleLogFeeding } from "@/components/collapsible-log-feeding";
 import { SuperAdminFeedingRecordActions } from "@/components/super-admin-feeding-record-actions";
 import { SuperAdminMedicalRecordActions } from "@/components/super-admin-medical-record-actions";
@@ -22,7 +23,8 @@ export function DogProfileMedicalSection({
   data: DogProfileData;
   variant?: ActivityVariant;
 }) {
-  const { dog, medical, recorderNames, superAdminViewer, upcomingMedical, todayStr } = data;
+  const { dog, medical, recorderNames, staffViewer, superAdminViewer, upcomingMedical, todayStr } =
+    data;
   const scroll = data.scrollMedicalList;
   const listWrap =
     variant === "v2"
@@ -37,7 +39,12 @@ export function DogProfileMedicalSection({
       : "text-sm font-semibold uppercase tracking-wide text-[var(--muted)]";
 
   return (
-    <section className={variant === "v2" ? "mb-0" : "mb-10"}>
+    <section
+      id="medical"
+      className={
+        variant === "v2" ? "mb-0 scroll-mt-8" : "mb-10 scroll-mt-8"
+      }
+    >
       <h2 className={titleClass}>Medical records</h2>
       <p
         className={
@@ -51,6 +58,11 @@ export function DogProfileMedicalSection({
           ? " As super admin, you can edit or remove individual records below."
           : null}
       </p>
+      {staffViewer ? (
+        <div className={variant === "v2" ? "mt-3" : "mt-2"}>
+          <CollapsibleAddMedicalRecord dogId={dog.id} dogSlug={dog.slug} />
+        </div>
+      ) : null}
       {upcomingMedical.length > 0 ? (
         <div
           className={
@@ -187,7 +199,7 @@ export function DogProfileFeedingSection({
       </p>
       {staffViewer ? (
         <div className={variant === "v2" ? "mt-3" : "mt-2"}>
-          <CollapsibleLogFeeding dogId={dog.id} dogSlug={dog.slug} />
+          <CollapsibleLogFeeding dogId={dog.id} dogSlug={dog.slug} dogName={dog.name} />
         </div>
       ) : null}
       <div className={listWrap ? `mt-3 ${listWrap}` : variant === "v2" ? "mt-3" : "mt-4"}>

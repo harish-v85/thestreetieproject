@@ -23,6 +23,7 @@ export const FLASH_MESSAGES = {
   neighbourhood_deleted: { message: "Neighbourhood deleted." },
   dog_created: { message: "Dog added to the directory." },
   dog_updated: { message: "Dog profile updated." },
+  welfare_updated: { message: "Welfare status updated." },
   user_created: { message: "User account created." },
   user_updated: { message: "User updated." },
   access_request_approved: { message: "Access request approved." },

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { redirectWithFlash } from "@/lib/redirect-with-flash";
 import { createClient } from "@/lib/supabase/server";
-import { requirePrivileged } from "@/lib/auth/require-privileged";
+import { requireActiveStaff } from "@/lib/auth/require-active-staff";
 import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 
 const EVENT_TYPES = ["vaccination", "neutering", "vet_visit", "other"] as const;
@@ -14,10 +14,13 @@ export type MedicalRecordFormState = { error: string | null };
 export async function addMedicalRecord(
   dogId: string,
   dogSlug: string,
+  returnTo: "edit" | "profile",
   _prev: MedicalRecordFormState,
   formData: FormData,
 ): Promise<MedicalRecordFormState> {
-  await requirePrivileged(`/manage/dogs/${dogSlug}/edit`);
+  const loginNext =
+    returnTo === "profile" ? `/dogs/${dogSlug}` : `/manage/dogs/${dogSlug}/edit`;
+  await requireActiveStaff(loginNext);
   const supabase = await createClient();
   const {
     data: { user },
@@ -61,7 +64,11 @@ export async function addMedicalRecord(
   revalidatePath(`/dogs/${dogSlug}`);
   revalidatePath("/manage/dogs");
   revalidatePath(`/manage/dogs/${dogSlug}/edit`);
-  redirectWithFlash(`/manage/dogs/${dogSlug}/edit#medical`, "medical_record_added");
+  const nextPath =
+    returnTo === "profile"
+      ? `/dogs/${dogSlug}#medical`
+      : `/manage/dogs/${dogSlug}/edit#medical`;
+  redirectWithFlash(nextPath, "medical_record_added");
 }
 
 export async function updateMedicalRecord(

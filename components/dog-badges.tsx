@@ -144,10 +144,10 @@ export function NeuterBadge({ status }: { status: string }) {
         : "Unknown";
   const title =
     status === "neutered"
-      ? "Sterilisation status — Neutered (spayed or castrated)"
+      ? "Sterilisation status — Neutered"
       : status === "not_neutered"
         ? "Sterilisation status — Not neutered"
-        : "Sterilisation status — Unknown or not recorded";
+        : "Sterilisation status — Unknown";
   const tone =
     status === "neutered" ? "success" : status === "not_neutered" ? "danger" : "neutral";
   const icon =

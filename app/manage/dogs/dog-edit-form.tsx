@@ -243,6 +243,7 @@ export function DogEditForm({
             />
           </div>
           <HangoutCoordsField
+            key={dog.slug}
             defaultLat={dog.map_lat}
             defaultLng={dog.map_lng}
             dogName={dog.name}

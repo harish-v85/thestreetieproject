@@ -36,7 +36,8 @@ function locLabel(row: DogRow): string {
 }
 
 export default async function ManageDogsPage() {
-  await requirePrivileged();
+  const { role } = await requirePrivileged();
+  const isSuperAdmin = role === "super_admin";
   const supabase = await createClient();
 
   const { data: dogs, error } = await supabase
@@ -112,7 +113,7 @@ export default async function ManageDogsPage() {
       {error ? (
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800">{error.message}</p>
       ) : (
-        <ManageDogsListing rows={tableRows} />
+        <ManageDogsListing rows={tableRows} isSuperAdmin={isSuperAdmin} />
       )}
 
       <p className="mt-8 text-center text-sm">

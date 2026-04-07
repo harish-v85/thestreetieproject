@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { logFeeding, type LogFeedingFormState } from "@/app/dogs/feeding-actions";
+import { HangoutCoordsField } from "@/components/hangout-coords-field";
 
 const initial: LogFeedingFormState = { error: null };
 
@@ -11,7 +12,15 @@ function localDateTimeValue(d: Date) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export function LogFeedingForm({ dogId, dogSlug }: { dogId: string; dogSlug: string }) {
+export function LogFeedingForm({
+  dogId,
+  dogSlug,
+  dogName,
+}: {
+  dogId: string;
+  dogSlug: string;
+  dogName: string;
+}) {
   const bound = logFeeding.bind(null, dogId, dogSlug);
   const [state, formAction, pending] = useActionState(bound, initial);
 
@@ -53,34 +62,13 @@ export function LogFeedingForm({ dogId, dogSlug }: { dogId: string; dogSlug: str
             className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-[var(--accent)] focus:ring-2"
           />
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <label htmlFor="feeding_lat" className="mb-1 block text-xs font-medium text-[var(--muted)]">
-              Lat <span className="font-normal">(optional)</span>
-            </label>
-            <input
-              id="feeding_lat"
-              name="lat"
-              type="text"
-              inputMode="decimal"
-              placeholder="e.g. 12.9716"
-              className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 font-mono text-sm outline-none ring-[var(--accent)] focus:ring-2"
-            />
-          </div>
-          <div>
-            <label htmlFor="feeding_lng" className="mb-1 block text-xs font-medium text-[var(--muted)]">
-              Lng <span className="font-normal">(optional)</span>
-            </label>
-            <input
-              id="feeding_lng"
-              name="lng"
-              type="text"
-              inputMode="decimal"
-              placeholder="e.g. 77.5946"
-              className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 font-mono text-sm outline-none ring-[var(--accent)] focus:ring-2"
-            />
-          </div>
-        </div>
+        <HangoutCoordsField
+          variant="feeding"
+          dogName={dogName}
+          defaultLat={null}
+          defaultLng={null}
+          className="rounded-xl border border-black/5 bg-white/80 p-4"
+        />
       </div>
       {state.error ? (
         <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">

@@ -5,6 +5,7 @@ import { DogPhotoCarousel } from "@/components/dog-photo-carousel";
 import { DogHangoutMapSection } from "@/components/dog-hangout-map-section";
 import { HangoutBuddyChips } from "@/components/hangout-buddy-chips";
 import type { DogProfileData } from "@/lib/dogs/load-dog-profile-data";
+import { CollapsibleUpdateWelfare } from "@/components/collapsible-update-welfare";
 import {
   DogProfileFeedingSection,
   DogProfileMedicalSection,
@@ -20,7 +21,7 @@ export function DogProfileClassic({
   data: DogProfileData;
   canEditDogProfile?: boolean;
 }) {
-  const { dog, locationHeadline, carouselPhotos, hasMap } = data;
+  const { dog, locationHeadline, carouselPhotos, hasMap, staffViewer } = data;
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
@@ -104,7 +105,7 @@ export function DogProfileClassic({
               </dd>
             </div>
           </div>
-          <div>
+          <div id="welfare" className="scroll-mt-8">
             <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
               Current Welfare Status
             </dt>
@@ -122,6 +123,16 @@ export function DogProfileClassic({
                 <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--foreground)]">
                   {dog.welfare_remarks.trim()}
                 </p>
+              ) : null}
+              {staffViewer ? (
+                <div className="mt-3">
+                  <CollapsibleUpdateWelfare
+                    dogId={dog.id}
+                    dogSlug={dog.slug}
+                    defaultWelfareStatus={dog.welfare_status}
+                    variant="classic"
+                  />
+                </div>
               ) : null}
             </dd>
           </div>

@@ -1,16 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { LogFeedingForm } from "@/components/log-feeding-form";
+import { AddMedicalRecordForm } from "@/app/manage/dogs/add-medical-record-form";
 
-export function CollapsibleLogFeeding({
+export function CollapsibleAddMedicalRecord({
   dogId,
   dogSlug,
-  dogName,
 }: {
   dogId: string;
   dogSlug: string;
-  dogName: string;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -32,7 +30,7 @@ export function CollapsibleLogFeeding({
         >
           <path d="M12 5v14M5 12h14" strokeLinecap="round" />
         </svg>
-        Log a feeding
+        Add a new medical record
       </button>
     );
   }
@@ -48,7 +46,15 @@ export function CollapsibleLogFeeding({
           Cancel
         </button>
       </div>
-      <LogFeedingForm dogId={dogId} dogSlug={dogSlug} dogName={dogName} />
+      <div className="rounded-xl border border-amber-200/80 bg-amber-50/50 p-4">
+        <h3 className="text-sm font-semibold text-[var(--foreground)]">Add medical record</h3>
+        <p className="mt-1 text-xs text-[var(--muted)]">
+          Log vaccinations, vet visits, or other care — same as on the edit profile page.
+        </p>
+        <div className="mt-4">
+          <AddMedicalRecordForm dogId={dogId} dogSlug={dogSlug} returnTo="profile" />
+        </div>
+      </div>
     </div>
   );
 }
