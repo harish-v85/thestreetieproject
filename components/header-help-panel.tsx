@@ -1,13 +1,51 @@
 "use client";
 
-import { CaretDown, Question } from "@phosphor-icons/react";
-import { useCallback, useEffect, useId, useState } from "react";
+import { CaretDown, MagnifyingGlass, Question } from "@phosphor-icons/react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import ReactMarkdown from "react-markdown";
 import { splitHelpSections } from "@/lib/help/split-help-sections";
 import { HoverTooltip } from "@/components/ui/hover-tooltip";
 
 export type HelpVariant = "dog_feeder" | "admin";
+
+function helpSectionMatchesQuery(query: string, question: string, body: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  return `${question}\n${body}`.toLowerCase().includes(q);
+}
+
+function HelpSearchField({
+  id,
+  value,
+  onChange,
+}: {
+  id: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="relative">
+      <label htmlFor={id} className="sr-only">
+        Search the guide
+      </label>
+      <MagnifyingGlass
+        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]"
+        weight="regular"
+        aria-hidden
+      />
+      <input
+        id={id}
+        type="search"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Search topics…"
+        autoComplete="off"
+        className="w-full rounded-lg border border-black/10 bg-[var(--background)] py-2.5 pl-9 pr-3 text-sm text-[var(--foreground)] outline-none ring-[var(--accent)] placeholder:text-[var(--muted)] focus:ring-2"
+      />
+    </div>
+  );
+}
 
 function HelpGuideBody({
   guideTitle,
@@ -18,9 +56,18 @@ function HelpGuideBody({
   guideHeadingId: string;
   markdown: string;
 }) {
-  const sections = splitHelpSections(markdown);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchFieldId = useId();
+
+  const sections = useMemo(() => splitHelpSections(markdown), [markdown]);
+
+  const filteredSections = useMemo(() => {
+    return sections.filter((s) => helpSectionMatchesQuery(searchQuery, s.question, s.body));
+  }, [sections, searchQuery]);
 
   if (sections.length === 0) {
+    const q = searchQuery.trim().toLowerCase();
+    const showContent = !q || markdown.toLowerCase().includes(q);
     return (
       <div className="space-y-4">
         <h1
@@ -29,9 +76,14 @@ function HelpGuideBody({
         >
           {guideTitle}
         </h1>
-        <div className="help-markdown text-sm text-[var(--foreground)] [&_a]:font-medium [&_a]:text-[var(--accent)] [&_a]:underline [&_li]:mt-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:leading-relaxed [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5">
-          <ReactMarkdown>{markdown}</ReactMarkdown>
-        </div>
+        <HelpSearchField id={searchFieldId} value={searchQuery} onChange={setSearchQuery} />
+        {!showContent ? (
+          <p className="text-sm text-[var(--muted)]">No topics match your search.</p>
+        ) : (
+          <div className="help-markdown text-sm text-[var(--foreground)] [&_a]:font-medium [&_a]:text-[var(--accent)] [&_a]:underline [&_li]:mt-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:leading-relaxed [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5">
+            <ReactMarkdown>{markdown}</ReactMarkdown>
+          </div>
+        )}
       </div>
     );
   }
@@ -44,11 +96,16 @@ function HelpGuideBody({
       >
         {guideTitle}
       </h1>
-      <div className="space-y-2 border-t border-black/10 pt-2">
-        {sections.map((s) => (
-          <HelpAccordionItem key={s.key} question={s.question} body={s.body} />
-        ))}
-      </div>
+      <HelpSearchField id={searchFieldId} value={searchQuery} onChange={setSearchQuery} />
+      {filteredSections.length === 0 ? (
+        <p className="text-sm text-[var(--muted)]">No topics match your search.</p>
+      ) : (
+        <div className="space-y-2 border-t border-black/10 pt-2">
+          {filteredSections.map((s) => (
+            <HelpAccordionItem key={s.key} question={s.question} body={s.body} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
