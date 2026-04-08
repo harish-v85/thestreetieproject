@@ -28,3 +28,12 @@
 2. Scroll to **Medical records**.
 3. Click **Add a new medical record**.
 4. Fill in **Event type**, **Date of event**, optional **Next due**, and **Notes**, then click **Add medical record**. The record appears on this dog’s public profile.
+
+## How to change your password
+
+1. Open **My profile** from the account menu:
+   - **On a desktop or laptop:** Click the avatar on the top right, then click **My profile**.
+   - **On a phone or tablet:** Open the hamburger menu, then tap **My profile**.
+2. Scroll to the **Authentication** section (the steps below are the same on desktop and mobile).
+3. Enter your new password in **New password** (at least 8 characters). Leave the field empty if you only want to update your profile details and keep your current password.
+4. Click **Save changes**. When the password is updated, you stay signed in with the new password.

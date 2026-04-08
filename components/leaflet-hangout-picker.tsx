@@ -3,19 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { createDogMarker } from "@/components/dog-map-pin-marker";
 
 const DEFAULT_CENTER: L.LatLngTuple = [20, 0];
 const DEFAULT_ZOOM = 2;
 const PIN_ZOOM = 16;
-
-function hangoutIcon() {
-  return L.divIcon({
-    className: "dog-hangout-marker-wrap",
-    html: '<div class="dog-hangout-marker-dot" aria-hidden="true"></div>',
-    iconSize: [22, 22],
-    iconAnchor: [11, 22],
-  });
-}
 
 export function LeafletHangoutPicker({
   defaultLat,
@@ -59,7 +51,7 @@ export function LeafletHangoutPicker({
       maxZoom: 19,
     }).addTo(map);
 
-    const icon = hangoutIcon();
+    const icon = createDogMarker();
 
     function ensureMarker(lat: number, lng: number) {
       if (markerRef.current) {

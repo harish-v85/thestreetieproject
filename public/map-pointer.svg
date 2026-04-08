@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5">
+  <!-- Geometry from Resources/map-pointer.svg  one path, no seam between head and pointer -->
+  <path d="M54.17,105.389C30.288,101.627 12,80.932 12,56C12,28.404 34.404,6 62,6C89.596,6 112,28.404 112,56C112,79.268 96.073,98.844 74.535,104.413L64,119L54.17,105.389Z" fill="#c45c26" stroke="white" stroke-width="4.17"/>
+  <g transform="matrix(1.180328,0,0,1.180328,-14.131148,-13.04918)">
+    <circle cx="64.5" cy="58.5" r="30.5" fill="white"/>
+  </g>
+</svg>

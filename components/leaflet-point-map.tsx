@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { createDogMarker } from "@/components/dog-map-pin-marker";
 
 export function LeafletPointMap({
   lat,
@@ -35,12 +36,7 @@ export function LeafletPointMap({
       maxZoom: 19,
     }).addTo(map);
 
-    const icon = L.divIcon({
-      className: "dog-hangout-marker-wrap",
-      html: '<div class="dog-hangout-marker-dot" aria-hidden="true"></div>',
-      iconSize: [22, 22],
-      iconAnchor: [11, 22],
-    });
+    const icon = createDogMarker();
 
     const marker = L.marker([lat, lng], { icon }).addTo(map);
     if (label) marker.bindPopup(label);
