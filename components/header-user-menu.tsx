@@ -1,6 +1,6 @@
 "use client";
 
-import { SignOut } from "@phosphor-icons/react";
+import { SignOut, User } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HoverTooltip } from "@/components/ui/hover-tooltip";
@@ -102,23 +102,26 @@ export function HeaderUserMenu({
               <p className="mt-2 text-xs font-medium text-[var(--muted)]">{roleLabel}</p>
             ) : null}
           </div>
-          <div className="p-2">
+          <div className="space-y-0.5 p-2">
             <Link
               href="/profile"
-              className="mb-1 block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--background)]"
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--background)]"
               role="menuitem"
               onClick={close}
             >
+              <User className="h-4 w-4 shrink-0 text-[var(--foreground)]/85" weight="regular" aria-hidden />
               My profile
             </Link>
             <form action="/auth/signout" method="post">
               <button
                 type="submit"
-                className="flex w-full items-center justify-between gap-2 rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/10 px-3 py-2 text-left text-sm font-medium text-[var(--accent)] transition hover:bg-[var(--accent)]/20"
+                className="flex w-full items-center justify-between gap-2 rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/10 px-3 py-2.5 text-left text-sm font-medium text-[var(--accent)] transition hover:bg-[var(--accent)]/20"
                 role="menuitem"
               >
-                <span>Sign out</span>
-                <SignOut className="h-5 w-5 shrink-0 opacity-90" weight="regular" aria-hidden />
+                <span className="inline-flex items-center gap-2.5">
+                  <SignOut className="h-4 w-4 shrink-0 opacity-90" weight="regular" aria-hidden />
+                  Sign out
+                </span>
               </button>
             </form>
           </div>

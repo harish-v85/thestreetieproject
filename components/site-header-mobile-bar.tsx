@@ -1,10 +1,24 @@
 "use client";
 
-import { List, SignOut, X } from "@phosphor-icons/react";
+import {
+  BookOpenText,
+  Dog,
+  House,
+  List,
+  MapPinArea,
+  Park,
+  SignOut,
+  User,
+  UserCircleCheck,
+  UserCircleGear,
+  X,
+} from "@phosphor-icons/react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { computeHeaderAccountInitials } from "@/components/header-user-menu";
+import { ManageIconDogs } from "@/components/manage-icon-dogs";
+import { FeedIconDogFood } from "@/components/manage-page-icons";
 import { TspSiteLogo } from "@/components/tsp-brand-logo";
 
 export type MobileNavProps = {
@@ -19,8 +33,10 @@ export type MobileSignedInAccount = {
   roleLabel: string | null;
 };
 
+const drawerIconClass = "h-5 w-5 shrink-0 text-[var(--foreground)]/85";
+
 function drawerLinkClass() {
-  return "block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--background)]";
+  return "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--background)]";
 }
 
 function sectionTitleClass() {
@@ -37,42 +53,53 @@ function MobileDrawerNav({
   const { canManage, isSuperAdmin, isActiveStaff } = navProps;
   return (
     <>
-      <p className={sectionTitleClass()}>Dogs</p>
+      <p className={sectionTitleClass()}>Browse</p>
+      <Link href="/" className={drawerLinkClass()} onClick={onNavigate}>
+        <House className={drawerIconClass} weight="regular" aria-hidden />
+        Home
+      </Link>
       <Link href="/dogs" className={drawerLinkClass()} onClick={onNavigate}>
-        All dogs
+        <Dog className={drawerIconClass} weight="regular" aria-hidden />
+        Dogs
       </Link>
       {isActiveStaff ? (
         <Link href="/dogs/feed" className={drawerLinkClass()} onClick={onNavigate}>
-          Feeding Activity
+          <FeedIconDogFood className={drawerIconClass} />
+          Log Feeding
         </Link>
       ) : null}
-      {canManage ? (
-        <Link href="/manage/dogs" className={drawerLinkClass()} onClick={onNavigate}>
-          Manage dogs
-        </Link>
-      ) : null}
+      <Link href="/about" className={drawerLinkClass()} onClick={onNavigate}>
+        <BookOpenText className={drawerIconClass} weight="regular" aria-hidden />
+        About
+      </Link>
 
       {canManage ? (
         <>
-          <p className={sectionTitleClass()}>Locations</p>
+          <p className={sectionTitleClass()}>Manage</p>
+          <Link href="/manage/dogs" className={drawerLinkClass()} onClick={onNavigate}>
+            <ManageIconDogs className={drawerIconClass} />
+            Dogs
+          </Link>
           <Link href="/manage/localities" className={drawerLinkClass()} onClick={onNavigate}>
+            <MapPinArea className={drawerIconClass} weight="regular" aria-hidden />
             Localities
           </Link>
           <Link href="/manage/neighbourhoods" className={drawerLinkClass()} onClick={onNavigate}>
+            <Park className={drawerIconClass} weight="regular" aria-hidden />
             Neighbourhoods
           </Link>
-        </>
-      ) : null}
-
-      {isSuperAdmin ? (
-        <>
-          <p className={sectionTitleClass()}>Users</p>
-          <Link href="/manage/users" className={drawerLinkClass()} onClick={onNavigate}>
-            Accounts
-          </Link>
-          <Link href="/manage/access-requests" className={drawerLinkClass()} onClick={onNavigate}>
-            Access requests
-          </Link>
+          {isSuperAdmin ? (
+            <>
+              <Link href="/manage/users" className={drawerLinkClass()} onClick={onNavigate}>
+                <UserCircleGear className={drawerIconClass} weight="regular" aria-hidden />
+                Users
+              </Link>
+              <Link href="/manage/access-requests" className={drawerLinkClass()} onClick={onNavigate}>
+                <UserCircleCheck className={drawerIconClass} weight="regular" aria-hidden />
+                Access Requests
+              </Link>
+            </>
+          ) : null}
         </>
       ) : null}
     </>
@@ -182,18 +209,19 @@ export function SiteHeaderMobileBar({
               <div className="shrink-0 border-t border-black/10 px-2 py-3">
                 <Link
                   href="/profile"
-                  className="mb-1 block w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--background)]"
+                  className="mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--background)]"
                   onClick={close}
                 >
+                  <User className={drawerIconClass} weight="regular" aria-hidden />
                   My profile
                 </Link>
                 <form action="/auth/signout" method="post">
                   <button
                     type="submit"
-                    className="flex w-full items-center justify-between gap-2 rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/10 px-3 py-2.5 text-left text-sm font-medium text-[var(--accent)] transition hover:bg-[var(--accent)]/20"
+                    className="flex w-full items-center gap-3 rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/10 px-3 py-3 text-left text-sm font-medium text-[var(--accent)] transition hover:bg-[var(--accent)]/20"
                   >
-                    <span>Sign out</span>
-                    <SignOut className="h-5 w-5 shrink-0 opacity-90" weight="regular" aria-hidden />
+                    <SignOut className={drawerIconClass} weight="regular" aria-hidden />
+                    Sign out
                   </button>
                 </form>
               </div>

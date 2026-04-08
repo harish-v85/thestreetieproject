@@ -1,6 +1,6 @@
 ## How to log a feeding activity for one dog
 
-1. In the top navigation, open **Dogs**, then **All dogs**.
+1. In the top navigation, open **Dogs**.
 2. Click the dog you fed to open their profile.
 3. Scroll to **Feeding log**.
 4. Click **Log a feeding**, fill in when you fed them and any notes, then submit so it’s saved for that dog only.
@@ -8,7 +8,7 @@
 
 ## How to log a feeding activity for a group of dogs
 
-1. In the top navigation, open **Dogs**, then **Feeding Activity**.
+1. In the top navigation, open **Log Feeding**.
 2. Under **Select dogs**, tick each dog you fed (use **Select all** or **Clear** if that helps).
 3. Optionally use **Search dogs** to narrow the list.
 4. Fill in **When**, **Notes**, and optionally **Feeding location** using **Add map location** or **Add coordinates** (same as logging for one dog). You can leave location empty.
@@ -16,7 +16,7 @@
 
 ## How to update welfare check status from a dog’s profile page
 
-1. Open **Dogs** → **All dogs**, then click the dog to open their profile.
+1. Open **Dogs**, then click the dog to open their profile.
 2. Scroll to **Current Welfare Status**.
 3. Click **Update latest welfare status**. 
 4. In the form, open **Welfare check** and choose a status, and add any text under **Welfare check — remarks**. The **Update welfare status** button stays disabled until you enter something in at least one of these fields.
@@ -24,7 +24,7 @@
 
 ## How to add a medical record from a dog’s profile page
 
-1. Open **Dogs** → **All dogs**, then click the dog to open their profile.
+1. Open **Dogs**, then click the dog to open their profile.
 2. Scroll to **Medical records**.
 3. Click **Add a new medical record**.
 4. Fill in **Event type**, **Date of event**, optional **Next due**, and **Notes**, then click **Add medical record**. The record appears on this dog’s public profile.

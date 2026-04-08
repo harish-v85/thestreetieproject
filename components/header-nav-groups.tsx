@@ -1,23 +1,39 @@
 "use client";
 
+import {
+  BookOpenText,
+  Dog,
+  GearSix,
+  House,
+  MapPinArea,
+  Park,
+  UserCircleCheck,
+  UserCircleGear,
+} from "@phosphor-icons/react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ManageIconDogs } from "@/components/manage-icon-dogs";
+import { FeedIconDogFood } from "@/components/manage-page-icons";
 
-type MenuKey = "dogs" | "locations" | "users";
+const navIconClass = "h-4 w-4 shrink-0 text-[var(--foreground)]/85";
+
+function topLinkClass() {
+  return "inline-flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-[var(--foreground)] hover:bg-black/[0.04] hover:text-[var(--foreground)]";
+}
 
 function triggerClass(open: boolean) {
   return [
-    "flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-[var(--muted)] hover:bg-black/[0.04] hover:text-[var(--foreground)]",
+    "inline-flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-[var(--foreground)] hover:bg-black/[0.04]",
     open ? "bg-black/[0.06] text-[var(--foreground)]" : "",
   ].join(" ");
 }
 
 function panelClass() {
-  return "absolute left-0 top-full z-50 mt-1 min-w-[12rem] rounded-xl border border-black/10 bg-white py-1 shadow-lg";
+  return "absolute left-0 top-full z-50 mt-1 min-w-[13.5rem] rounded-xl border border-black/10 bg-white py-1.5 shadow-lg";
 }
 
 function linkClass() {
-  return "block px-3 py-2 text-sm text-[var(--foreground)] hover:bg-[var(--background)]";
+  return "flex items-center gap-2.5 px-3 py-2.5 text-sm text-[var(--foreground)] hover:bg-[var(--background)]";
 }
 
 export function HeaderNavGroups({
@@ -30,10 +46,10 @@ export function HeaderNavGroups({
   /** Active dog feeder, admin, or super admin */
   isActiveStaff: boolean;
 }) {
-  const [openKey, setOpenKey] = useState<MenuKey | null>(null);
+  const [manageOpen, setManageOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
-  const close = useCallback(() => setOpenKey(null), []);
+  const close = useCallback(() => setManageOpen(false), []);
 
   useEffect(() => {
     function onDocMouseDown(e: MouseEvent) {
@@ -44,17 +60,13 @@ export function HeaderNavGroups({
   }, [close]);
 
   useEffect(() => {
-    if (!openKey) return;
+    if (!manageOpen) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") close();
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [openKey, close]);
-
-  function toggle(key: MenuKey) {
-    setOpenKey((k) => (k === key ? null : key));
-  }
+  }, [manageOpen, close]);
 
   function onNavBlur(e: React.FocusEvent<HTMLElement>) {
     const next = e.relatedTarget;
@@ -65,64 +77,47 @@ export function HeaderNavGroups({
   return (
     <nav
       ref={navRef}
-      className="flex flex-wrap items-center gap-x-1 gap-y-1 text-sm sm:gap-x-0 sm:gap-y-0"
+      className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm sm:gap-x-3 sm:gap-y-2"
       aria-label="Main"
       onBlur={onNavBlur}
     >
-      <div className="relative">
-        <button
-          type="button"
-          className={triggerClass(openKey === "dogs")}
-          aria-expanded={openKey === "dogs"}
-          aria-haspopup="true"
-          onClick={() => toggle("dogs")}
-        >
-          Dogs
-          <span className="text-black/40" aria-hidden>
-            ▾
-          </span>
-        </button>
-        {openKey === "dogs" ? (
-          <div className={panelClass()} role="menu">
-            <Link href="/dogs" className={linkClass()} role="menuitem" onClick={close}>
-              All dogs
-            </Link>
-            {isActiveStaff ? (
-              <Link href="/dogs/feed" className={linkClass()} role="menuitem" onClick={close}>
-                Feeding Activity
-              </Link>
-            ) : null}
-            {canManage ? (
-              <Link href="/manage/dogs" className={linkClass()} role="menuitem" onClick={close}>
-                Manage dogs
-              </Link>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
-
+      <Link href="/" className={topLinkClass()}>
+        <House className={navIconClass} weight="regular" aria-hidden />
+        Home
+      </Link>
+      <Link href="/dogs" className={topLinkClass()}>
+        <Dog className={navIconClass} weight="regular" aria-hidden />
+        Dogs
+      </Link>
+      {isActiveStaff ? (
+        <Link href="/dogs/feed" className={topLinkClass()}>
+          <FeedIconDogFood className={navIconClass} />
+          Log Feeding
+        </Link>
+      ) : null}
       {canManage ? (
         <div className="relative">
           <button
             type="button"
-            className={triggerClass(openKey === "locations")}
-            aria-expanded={openKey === "locations"}
+            className={triggerClass(manageOpen)}
+            aria-expanded={manageOpen}
             aria-haspopup="true"
-            onClick={() => toggle("locations")}
+            onClick={() => setManageOpen((o) => !o)}
           >
-            Locations
+            <GearSix className={navIconClass} weight="regular" aria-hidden />
+            Manage
             <span className="text-black/40" aria-hidden>
               ▾
             </span>
           </button>
-          {openKey === "locations" ? (
+          {manageOpen ? (
             <div className={panelClass()} role="menu">
-              <Link
-                href="/manage/localities"
-                className={linkClass()}
-                role="menuitem"
-                onClick={close}
-              >
+              <Link href="/manage/dogs" className={linkClass()} role="menuitem" onClick={close}>
+                <ManageIconDogs className={navIconClass} />
+                Dogs
+              </Link>
+              <Link href="/manage/localities" className={linkClass()} role="menuitem" onClick={close}>
+                <MapPinArea className={navIconClass} weight="regular" aria-hidden />
                 Localities
               </Link>
               <Link
@@ -131,44 +126,34 @@ export function HeaderNavGroups({
                 role="menuitem"
                 onClick={close}
               >
+                <Park className={navIconClass} weight="regular" aria-hidden />
                 Neighbourhoods
               </Link>
+              {isSuperAdmin ? (
+                <>
+                  <Link href="/manage/users" className={linkClass()} role="menuitem" onClick={close}>
+                    <UserCircleGear className={navIconClass} weight="regular" aria-hidden />
+                    Users
+                  </Link>
+                  <Link
+                    href="/manage/access-requests"
+                    className={linkClass()}
+                    role="menuitem"
+                    onClick={close}
+                  >
+                    <UserCircleCheck className={navIconClass} weight="regular" aria-hidden />
+                    Access Requests
+                  </Link>
+                </>
+              ) : null}
             </div>
           ) : null}
         </div>
       ) : null}
-
-      {isSuperAdmin ? (
-        <div className="relative">
-          <button
-            type="button"
-            className={triggerClass(openKey === "users")}
-            aria-expanded={openKey === "users"}
-            aria-haspopup="true"
-            onClick={() => toggle("users")}
-          >
-            Users
-            <span className="text-black/40" aria-hidden>
-              ▾
-            </span>
-          </button>
-          {openKey === "users" ? (
-            <div className={panelClass()} role="menu">
-              <Link href="/manage/users" className={linkClass()} role="menuitem" onClick={close}>
-                Accounts
-              </Link>
-              <Link
-                href="/manage/access-requests"
-                className={linkClass()}
-                role="menuitem"
-                onClick={close}
-              >
-                Access requests
-              </Link>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+      <Link href="/about" className={topLinkClass()}>
+        <BookOpenText className={navIconClass} weight="regular" aria-hidden />
+        About
+      </Link>
     </nav>
   );
 }

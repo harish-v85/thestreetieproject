@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { createDogMarker } from "@/components/dog-map-pin-marker";
 
@@ -27,29 +26,40 @@ export function LeafletPointMap({
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    let cancelled = false;
+    let cleanup: (() => void) | null = null;
 
-    const map = L.map(el, { scrollWheelZoom }).setView([lat, lng], zoom);
+    void (async () => {
+      const { default: L } = await import("leaflet");
+      if (cancelled) return;
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 19,
-    }).addTo(map);
+      const map = L.map(el, { scrollWheelZoom }).setView([lat, lng], zoom);
 
-    const icon = createDogMarker();
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+      }).addTo(map);
 
-    const marker = L.marker([lat, lng], { icon }).addTo(map);
-    if (label) marker.bindPopup(label);
+      const icon = createDogMarker();
+      const marker = L.marker([lat, lng], { icon }).addTo(map);
+      if (label) marker.bindPopup(label);
 
-    const raf = requestAnimationFrame(() => map.invalidateSize());
-    const t1 = window.setTimeout(() => map.invalidateSize(), 100);
-    const t2 = window.setTimeout(() => map.invalidateSize(), 400);
+      const raf = requestAnimationFrame(() => map.invalidateSize());
+      const t1 = window.setTimeout(() => map.invalidateSize(), 100);
+      const t2 = window.setTimeout(() => map.invalidateSize(), 400);
+
+      cleanup = () => {
+        cancelAnimationFrame(raf);
+        window.clearTimeout(t1);
+        window.clearTimeout(t2);
+        map.remove();
+      };
+    })();
 
     return () => {
-      cancelAnimationFrame(raf);
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      map.remove();
+      cancelled = true;
+      cleanup?.();
     };
   }, [lat, lng, label, scrollWheelZoom, zoom]);
 
