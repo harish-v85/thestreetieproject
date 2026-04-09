@@ -24,6 +24,17 @@ export async function signInWithEmail(
     return { error: error.message };
   }
 
+  // Best-effort login analytics event; auth should still proceed even if this fails.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    await supabase.from("login_events").insert({
+      user_id: user.id,
+      logged_in_at: new Date().toISOString(),
+    });
+  }
+
   const rawNext = String(formData.get("next") ?? "").trim();
   const next =
     rawNext.startsWith("/") && !rawNext.startsWith("//") && !rawNext.includes(":")

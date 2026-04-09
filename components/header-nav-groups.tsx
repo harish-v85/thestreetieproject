@@ -2,6 +2,7 @@
 
 import {
   BookOpenText,
+  ChartBar,
   Dog,
   GearSix,
   House,
@@ -117,6 +118,7 @@ export function HeaderNavGroups({
                 <ManageIconDogs className={navIconClass} />
                 Dogs
               </Link>
+              <div className="my-1 border-t border-black/10" role="separator" aria-hidden />
               <Link href="/manage/localities" className={linkClass()} role="menuitem" onClick={close}>
                 <MapPinArea className={navIconClass} weight="regular" aria-hidden />
                 Localities
@@ -132,10 +134,16 @@ export function HeaderNavGroups({
               </Link>
               {isSuperAdmin ? (
                 <>
+                  <div className="my-1 border-t border-black/10" role="separator" aria-hidden />
+                  <Link href="/manage/analytics" className={linkClass()} role="menuitem" onClick={close}>
+                    <ChartBar className={navIconClass} weight="regular" aria-hidden />
+                    Login Analytics
+                  </Link>
                   <Link href="/manage/activity" className={linkClass()} role="menuitem" onClick={close}>
                     <Pulse className={navIconClass} weight="regular" aria-hidden />
                     Activity
                   </Link>
+                  <div className="my-1 border-t border-black/10" role="separator" aria-hidden />
                   <Link href="/manage/users" className={linkClass()} role="menuitem" onClick={close}>
                     <UserCircleGear className={navIconClass} weight="regular" aria-hidden />
                     Users

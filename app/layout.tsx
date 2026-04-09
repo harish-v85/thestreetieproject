@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import Link from "next/link";
+import Script from "next/script";
 import { Suspense } from "react";
 import { AccessRequestsPendingRibbon } from "@/components/access-requests-pending-ribbon";
 import { AuthHashHandler } from "@/components/auth-hash-handler";
@@ -60,6 +61,12 @@ export default function RootLayout({
             </Link>
           </div>
         </footer>
+        <Script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="1705dda3-e675-4040-9f9e-684666ec2ad8"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
