@@ -37,25 +37,23 @@ export function ReviewButtons({ requestId }: { requestId: string }) {
         </p>
       ) : null}
       <div className="flex flex-wrap justify-end gap-2">
-        <div className="inline-flex overflow-hidden rounded-lg shadow-sm ring-1 ring-emerald-700/25">
-          <button
-            type="button"
-            disabled={pending}
-            onClick={() => run("approved")}
-            className="bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:opacity-60"
-          >
-            {pending ? "…" : "Approve"}
-          </button>
-          <button
-            type="button"
-            disabled={pending}
-            onClick={runApproveAndAdd}
-            className="border-l border-emerald-700/40 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-950 transition hover:bg-emerald-100 disabled:opacity-60"
-            title="Approve this request and open Add user with fields filled from the request"
-          >
-            {pending ? "…" : "Approve and Add"}
-          </button>
-        </div>
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => run("approved")}
+          className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:opacity-60"
+        >
+          {pending ? "…" : "Approve"}
+        </button>
+        <button
+          type="button"
+          disabled={pending}
+          onClick={runApproveAndAdd}
+          className="rounded-lg bg-emerald-600/90 px-3 py-1.5 text-sm font-medium text-white ring-1 ring-emerald-800/20 transition hover:bg-emerald-700 disabled:opacity-60"
+          title="Approve and go to Add user with this form prefilled"
+        >
+          {pending ? "…" : "Approve & add"}
+        </button>
         <button
           type="button"
           disabled={pending}

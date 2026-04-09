@@ -20,7 +20,7 @@ export async function fetchHomeDogsPage(
   let q = supabase
     .from("dogs")
     .select(
-      "id, slug, name, name_aliases, gender, neutering_status, welfare_status, estimated_birth_year, coat_pattern, colour_primary, colour_secondary, colour_tertiary, locality_id, neighbourhood_id, street_name, created_at",
+      "id, slug, name, name_aliases, gender, neutering_status, welfare_status, estimated_birth_year, estimated_death_year, coat_pattern, colour_primary, colour_secondary, colour_tertiary, locality_id, neighbourhood_id, street_name, created_at",
     )
     .eq("status", "active")
     .order("created_at", { ascending: false });
@@ -140,6 +140,8 @@ export async function fetchHomeDogsPage(
       thumb_focal_y: thumb?.focal_y ?? 0.5,
       estimated_birth_year:
         (d as { estimated_birth_year?: number | null }).estimated_birth_year ?? null,
+      estimated_death_year:
+        (d as { estimated_death_year?: number | null }).estimated_death_year ?? null,
     };
   });
 

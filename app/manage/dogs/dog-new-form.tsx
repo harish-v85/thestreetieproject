@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { DogLocationFields } from "@/components/dog-location-fields";
 import {
@@ -41,6 +41,8 @@ export function DogNewForm({
   streetSuggestions: string[];
 }) {
   const [state, formAction, pending] = useActionState(createDog, initial);
+  const [welfareStatus, setWelfareStatus] = useState("healthy");
+  const currentYear = new Date().getFullYear();
 
   return (
     <form action={formAction} className="space-y-0">
@@ -163,6 +165,7 @@ export function DogNewForm({
               id="welfare_status"
               name="welfare_status"
               defaultValue="healthy"
+              onChange={(e) => setWelfareStatus(e.target.value)}
               className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
             >
               <option value="healthy">Healthy</option>
@@ -184,6 +187,24 @@ export function DogNewForm({
               className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
             />
           </div>
+          {welfareStatus === "deceased" ? (
+            <div>
+              <label htmlFor="estimated_death_year" className="mb-1 block text-sm font-medium">
+                Estimated death year
+              </label>
+              <input
+                id="estimated_death_year"
+                name="estimated_death_year"
+                type="number"
+                min={1980}
+                max={currentYear}
+                step={1}
+                required
+                placeholder={`e.g. ${currentYear}`}
+                className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 font-mono text-sm outline-none ring-[var(--accent)] focus:ring-2"
+              />
+            </div>
+          ) : null}
           <DogCoatFields defaults={newDogCoatDefaults} />
           <DogCollarFields
             defaultHasCollar="unsure"

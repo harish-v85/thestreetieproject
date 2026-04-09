@@ -61,6 +61,7 @@ type DogInfo = {
   /** Matches `dogs.neutering_status` (same as home directory / manage). */
   neutering_status: string | null;
   estimated_birth_year: number | null;
+  estimated_death_year: number | null;
   street_name: string | null;
   localities: { name: string } | { name: string }[] | null;
   neighbourhoods: { name: string } | { name: string }[] | null;
@@ -80,12 +81,13 @@ export default async function AboutPage() {
     gender: string | null;
     neutering_status: string | null;
     estimated_birth_year: number | null;
+    estimated_death_year: number | null;
     welfare_status: string | null;
   } | null = null;
   if (featured) {
     const { data } = await supabase
       .from("dogs")
-      .select("gender, neutering_status, estimated_birth_year, welfare_status")
+      .select("gender, neutering_status, estimated_birth_year, estimated_death_year, welfare_status")
       .eq("id", featured.id)
       .maybeSingle();
     featuredProfile = data;
@@ -110,7 +112,7 @@ export default async function AboutPage() {
       ? await supabase
           .from("dogs")
           .select(
-            "id, slug, name, name_aliases, welfare_status, gender, neutering_status, estimated_birth_year, street_name, localities(name), neighbourhoods(name)",
+            "id, slug, name, name_aliases, welfare_status, gender, neutering_status, estimated_birth_year, estimated_death_year, street_name, localities(name), neighbourhoods(name)",
           )
           .in("id", dogIds)
           .eq("status", "active")
@@ -137,6 +139,7 @@ export default async function AboutPage() {
         gender: d.gender ?? "unknown",
         neuterStatus: d.neutering_status ?? "unknown",
         estimatedBirthYear: d.estimated_birth_year,
+        estimatedDeathYear: d.estimated_death_year,
         welfareStatus: d.welfare_status ?? "healthy",
         locationLine: formatDogLocationLine(
           embedName(d.localities) ?? "—",
@@ -161,6 +164,7 @@ export default async function AboutPage() {
       gender: featuredProfile?.gender ?? "unknown",
       neuterStatus: featuredProfile?.neutering_status ?? "unknown",
       estimatedBirthYear: featuredProfile?.estimated_birth_year ?? null,
+      estimatedDeathYear: featuredProfile?.estimated_death_year ?? null,
       welfareStatus: featuredProfile?.welfare_status ?? "healthy",
     });
   }

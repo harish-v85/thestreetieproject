@@ -32,7 +32,13 @@ function ConfidenceDot({
 }
 
 function ageDotProps(dog: DogProfileData["dog"]): { dotClass: string; tooltip: string } {
-  const y = approximateAgeYears(new Date().getFullYear(), dog.estimated_birth_year);
+  const baseYear =
+    dog.welfare_status === "deceased" &&
+    dog.estimated_death_year != null &&
+    Number.isFinite(dog.estimated_death_year)
+      ? dog.estimated_death_year
+      : new Date().getFullYear();
+  const y = approximateAgeYears(baseYear, dog.estimated_birth_year);
   if (y == null) {
     return { dotClass: "bg-red-500 shadow-sm ring-1 ring-red-600/30", tooltip: "Unknown" };
   }
@@ -58,7 +64,13 @@ function ageDotProps(dog: DogProfileData["dog"]): { dotClass: string; tooltip: s
 /** v2 profile stat card */
 export function DogProfileAgeStatCard({ data }: { data: DogProfileData }) {
   const { dog } = data;
-  const y = approximateAgeYears(new Date().getFullYear(), dog.estimated_birth_year);
+  const baseYear =
+    dog.welfare_status === "deceased" &&
+    dog.estimated_death_year != null &&
+    Number.isFinite(dog.estimated_death_year)
+      ? dog.estimated_death_year
+      : new Date().getFullYear();
+  const y = approximateAgeYears(baseYear, dog.estimated_birth_year);
   const { dotClass, tooltip } = ageDotProps(dog);
   const display =
     y == null ? (
@@ -84,7 +96,13 @@ export function DogProfileAgeStatCard({ data }: { data: DogProfileData }) {
 /** classic layout: dl row */
 export function DogProfileAgeClassicRow({ data }: { data: DogProfileData }) {
   const { dog } = data;
-  const y = approximateAgeYears(new Date().getFullYear(), dog.estimated_birth_year);
+  const baseYear =
+    dog.welfare_status === "deceased" &&
+    dog.estimated_death_year != null &&
+    Number.isFinite(dog.estimated_death_year)
+      ? dog.estimated_death_year
+      : new Date().getFullYear();
+  const y = approximateAgeYears(baseYear, dog.estimated_birth_year);
   const { dotClass, tooltip } = ageDotProps(dog);
   const display = y == null ? "N/A" : formatTentativeAgeYearsLabel(y);
 

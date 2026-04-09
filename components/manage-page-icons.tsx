@@ -1,7 +1,9 @@
 import {
   Dog,
   MapPinArea,
+  MapTrifold,
   Park,
+  Pulse,
   UserCircleCheck,
   UserCircleGear,
 } from "@phosphor-icons/react/ssr";
@@ -18,6 +20,11 @@ const phosphorClass = "h-7 w-7 shrink-0 sm:h-8 sm:w-8";
 
 export function ManageIconUsers() {
   return <UserCircleGear className={phosphorClass} weight="regular" aria-hidden />;
+}
+
+/** Activity feed / dashboard — recent changes across dogs. */
+export function ManageIconActivity() {
+  return <Pulse className={phosphorClass} weight="regular" aria-hidden />;
 }
 
 /** Access requests — reviewed user applications. */
@@ -43,6 +50,11 @@ export { ManageIconDogs } from "@/components/manage-icon-dogs";
 /** Public directory — all dogs. */
 export function DirectoryIconDog() {
   return <Dog className={phosphorClass} weight="regular" aria-hidden />;
+}
+
+/** Public map — dog presence / locations. */
+export function DirectoryIconMap() {
+  return <MapTrifold className={phosphorClass} weight="regular" aria-hidden />;
 }
 
 /**

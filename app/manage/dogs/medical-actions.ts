@@ -54,6 +54,7 @@ export async function addMedicalRecord(
     event_type,
     occurred_on,
     description,
+    description_snapshot: description,
     next_due_date,
     recorded_by: user.id,
   });
@@ -107,6 +108,7 @@ export async function updateMedicalRecord(
   const nextRaw = String(formData.get("next_due_date") ?? "").trim();
   const next_due_date = nextRaw || null;
 
+  const now = new Date().toISOString();
   const { error } = await supabase
     .from("medical_records")
     .update({
@@ -114,6 +116,7 @@ export async function updateMedicalRecord(
       occurred_on,
       description,
       next_due_date,
+      updated_at: now,
     })
     .eq("id", medicalRecordId)
     .eq("dog_id", dogId);
@@ -124,6 +127,7 @@ export async function updateMedicalRecord(
   revalidatePath(`/dogs/${dogSlug}`);
   revalidatePath("/manage/dogs");
   revalidatePath(`/manage/dogs/${dogSlug}/edit`);
+  revalidatePath("/manage/activity");
   redirectWithFlash(nextPath, "medical_record_updated");
 }
 

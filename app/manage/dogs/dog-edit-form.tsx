@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { DogLocationFields } from "@/components/dog-location-fields";
 import {
@@ -47,6 +47,7 @@ type DogRow = {
   featured: boolean;
   name_aliases: string[];
   estimated_birth_year: number | null;
+  estimated_death_year: number | null;
   age_estimated_on: string | null;
   age_confidence: string;
   has_collar: string;
@@ -72,6 +73,8 @@ export function DogEditForm({
 }) {
   const boundUpdate = updateDog.bind(null, dog.id, dog.slug);
   const [state, formAction, pending] = useActionState(boundUpdate, initial);
+  const [welfareStatus, setWelfareStatus] = useState(dog.welfare_status);
+  const currentYear = new Date().getFullYear();
 
   return (
     <form action={formAction} className="space-y-0">
@@ -197,6 +200,7 @@ export function DogEditForm({
               id="welfare_status"
               name="welfare_status"
               defaultValue={dog.welfare_status}
+              onChange={(e) => setWelfareStatus(e.target.value)}
               className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
             >
               <option value="healthy">Healthy</option>
@@ -219,6 +223,25 @@ export function DogEditForm({
               className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
             />
           </div>
+          {welfareStatus === "deceased" ? (
+            <div>
+              <label htmlFor="estimated_death_year" className="mb-1 block text-sm font-medium">
+                Estimated death year
+              </label>
+              <input
+                id="estimated_death_year"
+                name="estimated_death_year"
+                type="number"
+                min={1980}
+                max={currentYear}
+                step={1}
+                required
+                placeholder={`e.g. ${currentYear}`}
+                defaultValue={dog.estimated_death_year ?? ""}
+                className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 font-mono text-sm outline-none ring-[var(--accent)] focus:ring-2"
+              />
+            </div>
+          ) : null}
           <DogCoatFields defaults={coatDefaults} />
           <DogCollarFields
             defaultHasCollar={dog.has_collar}

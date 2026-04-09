@@ -124,7 +124,7 @@ export function DogProfileClassic({
                   {dog.welfare_remarks.trim()}
                 </p>
               ) : null}
-              {staffViewer ? (
+              {staffViewer && dog.welfare_status !== "deceased" ? (
                 <div className="mt-3">
                   <CollapsibleUpdateWelfare
                     dogId={dog.id}

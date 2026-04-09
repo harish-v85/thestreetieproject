@@ -84,6 +84,8 @@ export type DogProfileData = {
     name_aliases: string[];
     /** Approximate birth year; displayed age is ~(current year − this). */
     estimated_birth_year: number | null;
+    /** If deceased, approximate age uses (estimated_death_year − estimated_birth_year). */
+    estimated_death_year: number | null;
     /** Date the birth-year estimate was recorded. */
     age_estimated_on: string | null;
     age_confidence: string;
@@ -145,6 +147,7 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
       welfare_status_updated_at,
       name_aliases,
       estimated_birth_year,
+      estimated_death_year,
       age_estimated_on,
       age_confidence,
       has_collar,
@@ -398,6 +401,8 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
       ),
       estimated_birth_year:
         (dog as { estimated_birth_year?: number | null }).estimated_birth_year ?? null,
+      estimated_death_year:
+        (dog as { estimated_death_year?: number | null }).estimated_death_year ?? null,
       age_estimated_on:
         (dog as { age_estimated_on?: string | null }).age_estimated_on ?? null,
       age_confidence:

@@ -192,7 +192,7 @@ export function DogProfileV2({
               ) : (
                 <p className="mt-1.5 text-sm text-amber-900/65">No additional welfare notes.</p>
               )}
-              {staffViewer ? (
+              {staffViewer && dog.welfare_status !== "deceased" ? (
                 <CollapsibleUpdateWelfare
                   dogId={dog.id}
                   dogSlug={dog.slug}
@@ -202,7 +202,7 @@ export function DogProfileV2({
                 />
               ) : null}
 
-              {!staffViewer ? (
+              {!staffViewer || dog.welfare_status === "deceased" ? (
                 <div className="mt-3 border-t border-amber-200/70 pt-3">
                   <p className="text-xs text-amber-900/65">
                     Last updated {welfareLastUpdatedDisplay}

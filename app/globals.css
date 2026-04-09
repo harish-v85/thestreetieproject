@@ -45,16 +45,18 @@ body::before {
   mask-position: 0 0;
 }
 
-/* Leaflet (dog profile hangout map)
-   Tailwind preflight sets img { max-width: 100%; height: auto } which breaks
-   Leaflet’s tile layer (tiles rely on explicit pixel dimensions). */
+/* Leaflet — shared shell. Default height is for profile / hangout embeds only.
+   Full-page maps (e.g. dog presence) add class dogs-presence-map-root and set height via Tailwind. */
 .leaflet-container {
   font-family: inherit;
-  min-height: min(22rem, 55vh);
-  height: min(22rem, 55vh);
   width: 100%;
   border-radius: 0.75rem;
   z-index: 0;
+}
+
+.leaflet-container:not(.dogs-presence-map-root) {
+  min-height: min(22rem, 55vh);
+  height: min(22rem, 55vh);
 }
 
 .leaflet-container img.leaflet-tile,

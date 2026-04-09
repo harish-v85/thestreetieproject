@@ -25,21 +25,29 @@ export function CollapsibleUpdateWelfare({
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState("");
   const [remarks, setRemarks] = useState("");
+  const [estimatedDeathYear, setEstimatedDeathYear] = useState("");
   const uid = useId();
   const statusId = `${uid}-welfare_status`;
   const remarksId = `${uid}-welfare_remarks`;
+  const estimatedDeathYearId = `${uid}-estimated_death_year`;
 
   useEffect(() => {
     if (open) {
       setStatus("");
       setRemarks("");
+      setEstimatedDeathYear("");
     }
   }, [open]);
 
   const bound = updateDogWelfareFromProfile.bind(null, dogId, dogSlug);
   const [state, formAction, pending] = useActionState(bound, initial);
 
-  const canSubmit = status !== "" || remarks.trim() !== "";
+  const effectiveStatus = status || defaultWelfareStatus;
+  const needsDeathYear = effectiveStatus === "deceased";
+  const canSubmit =
+    (status !== "" || remarks.trim() !== "") &&
+    (!needsDeathYear || estimatedDeathYear.trim() !== "");
+  const currentYear = new Date().getFullYear();
 
   const closedButtonClass =
     variant === "v2"
@@ -149,6 +157,29 @@ export function CollapsibleUpdateWelfare({
               className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-[var(--accent)] focus:ring-2"
             />
           </div>
+          {needsDeathYear ? (
+            <div>
+              <label
+                htmlFor={estimatedDeathYearId}
+                className="mb-1 block text-xs font-medium text-[var(--muted)]"
+              >
+                Estimated death year
+              </label>
+              <input
+                id={estimatedDeathYearId}
+                name="estimated_death_year"
+                type="number"
+                min={1980}
+                max={currentYear}
+                step={1}
+                required
+                value={estimatedDeathYear}
+                onChange={(e) => setEstimatedDeathYear(e.target.value)}
+                placeholder={`e.g. ${currentYear}`}
+                className="w-full max-w-md rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-[var(--accent)] focus:ring-2"
+              />
+            </div>
+          ) : null}
         </div>
         {state.error ? (
           <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">

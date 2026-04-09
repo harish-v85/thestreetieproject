@@ -7,6 +7,7 @@ import {
   House,
   MapPinArea,
   Park,
+  Pulse,
   UserCircleCheck,
   UserCircleGear,
 } from "@phosphor-icons/react";
@@ -131,6 +132,10 @@ export function HeaderNavGroups({
               </Link>
               {isSuperAdmin ? (
                 <>
+                  <Link href="/manage/activity" className={linkClass()} role="menuitem" onClick={close}>
+                    <Pulse className={navIconClass} weight="regular" aria-hidden />
+                    Activity
+                  </Link>
                   <Link href="/manage/users" className={linkClass()} role="menuitem" onClick={close}>
                     <UserCircleGear className={navIconClass} weight="regular" aria-hidden />
                     Users

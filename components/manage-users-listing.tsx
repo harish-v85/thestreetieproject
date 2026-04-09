@@ -26,10 +26,18 @@ function userStatusClass(status: string) {
   if (status === "active") {
     return "rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800";
   }
+  if (status === "invited") {
+    return "rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-900";
+  }
   if (status === "pending") {
     return "rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900";
   }
   return "rounded-full bg-black/5 px-2 py-0.5 text-xs font-medium text-[var(--muted)]";
+}
+
+function statusLabel(status: string) {
+  if (status === "invited") return "Invited";
+  return status;
 }
 
 const addBtnClass =
@@ -91,15 +99,17 @@ export function ManageUsersListing({ rows }: { rows: UserListRow[] }) {
                     {u.locality_name}
                   </p>
                   <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]">
-                    <span className={userStatusClass(u.status)}>{u.status}</span>
+                    <span className={userStatusClass(u.status)}>{statusLabel(u.status)}</span>
                     <span>Joined {formatDisplayDate(u.created_at)}</span>
                   </div>
-                  <Link
-                    href={`/manage/users/${u.id}/edit`}
-                    className="mt-2 flex w-full items-center justify-center rounded-lg border border-black/10 px-3 py-2 text-sm font-medium text-[var(--accent)] transition hover:bg-[var(--background)]"
-                  >
-                    Edit
-                  </Link>
+                  <div className="mt-2 flex flex-col gap-2">
+                    <Link
+                      href={`/manage/users/${u.id}/edit`}
+                      className="flex w-full items-center justify-center rounded-lg border border-black/10 px-3 py-2 text-sm font-medium text-[var(--accent)] transition hover:bg-[var(--background)]"
+                    >
+                      Edit
+                    </Link>
+                  </div>
                 </div>
               </li>
             ))}
@@ -116,7 +126,7 @@ export function ManageUsersListing({ rows }: { rows: UserListRow[] }) {
                     <th className="px-4 py-3">Locality</th>
                     <th className="px-4 py-3">Status</th>
                     <th className="px-4 py-3">Joined</th>
-                    <th className="px-4 py-3" />
+                    <th className="px-4 py-3" aria-label="Actions" />
                   </tr>
                 </thead>
                 <tbody>
@@ -127,18 +137,20 @@ export function ManageUsersListing({ rows }: { rows: UserListRow[] }) {
                       <td className="px-4 py-3 text-[var(--muted)]">{roleLabel(u.role)}</td>
                       <td className="px-4 py-3 text-[var(--muted)]">{u.locality_name}</td>
                       <td className="px-4 py-3">
-                        <span className={userStatusClass(u.status)}>{u.status}</span>
+                        <span className={userStatusClass(u.status)}>{statusLabel(u.status)}</span>
                       </td>
                       <td className="px-4 py-3 text-[var(--muted)]">
                         {formatDisplayDate(u.created_at)}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <Link
-                          href={`/manage/users/${u.id}/edit`}
-                          className="font-medium text-[var(--accent)]"
-                        >
-                          Edit
-                        </Link>
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                          <Link
+                            href={`/manage/users/${u.id}/edit`}
+                            className="font-medium text-[var(--accent)]"
+                          >
+                            Edit
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))}

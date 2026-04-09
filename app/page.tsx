@@ -6,6 +6,7 @@ import { HomeDirectoryClient } from "@/components/home-directory-client";
 import { HomeFeatured } from "@/components/home-featured";
 import { loadFeaturedDogPayload } from "@/lib/dogs/load-featured";
 import { loadDirectoryFilterOptions } from "@/lib/dogs/load-directory-filter-options";
+import { supabaseErrorHint } from "@/lib/supabase/error-hints";
 import { getFaviconSrc, TspLogoImage, TSP_WORDMARK_TYPOGRAPHY } from "@/components/tsp-brand-logo";
 import { createClient } from "@/lib/supabase/server";
 
@@ -125,10 +126,7 @@ export default async function Home({
         >
           <p className="font-medium">Could not load localities</p>
           <p className="mt-1 font-mono text-xs">{locError.message}</p>
-          <p className="mt-2 text-red-900/80">
-            If Row Level Security is enabled on <code className="text-xs">localities</code>, add a
-            SELECT policy for anon and authenticated roles.
-          </p>
+          <p className="mt-2 text-red-900/80">{supabaseErrorHint(locError.message)}</p>
         </section>
       ) : null}
 
@@ -146,6 +144,7 @@ export default async function Home({
         excludeDogId={featured?.id ?? null}
         initialDogs={initialDogs}
         initialHasMore={initialHasMore}
+        showMapViewCallout
       />
     </main>
   );

@@ -7,6 +7,7 @@ import {
   List,
   MapPinArea,
   Park,
+  Pulse,
   SignOut,
   User,
   UserCircleCheck,
@@ -90,6 +91,10 @@ function MobileDrawerNav({
           </Link>
           {isSuperAdmin ? (
             <>
+              <Link href="/manage/activity" className={drawerLinkClass()} onClick={onNavigate}>
+                <Pulse className={drawerIconClass} weight="regular" aria-hidden />
+                Activity
+              </Link>
               <Link href="/manage/users" className={drawerLinkClass()} onClick={onNavigate}>
                 <UserCircleGear className={drawerIconClass} weight="regular" aria-hidden />
                 Users

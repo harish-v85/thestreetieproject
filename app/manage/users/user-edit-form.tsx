@@ -110,6 +110,7 @@ export function UserEditForm({
             className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
           >
             <option value="active">Active</option>
+            <option value="invited">Invited (awaiting password setup)</option>
             <option value="pending">Pending</option>
             <option value="archived">Archived</option>
           </select>

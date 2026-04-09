@@ -4,6 +4,7 @@ import { fetchHomeDogsPage } from "@/app/actions/home-dogs";
 import type { HomeDogFilters } from "@/lib/dogs/home-directory";
 import { HomeDirectoryClient } from "@/components/home-directory-client";
 import { loadDirectoryFilterOptions } from "@/lib/dogs/load-directory-filter-options";
+import { supabaseErrorHint } from "@/lib/supabase/error-hints";
 import { createClient } from "@/lib/supabase/server";
 import { ManagePageHeader } from "@/components/manage-page-header";
 import { DirectoryIconDog } from "@/components/manage-page-icons";
@@ -59,6 +60,10 @@ export default async function DogsDirectoryPage() {
           <>
             Browse active dog profiles in your area. Learn about them, track their care, and follow
             updates from the community.{" "}
+            <Link href="/dogs/map" className="font-medium text-[var(--accent)] underline-offset-2 hover:underline">
+              Map view
+            </Link>
+            {" · "}
             <Link href="/" className="font-medium text-[var(--accent)] underline-offset-2 hover:underline">
               Back to home
             </Link>
@@ -73,10 +78,7 @@ export default async function DogsDirectoryPage() {
         >
           <p className="font-medium">Could not load filter options</p>
           <p className="mt-1 font-mono text-xs">{locError.message}</p>
-          <p className="mt-2 text-red-900/80">
-            If Row Level Security is enabled on <code className="text-xs">localities</code>, add a
-            SELECT policy for anon and authenticated roles.
-          </p>
+          <p className="mt-2 text-red-900/80">{supabaseErrorHint(locError.message)}</p>
         </section>
       ) : null}
 
@@ -115,6 +117,7 @@ export default async function DogsDirectoryPage() {
           excludeDogId={null}
           initialDogs={initialDogs}
           initialHasMore={initialHasMore}
+          showMapViewCallout
         />
       )}
     </main>

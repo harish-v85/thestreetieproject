@@ -7,7 +7,45 @@ import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 
 export type ReviewState = { error: string | null };
 
-/** Approve request then send super admin to Add user with query prefill. */
+export async function reviewAccessRequest(
+  requestId: string,
+  status: "approved" | "rejected",
+): Promise<ReviewState> {
+  const { userId } = await requireSuperAdmin("/manage/access-requests");
+  const supabase = await createClient();
+
+  const { data: row, error: fetchErr } = await supabase
+    .from("access_requests")
+    .select("id, status")
+    .eq("id", requestId)
+    .maybeSingle();
+
+  if (fetchErr || !row) {
+    return { error: fetchErr?.message ?? "Request not found." };
+  }
+  if (row.status !== "pending") {
+    return { error: "This request was already reviewed." };
+  }
+
+  const { error } = await supabase
+    .from("access_requests")
+    .update({
+      status,
+      reviewed_by: userId,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("id", requestId)
+    .eq("status", "pending");
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/manage/access-requests");
+  revalidatePath("/");
+  return { error: null };
+}
+
 export async function approveAccessRequestAndAddUser(requestId: string): Promise<ReviewState> {
   const { userId } = await requireSuperAdmin("/manage/access-requests");
   const supabase = await createClient();
@@ -56,43 +94,4 @@ export async function approveAccessRequestAndAddUser(requestId: string): Promise
   }
 
   redirect(`/manage/users/new?${params.toString()}`);
-}
-
-export async function reviewAccessRequest(
-  requestId: string,
-  status: "approved" | "rejected",
-): Promise<ReviewState> {
-  const { userId } = await requireSuperAdmin("/manage/access-requests");
-  const supabase = await createClient();
-
-  const { data: row, error: fetchErr } = await supabase
-    .from("access_requests")
-    .select("id, status")
-    .eq("id", requestId)
-    .maybeSingle();
-
-  if (fetchErr || !row) {
-    return { error: fetchErr?.message ?? "Request not found." };
-  }
-  if (row.status !== "pending") {
-    return { error: "This request was already reviewed." };
-  }
-
-  const { error } = await supabase
-    .from("access_requests")
-    .update({
-      status,
-      reviewed_by: userId,
-      reviewed_at: new Date().toISOString(),
-    })
-    .eq("id", requestId)
-    .eq("status", "pending");
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  revalidatePath("/manage/access-requests");
-  revalidatePath("/");
-  return { error: null };
 }

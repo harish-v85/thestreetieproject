@@ -111,7 +111,7 @@ export async function updateUserAdmin(
   if (!["dog_feeder", "admin", "super_admin"].includes(role)) {
     return { error: "Invalid role." };
   }
-  if (!["active", "pending", "archived"].includes(status)) {
+  if (!["active", "pending", "archived", "invited"].includes(status)) {
     return { error: "Invalid status." };
   }
 
@@ -129,7 +129,9 @@ export async function updateUserAdmin(
 
   if (actorId === targetUserId) {
     if (status !== "active") {
-      return { error: "You cannot set your own account to pending or archived." };
+      return {
+        error: "You cannot set your own account to pending, archived, or invited.",
+      };
     }
     if (role !== "super_admin") {
       const { count } = await admin

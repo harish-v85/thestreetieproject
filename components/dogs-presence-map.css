@@ -1,0 +1,35 @@
+/* Marker cluster badges (leaflet.markercluster iconCreateFunction) */
+.streetie-cluster-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  border: 3px solid white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+  box-sizing: border-box;
+}
+
+.streetie-cluster-cream {
+  background: #fff8e8;
+  color: #4a3428;
+}
+
+.streetie-cluster-tan {
+  background: #d4a574;
+  color: #fff;
+}
+
+.streetie-cluster-chocolate {
+  background: #5c4033;
+  color: #fff;
+}
+
+.streetie-cluster-wrap {
+  background: transparent !important;
+  border: none !important;
+}

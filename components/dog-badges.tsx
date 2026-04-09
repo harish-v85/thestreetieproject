@@ -165,17 +165,33 @@ export function NeuterBadge({ status }: { status: string }) {
   );
 }
 
-export function AgeBadge({ estimatedBirthYear }: { estimatedBirthYear: number | null }) {
+export function AgeBadge({
+  estimatedBirthYear,
+  estimatedDeathYear,
+  welfareStatus,
+}: {
+  estimatedBirthYear: number | null;
+  estimatedDeathYear?: number | null;
+  welfareStatus?: string | null;
+}) {
   const cy = new Date().getFullYear();
+  const baseYear =
+    welfareStatus === "deceased" &&
+    estimatedDeathYear != null &&
+    Number.isFinite(estimatedDeathYear)
+      ? estimatedDeathYear
+      : cy;
   const y =
     estimatedBirthYear != null && Number.isFinite(estimatedBirthYear)
-      ? cy - estimatedBirthYear
+      ? baseYear - estimatedBirthYear
       : null;
   const label = y == null ? "N/A" : formatTentativeAgeYearsLabel(y);
   const title =
     y == null
       ? "Age unknown — no estimated birth year"
-      : `Approximate age: ${formatTentativeAgeYearsLabel(y)} (from estimated birth year)`;
+      : welfareStatus === "deceased" && estimatedDeathYear != null
+        ? `Approximate age at death: ${formatTentativeAgeYearsLabel(y)} (estimated death year − estimated birth year)`
+        : `Approximate age: ${formatTentativeAgeYearsLabel(y)} (from estimated birth year)`;
   return (
     <Badge tone="neutral" icon={<CalendarIcon />} title={title} chipShape="rect">
       {label}
