@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import type { NeighbourhoodOption } from "@/components/dog-location-fields";
+import { ProfileLocalityNeighbourhoodFields } from "@/components/profile-locality-neighbourhood";
 import { updateUserAdmin, type UserFormState } from "./actions";
 
 const initial: UserFormState = { error: null };
@@ -14,15 +16,18 @@ type EditUser = {
   role: string;
   status: string;
   locality_id: string | null;
+  neighbourhood_id: string | null;
 };
 
 export function UserEditForm({
   user,
   localities,
+  neighbourhoods,
   isSelf,
 }: {
   user: EditUser;
   localities: { id: string; name: string }[];
+  neighbourhoods: NeighbourhoodOption[];
   isSelf: boolean;
 }) {
   const bound = updateUserAdmin.bind(null, user.id);
@@ -81,25 +86,13 @@ export function UserEditForm({
             </p>
           ) : null}
         </div>
-        <div>
-          <label htmlFor="locality_id" className="mb-1 block text-sm font-medium">
-            Locality
-          </label>
-          <select
-            id="locality_id"
-            name="locality_id"
-            defaultValue={user.locality_id ?? ""}
-            className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
-          >
-            <option value="">—</option>
-            {localities.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
+        <ProfileLocalityNeighbourhoodFields
+          localities={localities}
+          neighbourhoods={neighbourhoods}
+          defaultLocalityId={user.locality_id ?? ""}
+          defaultNeighbourhoodId={user.neighbourhood_id ?? ""}
+        />
+        <div className="sm:col-span-2">
           <label htmlFor="status" className="mb-1 block text-sm font-medium">
             Status
           </label>

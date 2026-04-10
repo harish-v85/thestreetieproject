@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import type { NeighbourhoodOption } from "@/components/dog-location-fields";
 import { UserEditForm } from "../../user-edit-form";
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -42,7 +43,7 @@ export default async function EditUserPage({ params }: PageProps) {
 
   const { data: profile } = await admin
     .from("profiles")
-    .select("full_name, phone, role, status, locality_id")
+    .select("full_name, phone, role, status, locality_id, neighbourhood_id")
     .eq("id", id)
     .maybeSingle();
 
@@ -52,6 +53,17 @@ export default async function EditUserPage({ params }: PageProps) {
     .select("id, name")
     .order("sort_order", { ascending: true });
 
+  const { data: nbRows } = await supabase
+    .from("neighbourhoods")
+    .select("id, locality_id, name")
+    .order("sort_order", { ascending: true });
+
+  const neighbourhoods: NeighbourhoodOption[] = (nbRows ?? []).map((n) => ({
+    id: n.id,
+    locality_id: n.locality_id,
+    name: n.name,
+  }));
+
   const user = {
     id,
     email: authData.user.email ?? "—",
@@ -60,6 +72,7 @@ export default async function EditUserPage({ params }: PageProps) {
     role: profile?.role ?? "dog_feeder",
     status: profile?.status ?? "active",
     locality_id: profile?.locality_id ?? null,
+    neighbourhood_id: profile?.neighbourhood_id ?? null,
   };
 
   return (
@@ -76,6 +89,7 @@ export default async function EditUserPage({ params }: PageProps) {
         <UserEditForm
           user={user}
           localities={localities ?? []}
+          neighbourhoods={neighbourhoods}
           isSelf={actorId === id}
         />
       </div>

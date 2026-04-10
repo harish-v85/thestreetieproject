@@ -20,6 +20,7 @@ export default async function ManageUsersPage() {
     full_name: u.full_name,
     role: u.role,
     locality_name: u.locality_name,
+    neighbourhood_name: u.neighbourhood_name,
     status: u.status,
     created_at: u.created_at,
   }));

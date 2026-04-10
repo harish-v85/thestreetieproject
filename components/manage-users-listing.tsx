@@ -11,6 +11,7 @@ export type UserListRow = {
   full_name: string;
   role: string;
   locality_name: string;
+  neighbourhood_name: string;
   status: string;
   created_at: string;
 };
@@ -50,7 +51,8 @@ export function ManageUsersListing({ rows }: { rows: UserListRow[] }) {
     const s = q.trim().toLowerCase();
     if (!s) return rows;
     return rows.filter((u) => {
-      const hay = `${u.email} ${u.full_name} ${roleLabel(u.role)} ${u.locality_name} ${u.status}`.toLowerCase();
+      const hay =
+        `${u.email} ${u.full_name} ${roleLabel(u.role)} ${u.locality_name} ${u.neighbourhood_name} ${u.status}`.toLowerCase();
       return hay.includes(s);
     });
   }, [rows, q]);
@@ -59,7 +61,7 @@ export function ManageUsersListing({ rows }: { rows: UserListRow[] }) {
     <ManageListingToolbar
       inputId="manage-users-search"
       label="Search"
-      placeholder="Email, name, role, locality, status…"
+      placeholder="Email, name, role, locality, neighbourhood, status…"
       value={q}
       onChange={setQ}
       action={
@@ -98,6 +100,10 @@ export function ManageUsersListing({ rows }: { rows: UserListRow[] }) {
                     <span className="font-medium text-[var(--foreground)]/80">Locality:</span>{" "}
                     {u.locality_name}
                   </p>
+                  <p className="text-sm text-[var(--muted)]">
+                    <span className="font-medium text-[var(--foreground)]/80">Neighbourhood:</span>{" "}
+                    {u.neighbourhood_name}
+                  </p>
                   <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]">
                     <span className={userStatusClass(u.status)}>{statusLabel(u.status)}</span>
                     <span>Joined {formatDisplayDate(u.created_at)}</span>
@@ -117,13 +123,14 @@ export function ManageUsersListing({ rows }: { rows: UserListRow[] }) {
 
           <div className="hidden sm:block">
             <div className="w-full overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
-              <table className="w-full min-w-[56rem] text-left text-sm">
+              <table className="w-full min-w-[64rem] text-left text-sm">
                 <thead className="border-b border-white/15 bg-[var(--table-header-bg)] text-xs font-semibold uppercase tracking-wide text-white">
                   <tr>
                     <th className="px-4 py-3">Email</th>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">Role</th>
                     <th className="px-4 py-3">Locality</th>
+                    <th className="px-4 py-3">Neighbourhood</th>
                     <th className="px-4 py-3">Status</th>
                     <th className="px-4 py-3">Joined</th>
                     <th className="px-4 py-3" aria-label="Actions" />
@@ -136,6 +143,7 @@ export function ManageUsersListing({ rows }: { rows: UserListRow[] }) {
                       <td className="px-4 py-3 text-[var(--foreground)]">{u.full_name}</td>
                       <td className="px-4 py-3 text-[var(--muted)]">{roleLabel(u.role)}</td>
                       <td className="px-4 py-3 text-[var(--muted)]">{u.locality_name}</td>
+                      <td className="px-4 py-3 text-[var(--muted)]">{u.neighbourhood_name}</td>
                       <td className="px-4 py-3">
                         <span className={userStatusClass(u.status)}>{statusLabel(u.status)}</span>
                       </td>

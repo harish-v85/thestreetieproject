@@ -16,6 +16,8 @@ export type MergedUserRow = {
   status: string;
   locality_id: string | null;
   locality_name: string;
+  neighbourhood_id: string | null;
+  neighbourhood_name: string;
   created_at: string;
   last_sign_in: string | null | undefined;
 };
@@ -104,6 +106,7 @@ export async function updateUserAdmin(
   const phone = String(formData.get("phone") ?? "").trim() || null;
   const role = String(formData.get("role") ?? "dog_feeder");
   const locality_id = String(formData.get("locality_id") ?? "").trim() || null;
+  const neighbourhood_id = String(formData.get("neighbourhood_id") ?? "").trim() || null;
   const status = String(formData.get("status") ?? "active");
   const newPassword = String(formData.get("new_password") ?? "").trim();
 
@@ -117,6 +120,23 @@ export async function updateUserAdmin(
 
   if (newPassword && newPassword.length < 8) {
     return { error: "New password must be at least 8 characters or left blank." };
+  }
+
+  if (neighbourhood_id && locality_id) {
+    const { data: nb, error: nbErr } = await admin
+      .from("neighbourhoods")
+      .select("id, locality_id")
+      .eq("id", neighbourhood_id)
+      .maybeSingle();
+
+    if (nbErr || !nb) {
+      return { error: "Invalid neighbourhood." };
+    }
+    if (nb.locality_id !== locality_id) {
+      return { error: "Neighbourhood must match the selected locality." };
+    }
+  } else if (neighbourhood_id && !locality_id) {
+    return { error: "Choose a locality before a neighbourhood." };
   }
 
   const { data: targetProfile } = await admin
@@ -170,10 +190,19 @@ export async function updateUserAdmin(
       role,
       status,
       locality_id,
+      neighbourhood_id: locality_id ? neighbourhood_id ?? null : null,
     })
     .eq("id", targetUserId);
 
-  if (profErr) return { error: profErr.message };
+  if (profErr) {
+    if (profErr.message.includes("neighbourhood_id") || profErr.message.includes("column")) {
+      return {
+        error:
+          "Could not save neighbourhood. Run database migration 015_profiles_neighbourhood_id.sql if this column is missing.",
+      };
+    }
+    return { error: profErr.message };
+  }
 
   if (newPassword) {
     const { error: pwErr } = await admin.auth.admin.updateUserById(targetUserId, {
@@ -217,7 +246,7 @@ export async function loadUsersForSuperAdmin() {
 
   const authUsers = await fetchAllAuthUsers(admin);
   const { data: profiles, error: pErr } = await admin.from("profiles").select(
-    "id, full_name, phone, role, status, locality_id, created_at",
+    "id, full_name, phone, role, status, locality_id, neighbourhood_id, created_at",
   );
 
   if (pErr) {
@@ -227,6 +256,8 @@ export async function loadUsersForSuperAdmin() {
   const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
   const { data: locs } = await admin.from("localities").select("id, name");
   const locMap = new Map((locs ?? []).map((l) => [l.id, l.name]));
+  const { data: nbs } = await admin.from("neighbourhoods").select("id, name");
+  const nbMap = new Map((nbs ?? []).map((n) => [n.id, n.name]));
 
   const rows: MergedUserRow[] = authUsers.map((u) => {
     const p = profileById.get(u.id);
@@ -239,6 +270,8 @@ export async function loadUsersForSuperAdmin() {
       status: p?.status ?? "—",
       locality_id: p?.locality_id ?? null,
       locality_name: p?.locality_id ? locMap.get(p.locality_id) ?? "—" : "—",
+      neighbourhood_id: p?.neighbourhood_id ?? null,
+      neighbourhood_name: p?.neighbourhood_id ? nbMap.get(p.neighbourhood_id) ?? "—" : "—",
       created_at: p?.created_at ?? u.created_at,
       last_sign_in: u.last_sign_in_at,
     };
