@@ -95,8 +95,9 @@ export function AboutDogCarousel({ dogs }: { dogs: AboutDogCarouselItem[] }) {
             fill
             className="object-cover transition group-hover:scale-[1.02]"
             style={{ objectPosition: objectPositionFromFocal(active.focalX, active.focalY) }}
-            sizes="(max-width: 1024px) 100vw, 33vw"
-            unoptimized
+            sizes="(max-width: 1024px) 100vw, 40vw"
+            priority={idx === 0}
+            loading={idx === 0 ? undefined : "lazy"}
           />
         ) : (
           <Image
@@ -104,7 +105,9 @@ export function AboutDogCarousel({ dogs }: { dogs: AboutDogCarouselItem[] }) {
             alt=""
             fill
             className="object-cover transition group-hover:scale-[1.02]"
-            sizes="(max-width: 1024px) 100vw, 33vw"
+            sizes="(max-width: 1024px) 100vw, 40vw"
+            priority={idx === 0}
+            loading={idx === 0 ? undefined : "lazy"}
           />
         )}
         {hasWelfareFlag ? (

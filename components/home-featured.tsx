@@ -28,7 +28,6 @@ export function HomeFeatured({ dog }: { dog: FeaturedDogPayload }) {
               }}
               sizes="(max-width: 768px) 100vw, 50vw"
               priority
-              unoptimized
             />
           ) : (
             <Image

@@ -18,6 +18,7 @@ import { SingleSelectDropdown } from "@/components/single-select-dropdown";
 import { objectPositionFromFocal } from "@/lib/dogs/photo-focal";
 import { formatDogLocationLine } from "@/lib/dogs/location-line";
 import { dogPhotoPlaceholder } from "@/lib/dogs/photo-placeholder";
+import { HomeDirectoryGridSkeleton } from "@/components/home-directory-skeleton";
 
 /** Safari: lock row height so search, multiselect triggers, and native selects align. */
 const DIRECTORY_FILTER_ROW =
@@ -51,20 +52,21 @@ function DogMiniCard({ dog }: { dog: HomeDogCard }) {
             src={dog.thumb_url}
             alt=""
             fill
+            loading="lazy"
             className="object-cover transition group-hover:scale-[1.02]"
             style={{
               objectPosition: objectPositionFromFocal(dog.thumb_focal_x, dog.thumb_focal_y),
             }}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            unoptimized
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 384px"
           />
         ) : (
           <Image
             src={dogPhotoPlaceholder}
             alt=""
             fill
+            loading="lazy"
             className="object-cover transition group-hover:scale-[1.02]"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 384px"
           />
         )}
         {hasWelfareFlag ? (
@@ -147,6 +149,8 @@ export function HomeDirectoryClient({
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  /** Mobile: locality / neighbourhood / gender / neutering / colour collapsed behind “Show filters”. */
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const skipInitialRefetch = useRef(true);
@@ -302,7 +306,21 @@ export function HomeDirectoryClient({
               className={DIRECTORY_FILTER_SEARCH_CLASS}
             />
           </div>
-          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-5 sm:items-end">
+          <div className="sm:hidden">
+            <button
+              type="button"
+              onClick={() => setFiltersExpanded((v) => !v)}
+              aria-expanded={filtersExpanded}
+              aria-controls="home-directory-filters"
+              className="text-sm font-medium text-[var(--accent)] underline-offset-2 hover:underline"
+            >
+              {filtersExpanded ? "Hide filters" : "Show filters"}
+            </button>
+          </div>
+          <div
+            id="home-directory-filters"
+            className={`w-full grid-cols-1 gap-3 sm:grid sm:grid-cols-5 sm:items-end ${filtersExpanded ? "grid" : "hidden sm:grid"}`}
+          >
             <div className="min-w-0">
               <MultiSelectDropdown
                 label="Locality"
@@ -457,17 +475,13 @@ export function HomeDirectoryClient({
         ) : null}
       </div>
 
-      {loading && (
-        <p className="mb-4 text-center text-sm text-[var(--muted)]">Updating results…</p>
-      )}
-
-      {!loading && dogs.length === 0 && (
+      {loading ? (
+        <HomeDirectoryGridSkeleton count={6} />
+      ) : dogs.length === 0 ? (
         <p className="rounded-xl border border-black/5 bg-white py-12 text-center text-[var(--muted)]">
           No dogs match these filters.
         </p>
-      )}
-
-      {dogs.length > 0 && (
+      ) : (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {dogs.map((dog) => (
             <li key={dog.id}>

@@ -2,14 +2,10 @@ import { BookOpenText, Heart, MagnifyingGlass, NotePencil, Stethoscope } from "@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { AboutDogCarousel, type AboutDogCarouselItem } from "@/components/about-dog-carousel";
+import { AboutDogCarouselSection } from "@/components/about-dog-carousel-section";
 import { LeafletPointMap } from "@/components/leaflet-point-map";
 import { ManagePageHeader } from "@/components/manage-page-header";
 import tspLogoV2 from "@/content/tsp-logo-v2.svg";
-import { createClient } from "@/lib/supabase/server";
-import { loadFeaturedDogPayload } from "@/lib/dogs/load-featured";
-import { thumbForDogId, type DogPhotoThumbRow } from "@/lib/dogs/photo-focal";
-import { formatDogLocationLine } from "@/lib/dogs/location-line";
 
 export const metadata: Metadata = {
   title: "About — The Streetie Project",
@@ -42,133 +38,7 @@ const ACTIONS = [
 
 const bodyCopyClass = "leading-relaxed text-[var(--foreground)]/90";
 
-function shuffle<T>(arr: T[]): T[] {
-  const out = [...arr];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
-}
-
-type DogInfo = {
-  id: string;
-  slug: string;
-  name: string;
-  name_aliases: unknown;
-  welfare_status: string | null;
-  gender: string | null;
-  /** Matches `dogs.neutering_status` (same as home directory / manage). */
-  neutering_status: string | null;
-  estimated_birth_year: number | null;
-  estimated_death_year: number | null;
-  street_name: string | null;
-  localities: { name: string } | { name: string }[] | null;
-  neighbourhoods: { name: string } | { name: string }[] | null;
-};
-
-function embedName(v: DogInfo["localities"] | DogInfo["neighbourhoods"]): string | null {
-  if (!v) return null;
-  return Array.isArray(v) ? v[0]?.name ?? null : v.name;
-}
-
 export default async function AboutPage() {
-  const supabase = await createClient();
-  const featured = await loadFeaturedDogPayload(supabase);
-
-  /** When carousel falls back to featured dog only, load profile fields for badges (not in FeaturedDogPayload). */
-  let featuredProfile: {
-    gender: string | null;
-    neutering_status: string | null;
-    estimated_birth_year: number | null;
-    estimated_death_year: number | null;
-    welfare_status: string | null;
-  } | null = null;
-  if (featured) {
-    const { data } = await supabase
-      .from("dogs")
-      .select("gender, neutering_status, estimated_birth_year, estimated_death_year, welfare_status")
-      .eq("id", featured.id)
-      .maybeSingle();
-    featuredProfile = data;
-  }
-  /** Enough rows to cover many dogs (multiple photos per dog). */
-  const { data: photoRows } = await supabase
-    .from("dog_photos")
-    .select("dog_id, url, is_primary, sort_order, uploaded_at, focal_x, focal_y")
-    .not("url", "is", null)
-    .limit(2000);
-
-  const photoByDog = new Map<string, DogPhotoThumbRow[]>();
-  for (const row of (photoRows ?? []) as DogPhotoThumbRow[]) {
-    const list = photoByDog.get(row.dog_id) ?? [];
-    list.push(row);
-    photoByDog.set(row.dog_id, list);
-  }
-
-  const dogIds = Array.from(photoByDog.keys());
-  const { data: dogRows, error: dogRowsError } =
-    dogIds.length > 0
-      ? await supabase
-          .from("dogs")
-          .select(
-            "id, slug, name, name_aliases, welfare_status, gender, neutering_status, estimated_birth_year, estimated_death_year, street_name, localities(name), neighbourhoods(name)",
-          )
-          .in("id", dogIds)
-          .eq("status", "active")
-      : { data: [] as DogInfo[], error: null };
-
-  if (dogRowsError) {
-    console.error("about page dogs query", dogRowsError.message);
-  }
-
-  const dogCarouselItems: AboutDogCarouselItem[] = shuffle((dogRows as DogInfo[] | null) ?? [])
-    .map((d) => {
-      const thumb = thumbForDogId(d.id, photoByDog.get(d.id) ?? []);
-      if (!thumb?.url) return null;
-      return {
-        id: d.id,
-        slug: d.slug,
-        name: d.name,
-        nameAliases: Array.isArray(d.name_aliases)
-          ? d.name_aliases.filter((x): x is string => typeof x === "string")
-          : [],
-        imageUrl: thumb.url,
-        focalX: thumb.focalX,
-        focalY: thumb.focalY,
-        gender: d.gender ?? "unknown",
-        neuterStatus: d.neutering_status ?? "unknown",
-        estimatedBirthYear: d.estimated_birth_year,
-        estimatedDeathYear: d.estimated_death_year,
-        welfareStatus: d.welfare_status ?? "healthy",
-        locationLine: formatDogLocationLine(
-          embedName(d.localities) ?? "—",
-          embedName(d.neighbourhoods),
-          d.street_name,
-        ),
-      };
-    })
-    .filter((x): x is AboutDogCarouselItem => Boolean(x))
-    .slice(0, 10);
-
-  if (dogCarouselItems.length === 0 && featured?.imageUrl) {
-    dogCarouselItems.push({
-      id: featured.id,
-      name: featured.name,
-      nameAliases: featured.name_aliases,
-      slug: featured.slug,
-      locationLine: featured.locationLine,
-      imageUrl: featured.imageUrl,
-      focalX: featured.imageFocalX,
-      focalY: featured.imageFocalY,
-      gender: featuredProfile?.gender ?? "unknown",
-      neuterStatus: featuredProfile?.neutering_status ?? "unknown",
-      estimatedBirthYear: featuredProfile?.estimated_birth_year ?? null,
-      estimatedDeathYear: featuredProfile?.estimated_death_year ?? null,
-      welfareStatus: featuredProfile?.welfare_status ?? "healthy",
-    });
-  }
-
   return (
     <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <nav className="mb-6 text-sm">
@@ -232,21 +102,19 @@ export default async function AboutPage() {
                 Over time, something simple becomes clear: when we begin to recognise individual dogs, not
                 just &ldquo;strays,&rdquo; our relationship with them shifts.
               </p>
-              
-                <p className="list-disc list-inside font-medium text-[var(--foreground)]">
-                
-                  <li> Familiarity replaces uncertainty.</li> 
-                  <li> Care becomes easier to share.</li> 
-                  <li> The neighbourhood learns to live alongside them, a little more comfortably.</li>
-                
-                </p>
-              
+
+              <ul className="list-disc list-inside font-medium text-[var(--foreground)]">
+                <li>Familiarity replaces uncertainty.</li>
+                <li>Care becomes easier to share.</li>
+                <li>The neighbourhood learns to live alongside them, a little more comfortably.</li>
+              </ul>
+
               <p className={bodyCopyClass}>
                 The hope is for this to grow into something shared - a quiet, collective record shaped by
                 the community that sees and cares for these dogs every day.
               </p>
             </div>
-            <AboutDogCarousel dogs={dogCarouselItems} />
+            <AboutDogCarouselSection />
           </div>
         </section>
 

@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { fetchHomeDogsPage } from "@/app/actions/home-dogs";
-import type { HomeDogFilters } from "@/lib/dogs/home-directory";
-import { HomeDirectoryClient } from "@/components/home-directory-client";
-import { HomeFeatured } from "@/components/home-featured";
-import { loadFeaturedDogPayload } from "@/lib/dogs/load-featured";
-import { loadDirectoryFilterOptions } from "@/lib/dogs/load-directory-filter-options";
-import { supabaseErrorHint } from "@/lib/supabase/error-hints";
+import { Suspense } from "react";
+import { HomeDirectorySection } from "@/components/home-directory-section";
+import { HomeDirectorySectionSkeleton } from "@/components/home-directory-skeleton";
+import { HomeFeaturedSection } from "@/components/home-featured-section";
+import { HomeFeaturedSkeleton } from "@/components/home-featured-skeleton";
 import { getFaviconSrc, TspLogoImage, TSP_WORDMARK_TYPOGRAPHY } from "@/components/tsp-brand-logo";
-import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Home — The Streetie Project",
@@ -56,31 +53,6 @@ export default async function Home({
     );
   }
 
-  const supabase = await createClient();
-
-  const [filterOpts, featured] = await Promise.all([
-    loadDirectoryFilterOptions(supabase),
-    loadFeaturedDogPayload(supabase),
-  ]);
-
-  const { locError, localities: localityOpts, neighbourhoods: neighbourhoodOpts, colourOptions } =
-    filterOpts;
-
-  const initialFilters: HomeDogFilters = {
-    search: "",
-    localityIds: [],
-    neighbourhoodIds: [],
-    gender: null,
-    neutering: null,
-    colour: null,
-    excludeDogId: featured?.id ?? null,
-  };
-
-  const { dogs: initialDogs, hasMore: initialHasMore } = await fetchHomeDogsPage(
-    0,
-    initialFilters,
-  );
-
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <header className="mb-10 flex flex-col items-center gap-5 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left">
@@ -119,33 +91,18 @@ export default async function Home({
         </p>
       )}
 
-      {locError ? (
-        <section
-          className="mb-8 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-950"
-          role="alert"
-        >
-          <p className="font-medium">Could not load localities</p>
-          <p className="mt-1 font-mono text-xs">{locError.message}</p>
-          <p className="mt-2 text-red-900/80">{supabaseErrorHint(locError.message)}</p>
-        </section>
-      ) : null}
-
-      {featured ? <HomeFeatured dog={featured} /> : null}
+      <Suspense fallback={<HomeFeaturedSkeleton />}>
+        <HomeFeaturedSection />
+      </Suspense>
 
       <h2 className="mb-2 text-lg font-semibold text-[var(--foreground)]">All dogs</h2>
       <p className="mb-6 text-sm text-[var(--muted)]">
         Search and filter to find dogs by name, area, or characteristics.
       </p>
 
-      <HomeDirectoryClient
-        localities={localityOpts}
-        neighbourhoods={neighbourhoodOpts}
-        colourOptions={colourOptions}
-        excludeDogId={featured?.id ?? null}
-        initialDogs={initialDogs}
-        initialHasMore={initialHasMore}
-        showMapViewCallout
-      />
+      <Suspense fallback={<HomeDirectorySectionSkeleton />}>
+        <HomeDirectorySection showMapViewCallout />
+      </Suspense>
     </main>
   );
 }
