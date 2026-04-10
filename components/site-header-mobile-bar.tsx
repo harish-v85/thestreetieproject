@@ -2,6 +2,7 @@
 
 import {
   BookOpenText,
+  ChartBar,
   Dog,
   House,
   List,
@@ -44,6 +45,16 @@ function sectionTitleClass() {
   return "mb-1 mt-5 px-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--muted)] first:mt-0";
 }
 
+/** Between Browse and Manage (major sections). */
+function browseManageDividerClass() {
+  return "mx-2 my-4 border-t border-black/10";
+}
+
+/** Between item groups inside Manage (lighter than section break). */
+function manageSubsectionDividerClass() {
+  return "mx-2 my-2 border-t border-black/[0.06]";
+}
+
 function MobileDrawerNav({
   navProps,
   onNavigate,
@@ -76,11 +87,13 @@ function MobileDrawerNav({
 
       {canManage ? (
         <>
+          <div className={browseManageDividerClass()} role="separator" aria-hidden />
           <p className={sectionTitleClass()}>Manage</p>
           <Link href="/manage/dogs" className={drawerLinkClass()} onClick={onNavigate}>
             <ManageIconDogs className={drawerIconClass} />
             Dogs
           </Link>
+          <div className={manageSubsectionDividerClass()} role="separator" aria-hidden />
           <Link href="/manage/localities" className={drawerLinkClass()} onClick={onNavigate}>
             <MapPinArea className={drawerIconClass} weight="regular" aria-hidden />
             Localities
@@ -91,10 +104,16 @@ function MobileDrawerNav({
           </Link>
           {isSuperAdmin ? (
             <>
+              <div className={manageSubsectionDividerClass()} role="separator" aria-hidden />
+              <Link href="/manage/analytics" className={drawerLinkClass()} onClick={onNavigate}>
+                <ChartBar className={drawerIconClass} weight="regular" aria-hidden />
+                Login Analytics
+              </Link>
               <Link href="/manage/activity" className={drawerLinkClass()} onClick={onNavigate}>
                 <Pulse className={drawerIconClass} weight="regular" aria-hidden />
                 Activity
               </Link>
+              <div className={manageSubsectionDividerClass()} role="separator" aria-hidden />
               <Link href="/manage/users" className={drawerLinkClass()} onClick={onNavigate}>
                 <UserCircleGear className={drawerIconClass} weight="regular" aria-hidden />
                 Users

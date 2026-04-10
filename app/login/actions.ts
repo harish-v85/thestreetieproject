@@ -18,21 +18,26 @@ export async function signInWithEmail(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data: signInData, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
   if (error) {
     return { error: error.message };
   }
 
-  // Best-effort login analytics event; auth should still proceed even if this fails.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Use the user from the sign-in response. In the same server action, getUser() can still
+  // see no session (cookie not readable yet), so inserts were skipped and monthly counts stayed 0.
+  const user = signInData.user;
   if (user) {
-    await supabase.from("login_events").insert({
+    const { error: insertError } = await supabase.from("login_events").insert({
       user_id: user.id,
       logged_in_at: new Date().toISOString(),
     });
+    if (insertError) {
+      console.error("[login_events]", insertError.message);
+    }
   }
 
   const rawNext = String(formData.get("next") ?? "").trim();

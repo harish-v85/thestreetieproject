@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { DogsPresenceMapLoader } from "@/components/dogs-presence-map-loader";
 import { ManagePageHeader } from "@/components/manage-page-header";
 import { DirectoryIconMap } from "@/components/manage-page-icons";
+import { canUsePresenceHeatmap } from "@/lib/auth/can-use-presence-heatmap";
 import { loadDogsForPresenceMap } from "@/lib/dogs/load-dogs-presence-map";
 
 export const metadata: Metadata = {
@@ -13,7 +14,10 @@ export const metadata: Metadata = {
 
 export default async function DogsMapPage() {
   const supabase = await createClient();
-  const { pins, error } = await loadDogsForPresenceMap(supabase);
+  const [{ pins, error }, canUseHeatmap] = await Promise.all([
+    loadDogsForPresenceMap(supabase),
+    canUsePresenceHeatmap(),
+  ]);
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
@@ -39,7 +43,7 @@ export default async function DogsMapPage() {
           profile.
         </p>
       ) : (
-        <DogsPresenceMapLoader pins={pins} />
+        <DogsPresenceMapLoader pins={pins} canUseHeatmap={canUseHeatmap} />
       )}
     </main>
   );

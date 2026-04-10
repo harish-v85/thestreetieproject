@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { DM_Sans } from "next/font/google";
 import Link from "next/link";
 import Script from "next/script";
@@ -67,6 +69,8 @@ export default function RootLayout({
           data-website-id="1705dda3-e675-4040-9f9e-684666ec2ad8"
           strategy="afterInteractive"
         />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

@@ -15,6 +15,12 @@ const DogsPresenceMap = dynamic(
   },
 );
 
-export function DogsPresenceMapLoader({ pins }: { pins: DogPresenceMapPin[] }) {
-  return <DogsPresenceMap pins={pins} />;
+export function DogsPresenceMapLoader({
+  pins,
+  canUseHeatmap = false,
+}: {
+  pins: DogPresenceMapPin[];
+  canUseHeatmap?: boolean;
+}) {
+  return <DogsPresenceMap pins={pins} canUseHeatmap={canUseHeatmap} />;
 }

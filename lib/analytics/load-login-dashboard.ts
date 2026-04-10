@@ -112,8 +112,16 @@ export async function loadLoginDashboardData(): Promise<LoginDashboardData> {
     monthlyLogins: monthlyCountByUser.get(u.id) ?? 0,
   }));
 
+  function lastLoginMs(iso: string | null): number {
+    if (!iso) return Number.NEGATIVE_INFINITY;
+    const t = Date.parse(iso);
+    return Number.isNaN(t) ? Number.NEGATIVE_INFINITY : t;
+  }
+
   users.sort((a, b) => {
-    if (b.monthlyLogins !== a.monthlyLogins) return b.monthlyLogins - a.monthlyLogins;
+    const tb = lastLoginMs(b.lastSignInAt);
+    const ta = lastLoginMs(a.lastSignInAt);
+    if (tb !== ta) return tb - ta;
     return a.email.localeCompare(b.email);
   });
 
