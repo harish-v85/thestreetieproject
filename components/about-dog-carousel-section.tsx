@@ -6,6 +6,30 @@ import { thumbForDogId, type DogPhotoThumbRow } from "@/lib/dogs/photo-focal";
 import { formatDogLocationLine } from "@/lib/dogs/location-line";
 import { createClient } from "@/lib/supabase/server";
 
+/** Max active dogs to load for the carousel pool (photos are fetched only for these IDs). */
+const CAROUSEL_DOG_POOL = 200;
+
+/** PostgREST `in` filters can hit URL limits; batch photo fetches. */
+const PHOTO_IN_CHUNK = 100;
+
+async function fetchDogPhotosForIds(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  dogIds: string[],
+): Promise<DogPhotoThumbRow[]> {
+  if (dogIds.length === 0) return [];
+  const out: DogPhotoThumbRow[] = [];
+  for (let i = 0; i < dogIds.length; i += PHOTO_IN_CHUNK) {
+    const slice = dogIds.slice(i, i + PHOTO_IN_CHUNK);
+    const { data } = await supabase
+      .from("dog_photos")
+      .select("dog_id, url, is_primary, sort_order, uploaded_at, focal_x, focal_y")
+      .in("dog_id", slice)
+      .not("url", "is", null);
+    out.push(...((data ?? []) as DogPhotoThumbRow[]));
+  }
+  return out;
+}
+
 function shuffle<T>(arr: T[]): T[] {
   const out = [...arr];
   for (let i = out.length - 1; i > 0; i--) {
@@ -37,7 +61,24 @@ function embedName(v: DogInfo["localities"] | DogInfo["neighbourhoods"]): string
 
 async function AboutDogCarouselContent() {
   const supabase = await createClient();
-  const featured = await loadFeaturedDogPayload(supabase);
+
+  const dogSelect =
+    "id, slug, name, name_aliases, welfare_status, gender, neutering_status, estimated_birth_year, estimated_death_year, street_name, localities(name), neighbourhoods(name)";
+
+  const [featured, poolRes] = await Promise.all([
+    loadFeaturedDogPayload(supabase),
+    supabase
+      .from("dogs")
+      .select(dogSelect)
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(CAROUSEL_DOG_POOL),
+  ]);
+
+  const { data: poolRows, error: poolErr } = poolRes;
+  if (poolErr) {
+    console.error("about carousel dog pool", poolErr.message);
+  }
 
   let featuredProfile: {
     gender: string | null;
@@ -55,39 +96,27 @@ async function AboutDogCarouselContent() {
     featuredProfile = data;
   }
 
-  const { data: photoRows } = await supabase
-    .from("dog_photos")
-    .select("dog_id, url, is_primary, sort_order, uploaded_at, focal_x, focal_y")
-    .not("url", "is", null)
-    .limit(2000);
+  const poolDogs = (poolRows ?? []) as DogInfo[];
+  const poolIds = poolDogs.map((d) => d.id);
+
+  const photoRows = await fetchDogPhotosForIds(supabase, poolIds);
 
   const photoByDog = new Map<string, DogPhotoThumbRow[]>();
-  for (const row of (photoRows ?? []) as DogPhotoThumbRow[]) {
+  for (const row of photoRows) {
     const list = photoByDog.get(row.dog_id) ?? [];
     list.push(row);
     photoByDog.set(row.dog_id, list);
   }
 
-  const dogIds = Array.from(photoByDog.keys());
-  const { data: dogRows, error: dogRowsError } =
-    dogIds.length > 0
-      ? await supabase
-          .from("dogs")
-          .select(
-            "id, slug, name, name_aliases, welfare_status, gender, neutering_status, estimated_birth_year, estimated_death_year, street_name, localities(name), neighbourhoods(name)",
-          )
-          .in("id", dogIds)
-          .eq("status", "active")
-      : { data: [] as DogInfo[], error: null };
+  const withThumb = poolDogs.filter((d) => {
+    const thumb = thumbForDogId(d.id, photoByDog.get(d.id) ?? []);
+    return Boolean(thumb?.url);
+  });
 
-  if (dogRowsError) {
-    console.error("about page dogs query", dogRowsError.message);
-  }
-
-  const dogCarouselItems: AboutDogCarouselItem[] = shuffle((dogRows as DogInfo[] | null) ?? [])
+  const dogCarouselItems: AboutDogCarouselItem[] = shuffle(withThumb)
+    .slice(0, 10)
     .map((d) => {
-      const thumb = thumbForDogId(d.id, photoByDog.get(d.id) ?? []);
-      if (!thumb?.url) return null;
+      const thumb = thumbForDogId(d.id, photoByDog.get(d.id) ?? [])!;
       return {
         id: d.id,
         slug: d.slug,
@@ -109,9 +138,7 @@ async function AboutDogCarouselContent() {
           d.street_name,
         ),
       };
-    })
-    .filter((x): x is AboutDogCarouselItem => Boolean(x))
-    .slice(0, 10);
+    });
 
   if (dogCarouselItems.length === 0 && featured?.imageUrl) {
     dogCarouselItems.push({

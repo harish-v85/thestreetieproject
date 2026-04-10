@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { AboutDogCarouselSection } from "@/components/about-dog-carousel-section";
-import { LeafletPointMap } from "@/components/leaflet-point-map";
+import { LeafletPointMapDynamic } from "@/components/leaflet-point-map-dynamic";
 import { ManagePageHeader } from "@/components/manage-page-header";
 import tspLogoV2 from "@/content/tsp-logo-v2.svg";
 
@@ -146,7 +146,7 @@ export default async function AboutPage() {
         <section className="mt-15">
           <div className="grid gap-5 lg:grid-cols-[1fr_1.1fr] lg:items-start">
             <div className="overflow-hidden rounded-2xl border border-black/10 lg:sticky lg:top-24">
-              <LeafletPointMap
+              <LeafletPointMapDynamic
                 lat={13.0827}
                 lng={80.2707}
                 label="Chennai"

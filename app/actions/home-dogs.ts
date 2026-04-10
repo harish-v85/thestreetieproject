@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import {
   HOME_PAGE_SIZE,
+  MIN_DIRECTORY_SEARCH_CHARS,
   type HomeDogCard,
   type HomeDogFilters,
 } from "@/lib/dogs/home-directory";
@@ -49,8 +50,10 @@ export async function fetchHomeDogsPage(
   }
 
   const rawSearch = filters.search.trim();
-  if (rawSearch) {
-    const ids = await resolveSearchDogIds(supabase, rawSearch);
+  const searchQuery =
+    rawSearch.length === 0 || rawSearch.length >= MIN_DIRECTORY_SEARCH_CHARS ? rawSearch : "";
+  if (searchQuery) {
+    const ids = await resolveSearchDogIds(supabase, searchQuery);
     if (ids.length === 0) {
       return { dogs: [], hasMore: false };
     }

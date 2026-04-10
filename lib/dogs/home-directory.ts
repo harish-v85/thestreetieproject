@@ -1,5 +1,8 @@
 export const HOME_PAGE_SIZE = 12;
 
+/** Text search (name, place, etc.) runs only at this length or longer — avoids noisy prefix matches while typing. */
+export const MIN_DIRECTORY_SEARCH_CHARS = 3;
+
 export type HomeDogFilters = {
   search: string;
   localityIds: string[];

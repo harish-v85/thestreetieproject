@@ -4,7 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchHomeDogsPage } from "@/app/actions/home-dogs";
-import type { HomeDogCard, HomeDogFilters } from "@/lib/dogs/home-directory";
+import {
+  MIN_DIRECTORY_SEARCH_CHARS,
+  type HomeDogCard,
+  type HomeDogFilters,
+} from "@/lib/dogs/home-directory";
 import { DogCardInlineNameWithAliases } from "@/components/dog-aliases-strip";
 import {
   AgeBadge,
@@ -156,7 +160,7 @@ export function HomeDirectoryClient({
   const skipInitialRefetch = useRef(true);
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search.trim()), 320);
+    const t = setTimeout(() => setDebouncedSearch(search.trim()), 550);
     return () => clearTimeout(t);
   }, [search]);
 
@@ -199,9 +203,16 @@ export function HomeDirectoryClient({
     setNeighbourhoodIds((prev) => prev.filter((id) => visibleNeighbourhoods.some((n) => n.id === id)));
   }, [visibleNeighbourhoods]);
 
+  /** Omits 1–2 character queries so we don’t run broad prefix matches (e.g. “Go” → Gold Coast) while typing. */
+  const effectiveSearch = useMemo(() => {
+    if (debouncedSearch.length === 0) return "";
+    if (debouncedSearch.length < MIN_DIRECTORY_SEARCH_CHARS) return "";
+    return debouncedSearch;
+  }, [debouncedSearch]);
+
   const filters: HomeDogFilters = useMemo(
     () => ({
-      search: debouncedSearch,
+      search: effectiveSearch,
       localityIds,
       neighbourhoodIds,
       gender: gender || null,
@@ -209,7 +220,7 @@ export function HomeDirectoryClient({
       colour: colour || null,
       excludeDogId,
     }),
-    [debouncedSearch, localityIds, neighbourhoodIds, gender, neutering, colour, excludeDogId],
+    [effectiveSearch, localityIds, neighbourhoodIds, gender, neutering, colour, excludeDogId],
   );
 
   const refetchFromStart = useCallback(async () => {
@@ -305,6 +316,12 @@ export function HomeDirectoryClient({
               placeholder="Search by name, locality, neighbourhood, or street…"
               className={DIRECTORY_FILTER_SEARCH_CLASS}
             />
+            {search.trim().length > 0 &&
+            search.trim().length < MIN_DIRECTORY_SEARCH_CHARS ? (
+              <p className="mt-1.5 text-xs text-[var(--muted)]">
+                Type at least {MIN_DIRECTORY_SEARCH_CHARS} characters to search names and places.
+              </p>
+            ) : null}
           </div>
           <div className="sm:hidden">
             <button

@@ -4,6 +4,16 @@ import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import { createDogMarker } from "@/components/dog-map-pin-marker";
 
+export type LeafletPointMapProps = {
+  lat: number;
+  lng: number;
+  label?: string;
+  scrollWheelZoom?: boolean;
+  className?: string;
+  zoom?: number;
+  "aria-label"?: string;
+};
+
 export function LeafletPointMap({
   lat,
   lng,
@@ -12,15 +22,7 @@ export function LeafletPointMap({
   className,
   zoom = 16,
   "aria-label": ariaLabel = "Map",
-}: {
-  lat: number;
-  lng: number;
-  label?: string;
-  scrollWheelZoom?: boolean;
-  className?: string;
-  zoom?: number;
-  "aria-label"?: string;
-}) {
+}: LeafletPointMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
