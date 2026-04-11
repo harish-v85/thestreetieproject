@@ -16,7 +16,7 @@ export function HomeFeatured({ dog }: { dog: FeaturedDogPayload }) {
       className={`mb-12 overflow-hidden rounded-3xl border border-black/5 shadow-sm ${homeFeaturedSurfaceClass}`}
     >
       <div className="grid gap-0 md:grid-cols-2 md:items-stretch">
-        <div className="relative aspect-[4/3] min-h-[220px] bg-[var(--background)] md:aspect-auto md:min-h-[280px]">
+        <div className="relative aspect-[4/3] min-h-[220px] overflow-hidden bg-[var(--background)] md:aspect-auto md:min-h-[280px]">
           {dog.imageUrl ? (
             <Image
               src={dog.imageUrl}
@@ -39,6 +39,7 @@ export function HomeFeatured({ dog }: { dog: FeaturedDogPayload }) {
               priority
             />
           )}
+          <div className="home-featured-photo-glimmer" aria-hidden />
         </div>
         <div className="flex flex-col justify-center p-6 sm:p-8 md:p-10">
           <p className="text-xs font-semibold uppercase tracking-widest text-[var(--accent)]">

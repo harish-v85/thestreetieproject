@@ -7,6 +7,7 @@ import {
   House,
   List,
   MapPinArea,
+  MapTrifold,
   Park,
   Pulse,
   SignOut,
@@ -73,6 +74,10 @@ function MobileDrawerNav({
       <Link href="/dogs" className={drawerLinkClass()} onClick={onNavigate}>
         <Dog className={drawerIconClass} weight="regular" aria-hidden />
         Dogs
+      </Link>
+      <Link href="/dogs/map" className={drawerLinkClass()} onClick={onNavigate}>
+        <MapTrifold className={drawerIconClass} weight="regular" aria-hidden />
+        Map
       </Link>
       {isActiveStaff ? (
         <Link href="/dogs/feed" className={drawerLinkClass()} onClick={onNavigate}>

@@ -7,6 +7,7 @@ import {
   GearSix,
   House,
   MapPinArea,
+  MapTrifold,
   Park,
   Pulse,
   UserCircleCheck,
@@ -90,6 +91,10 @@ export function HeaderNavGroups({
       <Link href="/dogs" className={topLinkClass()}>
         <Dog className={navIconClass} weight="regular" aria-hidden />
         Dogs
+      </Link>
+      <Link href="/dogs/map" className={topLinkClass()}>
+        <MapTrifold className={navIconClass} weight="regular" aria-hidden />
+        Map
       </Link>
       {isActiveStaff ? (
         <Link href="/dogs/feed" className={topLinkClass()}>

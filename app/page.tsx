@@ -70,7 +70,14 @@ export default async function Home({
               Every street has its regulars. This is a shared record of the dogs in your neighbourhood
               - who they are, where they&apos;re seen, and how they&apos;re cared for.
             </p>
-            <p>
+            <p className="text-balance">
+              <Link
+                href="/about"
+                className="font-medium text-[var(--accent)] underline-offset-2 hover:underline"
+              >
+                Learn more about the Streetie Project →
+              </Link>
+              <span className="text-[var(--muted)]"> (or) </span>
               <Link
                 href="/dogs"
                 className="font-medium text-[var(--accent)] underline-offset-2 hover:underline"
