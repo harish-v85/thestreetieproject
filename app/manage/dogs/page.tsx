@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { requirePrivileged } from "@/lib/auth/require-privileged";
+import { ManageDogsBulkEditSuccessBanner } from "@/components/manage-dogs-bulk-edit-success-banner";
 import { ManageDogsListing } from "@/components/manage-dogs-listing";
 import { ManagePageHeader } from "@/components/manage-page-header";
 import { ManageIconDogs } from "@/components/manage-page-icons";
@@ -113,7 +115,12 @@ export default async function ManageDogsPage() {
       {error ? (
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800">{error.message}</p>
       ) : (
-        <ManageDogsListing rows={tableRows} isSuperAdmin={isSuperAdmin} />
+        <>
+          <Suspense fallback={null}>
+            <ManageDogsBulkEditSuccessBanner />
+          </Suspense>
+          <ManageDogsListing rows={tableRows} isSuperAdmin={isSuperAdmin} />
+        </>
       )}
 
       <p className="mt-8 text-center text-sm">

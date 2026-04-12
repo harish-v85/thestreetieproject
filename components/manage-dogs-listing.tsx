@@ -29,6 +29,9 @@ export function ManageDogsListing({
       onChange={setQ}
       action={
         <div className="flex flex-wrap items-center justify-end gap-2">
+          <Link href="/manage/dogs/bulk-edit" className={bulkAddButtonClass}>
+            Bulk edit
+          </Link>
           {isSuperAdmin ? (
             <Link href="/manage/dogs/bulk-add" className={bulkAddButtonClass}>
               Bulk add

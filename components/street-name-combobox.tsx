@@ -29,12 +29,14 @@ export function StreetNameCombobox({
   defaultValue = "",
   suggestions,
   placeholder,
+  onValueChange,
 }: {
   id: string;
   name?: string;
   defaultValue?: string;
   suggestions: string[];
   placeholder?: string;
+  onValueChange?: (value: string) => void;
 }) {
   const listId = useId();
   const [value, setValue] = useState(defaultValue);
@@ -69,6 +71,7 @@ export function StreetNameCombobox({
   function pick(street: string) {
     cancelBlurClose();
     setValue(street);
+    onValueChange?.(street);
     setOpen(false);
     inputRef.current?.focus();
   }
@@ -83,7 +86,9 @@ export function StreetNameCombobox({
         autoComplete="off"
         value={value}
         onChange={(e) => {
-          setValue(e.target.value);
+          const v = e.target.value;
+          setValue(v);
+          onValueChange?.(v);
           setOpen(true);
         }}
         onFocus={() => {

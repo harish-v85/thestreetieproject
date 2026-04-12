@@ -80,18 +80,33 @@ export function RequestAccessForm() {
       </div>
       <div>
         <label htmlFor="locality_name" className="mb-1 block text-sm font-medium">
-          Locality / area you work in <span className="text-red-600">*</span>
+          Locality / area you live in <span className="text-red-600">*</span>
         </label>
         <input
           id="locality_name"
           name="locality_name"
           required
-          placeholder="e.g. Indiranagar, Koramangala…"
+          placeholder="e.g. Adyar, Thiruvanmiyur, Mylapore…"
           disabled={pending}
           className="w-full rounded-lg border border-black/10 bg-[var(--background)] px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2 disabled:opacity-60"
         />
         <p className="mt-1 text-xs text-[var(--muted)]">
-          Free text is fine; we&apos;ll match you to a directory locality when you&apos;re onboarded.
+          If you're unsure about what to enter, put N/A for now and update your profile later.
+        </p>
+      </div>
+      <div>
+        <label htmlFor="neighbourhood_name" className="mb-1 block text-sm font-medium">
+          Neighbourhood <span className="text-[var(--muted)]">(optional)</span>
+        </label>
+        <input
+          id="neighbourhood_name"
+          name="neighbourhood_name"
+          placeholder="e.g. Indiranagar, Valmiki Nagar, Mandaveli…"
+          disabled={pending}
+          className="w-full rounded-lg border border-black/10 bg-[var(--background)] px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2 disabled:opacity-60"
+        />
+        <p className="mt-1 text-xs text-[var(--muted)]">
+          If you're unsure about what to enter, put N/A for now and update your profile later.
         </p>
       </div>
       <div>

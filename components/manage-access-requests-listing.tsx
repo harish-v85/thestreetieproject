@@ -12,6 +12,7 @@ export type AccessRequestListRow = {
   email: string;
   phone: string | null;
   locality_name: string;
+  neighbourhood_name: string | null;
   intended_role: string;
   message: string | null;
   status: string;
@@ -57,7 +58,7 @@ export function ManageAccessRequestsListing({ rows }: { rows: AccessRequestListR
     const s = q.trim().toLowerCase();
     if (!s) return rows;
     return rows.filter((r) => {
-      const hay = `${r.full_name} ${r.email} ${r.phone ?? ""} ${r.locality_name} ${r.intended_role} ${r.message ?? ""} ${r.status}`.toLowerCase();
+      const hay = `${r.full_name} ${r.email} ${r.phone ?? ""} ${r.locality_name} ${r.neighbourhood_name ?? ""} ${r.intended_role} ${r.message ?? ""} ${r.status}`.toLowerCase();
       return hay.includes(s);
     });
   }, [rows, q]);
@@ -104,7 +105,14 @@ export function ManageAccessRequestsListing({ rows }: { rows: AccessRequestListR
                     ) : null}
                   </p>
                   <p className="text-sm">
-                    <span className="text-[var(--muted)]">Area:</span> {r.locality_name}
+                    <span className="text-[var(--muted)]">Locality:</span> {r.locality_name}
+                    {r.neighbourhood_name?.trim() ? (
+                      <>
+                        {" · "}
+                        <span className="text-[var(--muted)]">Neighbourhood:</span>{" "}
+                        {r.neighbourhood_name.trim()}
+                      </>
+                    ) : null}
                     {" · "}
                     <span className="text-[var(--muted)]">Role:</span> {roleLabel(r.intended_role)}
                   </p>

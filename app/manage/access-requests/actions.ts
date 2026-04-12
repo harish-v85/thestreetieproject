@@ -7,6 +7,17 @@ import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 
 export type ReviewState = { error: string | null };
 
+type AccessRequestApproveRow = {
+  id: string;
+  status: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  locality_name: string | null;
+  neighbourhood_name: string | null;
+  intended_role: string;
+};
+
 export async function reviewAccessRequest(
   requestId: string,
   status: "approved" | "rejected",
@@ -53,7 +64,7 @@ export async function approveAccessRequestAndAddUser(requestId: string): Promise
   const { data: row, error: fetchErr } = await supabase
     .from("access_requests")
     .select(
-      "id, status, full_name, email, phone, locality_name, intended_role",
+      "id, status, full_name, email, phone, locality_name, neighbourhood_name, intended_role",
     )
     .eq("id", requestId)
     .maybeSingle();
@@ -61,7 +72,8 @@ export async function approveAccessRequestAndAddUser(requestId: string): Promise
   if (fetchErr || !row) {
     return { error: fetchErr?.message ?? "Request not found." };
   }
-  if (row.status !== "pending") {
+  const ar = row as AccessRequestApproveRow;
+  if (ar.status !== "pending") {
     return { error: "This request was already reviewed." };
   }
 
@@ -84,13 +96,16 @@ export async function approveAccessRequestAndAddUser(requestId: string): Promise
 
   const params = new URLSearchParams();
   params.set("from", "access");
-  params.set("email", row.email.trim().toLowerCase());
-  params.set("full_name", row.full_name.trim());
-  if (row.phone?.trim()) params.set("phone", row.phone.trim());
-  const role = row.intended_role === "admin" ? "admin" : "dog_feeder";
+  params.set("email", ar.email.trim().toLowerCase());
+  params.set("full_name", ar.full_name.trim());
+  if (ar.phone?.trim()) params.set("phone", ar.phone.trim());
+  const role = ar.intended_role === "admin" ? "admin" : "dog_feeder";
   params.set("intended_role", role);
-  if (row.locality_name?.trim()) {
-    params.set("locality_name", row.locality_name.trim());
+  if (ar.locality_name?.trim()) {
+    params.set("locality_name", ar.locality_name.trim());
+  }
+  if (ar.neighbourhood_name?.trim()) {
+    params.set("neighbourhood_name", ar.neighbourhood_name.trim());
   }
 
   redirect(`/manage/users/new?${params.toString()}`);

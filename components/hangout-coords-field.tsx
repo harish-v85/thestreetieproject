@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 const LeafletHangoutPicker = dynamic(
@@ -27,6 +27,8 @@ export function HangoutCoordsField({
   dogName,
   variant = "hangout",
   className,
+  titleAddon,
+  onCoordsChange,
 }: {
   defaultLat: number | null;
   defaultLng: number | null;
@@ -34,6 +36,8 @@ export function HangoutCoordsField({
   /** `feeding` uses hidden fields `lat`/`lng` (e.g. log feeding); `hangout` uses `map_lat`/`map_lng`. */
   variant?: "hangout" | "feeding";
   className?: string;
+  titleAddon?: ReactNode;
+  onCoordsChange?: (lat: number | null, lng: number | null) => void;
 }) {
   const coordFieldId = useId();
   const hiddenLatName = variant === "feeding" ? "lat" : "map_lat";
@@ -83,6 +87,10 @@ export function HangoutCoordsField({
     if (la == null || lo == null) setShowPicker(false);
   }, []);
 
+  useEffect(() => {
+    onCoordsChange?.(lat, lng);
+  }, [lat, lng, onCoordsChange]);
+
   const hasPin = lat != null && lng != null;
 
   function submitCoordinates() {
@@ -113,7 +121,10 @@ export function HangoutCoordsField({
 
   return (
     <div className={wrapClass}>
-      <h3 className="text-sm font-semibold text-[var(--foreground)]">{title}</h3>
+      <div className="flex flex-wrap items-center gap-2">
+        <h3 className="text-sm font-semibold text-[var(--foreground)]">{title}</h3>
+        {titleAddon}
+      </div>
       <p className="mt-1 text-xs text-[var(--muted)]">{description}</p>
 
       <input type="hidden" name={hiddenLatName} value={hasPin ? String(lat) : ""} readOnly />

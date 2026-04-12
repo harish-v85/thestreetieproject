@@ -17,6 +17,7 @@ export async function submitAccessRequest(
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const phone = String(formData.get("phone") ?? "").trim() || null;
   const locality_name = String(formData.get("locality_name") ?? "").trim();
+  const neighbourhood_name = String(formData.get("neighbourhood_name") ?? "").trim() || null;
   const intended_role = String(formData.get("intended_role") ?? "");
   const message = String(formData.get("message") ?? "").trim() || null;
 
@@ -33,6 +34,7 @@ export async function submitAccessRequest(
     email,
     phone,
     locality_name,
+    neighbourhood_name,
     intended_role,
     message,
   });

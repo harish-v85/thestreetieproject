@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 import { defaultPasswordFromFirstName } from "@/lib/users/default-password-from-name";
 import { resolveLocalityIdFromPrefill } from "@/lib/users/resolve-locality-prefill";
+import { resolveNeighbourhoodIdFromPrefill } from "@/lib/users/resolve-neighbourhood-prefill";
+import type { NeighbourhoodOption } from "@/components/dog-location-fields";
 import { UserNewForm } from "../user-new-form";
 
 export const metadata: Metadata = {
@@ -34,15 +36,30 @@ export default async function NewUserPage({
     .select("id, name, slug")
     .order("sort_order", { ascending: true });
 
+  const { data: neighbourhoodRows } = await supabase
+    .from("neighbourhoods")
+    .select("id, locality_id, name")
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+
   const sp = await searchParams;
   const fromAccess = firstString(sp, "from") === "access";
   const email = firstString(sp, "email")?.trim();
   const fullName = firstString(sp, "full_name")?.trim();
   const phone = firstString(sp, "phone")?.trim();
   const localityName = firstString(sp, "locality_name")?.trim();
+  const neighbourhoodName = firstString(sp, "neighbourhood_name")?.trim();
   const intendedRole = firstString(sp, "intended_role");
 
   const locRows = (localities ?? []) as { id: string; name: string; slug: string }[];
+  const neighbourhoods = (neighbourhoodRows ?? []) as NeighbourhoodOption[];
+
+  const locality_id = resolveLocalityIdFromPrefill(localityName, locRows);
+  const neighbourhood_id = resolveNeighbourhoodIdFromPrefill(
+    neighbourhoodName,
+    locality_id,
+    neighbourhoods,
+  );
 
   const prefill =
     fromAccess && email && fullName
@@ -51,7 +68,8 @@ export default async function NewUserPage({
           full_name: fullName,
           phone: phone || null,
           role: intendedRole === "admin" ? ("admin" as const) : ("dog_feeder" as const),
-          locality_id: resolveLocalityIdFromPrefill(localityName, locRows),
+          locality_id,
+          neighbourhood_id,
           defaultPassword: defaultPasswordFromFirstName(fullName),
         }
       : null;
@@ -77,8 +95,13 @@ export default async function NewUserPage({
       ) : null}
       <div className="mt-8 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
         <UserNewForm
-          key={prefill ? `prefill-${prefill.email}` : "new-user-empty"}
+          key={
+            prefill
+              ? `prefill-${prefill.email}-${prefill.locality_id ?? ""}-${prefill.neighbourhood_id ?? ""}`
+              : "new-user-empty"
+          }
           localities={locRows}
+          neighbourhoods={neighbourhoods}
           prefill={prefill}
         />
       </div>

@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import type { NeighbourhoodOption } from "@/components/dog-location-fields";
+import { ProfileLocalityNeighbourhoodFields } from "@/components/profile-locality-neighbourhood";
 import { createUserAdmin, type UserFormState } from "./actions";
 
 const initial: UserFormState = { error: null };
@@ -12,14 +14,17 @@ export type UserNewPrefill = {
   phone: string | null;
   role: "dog_feeder" | "admin";
   locality_id: string | null;
+  neighbourhood_id: string | null;
   defaultPassword: string;
 };
 
 export function UserNewForm({
   localities,
+  neighbourhoods,
   prefill,
 }: {
   localities: { id: string; name: string }[];
+  neighbourhoods: NeighbourhoodOption[];
   prefill?: UserNewPrefill | null;
 }) {
   const [state, formAction, pending] = useActionState(createUserAdmin, initial);
@@ -96,23 +101,14 @@ export function UserNewForm({
             <option value="super_admin">Super Admin</option>
           </select>
         </div>
-        <div>
-          <label htmlFor="locality_id" className="mb-1 block text-sm font-medium">
-            Locality
-          </label>
-          <select
-            id="locality_id"
-            name="locality_id"
-            defaultValue={prefill?.locality_id ?? ""}
-            className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2"
-          >
-            <option value="">—</option>
-            {localities.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </select>
+        <div className="sm:col-span-2 grid gap-4 sm:grid-cols-2">
+          <ProfileLocalityNeighbourhoodFields
+            localities={localities}
+            neighbourhoods={neighbourhoods}
+            defaultLocalityId={prefill?.locality_id ?? ""}
+            defaultNeighbourhoodId={prefill?.neighbourhood_id ?? ""}
+            allowBlankNeighbourhood
+          />
         </div>
         <div>
           <label htmlFor="status" className="mb-1 block text-sm font-medium">

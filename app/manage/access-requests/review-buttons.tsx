@@ -50,7 +50,7 @@ export function ReviewButtons({ requestId }: { requestId: string }) {
           disabled={pending}
           onClick={runApproveAndAdd}
           className="rounded-lg bg-emerald-600/90 px-3 py-1.5 text-sm font-medium text-white ring-1 ring-emerald-800/20 transition hover:bg-emerald-700 disabled:opacity-60"
-          title="Approve and go to Add user with this form prefilled"
+          title="Approve and go to Add user with locality and neighbourhood prefilled when provided"
         >
           {pending ? "…" : "Approve & add"}
         </button>

@@ -9,11 +9,14 @@ export function ProfileLocalityNeighbourhoodFields({
   neighbourhoods,
   defaultLocalityId,
   defaultNeighbourhoodId,
+  /** When true, neighbourhood can stay blank (—) and we do not auto-pick the first hood. */
+  allowBlankNeighbourhood = false,
 }: {
   localities: { id: string; name: string }[];
   neighbourhoods: NeighbourhoodOption[];
   defaultLocalityId: string;
   defaultNeighbourhoodId: string;
+  allowBlankNeighbourhood?: boolean;
 }) {
   const [localityId, setLocalityId] = useState(defaultLocalityId);
   const filtered = useMemo(
@@ -28,14 +31,15 @@ export function ProfileLocalityNeighbourhoodFields({
     ) {
       return defaultNeighbourhoodId;
     }
+    if (allowBlankNeighbourhood) return "";
     const first = neighbourhoods.find((n) => n.locality_id === localityId);
     return first?.id ?? "";
   });
 
   useEffect(() => {
     if (filtered.some((n) => n.id === neighbourhoodId)) return;
-    setNeighbourhoodId(filtered[0]?.id ?? "");
-  }, [localityId, filtered, neighbourhoodId]);
+    setNeighbourhoodId(allowBlankNeighbourhood ? "" : filtered[0]?.id ?? "");
+  }, [localityId, filtered, neighbourhoodId, allowBlankNeighbourhood]);
 
   return (
     <>
@@ -73,6 +77,8 @@ export function ProfileLocalityNeighbourhoodFields({
             <option value="">—</option>
           ) : filtered.length === 0 ? (
             <option value="">No neighbourhoods in this area</option>
+          ) : allowBlankNeighbourhood ? (
+            <option value="">—</option>
           ) : null}
           {filtered.map((n) => (
             <option key={n.id} value={n.id}>

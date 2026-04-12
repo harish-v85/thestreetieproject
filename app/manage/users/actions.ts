@@ -47,6 +47,7 @@ export async function createUserAdmin(
   const phone = String(formData.get("phone") ?? "").trim() || null;
   const role = String(formData.get("role") ?? "dog_feeder");
   const locality_id = String(formData.get("locality_id") ?? "").trim() || null;
+  const neighbourhood_id = String(formData.get("neighbourhood_id") ?? "").trim() || null;
   const status = String(formData.get("status") ?? "active");
 
   if (!email || !email.includes("@")) return { error: "Valid email is required." };
@@ -58,6 +59,23 @@ export async function createUserAdmin(
   }
   if (!["active", "pending", "archived"].includes(status)) {
     return { error: "Invalid status." };
+  }
+
+  if (neighbourhood_id && locality_id) {
+    const { data: nb, error: nbErr } = await admin
+      .from("neighbourhoods")
+      .select("id, locality_id")
+      .eq("id", neighbourhood_id)
+      .maybeSingle();
+
+    if (nbErr || !nb) {
+      return { error: "Invalid neighbourhood." };
+    }
+    if (nb.locality_id !== locality_id) {
+      return { error: "Neighbourhood must match the selected locality." };
+    }
+  } else if (neighbourhood_id && !locality_id) {
+    return { error: "Choose a locality before a neighbourhood." };
   }
 
   const { data: created, error: createErr } = await admin.auth.admin.createUser({
@@ -79,11 +97,20 @@ export async function createUserAdmin(
       role,
       status,
       locality_id,
+      neighbourhood_id: locality_id ? neighbourhood_id ?? null : null,
     },
     { onConflict: "id" },
   );
 
-  if (profErr) return { error: profErr.message };
+  if (profErr) {
+    if (profErr.message.includes("neighbourhood_id") || profErr.message.includes("column")) {
+      return {
+        error:
+          "Could not save neighbourhood. Ensure profiles.neighbourhood_id exists (see migration 015_profiles_neighbourhood_id.sql).",
+      };
+    }
+    return { error: profErr.message };
+  }
 
   if (status === "archived" || status === "pending") {
     await admin.auth.admin.updateUserById(userId, { ban_duration: "876000h" });

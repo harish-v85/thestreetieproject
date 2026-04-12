@@ -17,6 +17,20 @@ export const metadata: Metadata = {
   title: "Access requests",
 };
 
+type AccessRequestDbRow = {
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  locality_name: string;
+  neighbourhood_name: string | null;
+  intended_role: string;
+  message: string | null;
+  status: string;
+  reviewed_at: string | null;
+  created_at: string;
+};
+
 export default async function AccessRequestsPage() {
   await requireSuperAdmin("/manage/access-requests");
   const supabase = await createClient();
@@ -24,16 +38,17 @@ export default async function AccessRequestsPage() {
   const { data: rows, error } = await supabase
     .from("access_requests")
     .select(
-      "id, full_name, email, phone, locality_name, intended_role, message, status, reviewed_at, created_at",
+      "id, full_name, email, phone, locality_name, neighbourhood_name, intended_role, message, status, reviewed_at, created_at",
     )
     .order("created_at", { ascending: false });
 
-  const listRows: AccessRequestListRow[] = (rows ?? []).map((r) => ({
+  const listRows: AccessRequestListRow[] = ((rows ?? []) as AccessRequestDbRow[]).map((r) => ({
     id: r.id,
     full_name: r.full_name,
     email: r.email,
     phone: r.phone,
     locality_name: r.locality_name,
+    neighbourhood_name: r.neighbourhood_name ?? null,
     intended_role: r.intended_role,
     message: r.message,
     status: r.status,
