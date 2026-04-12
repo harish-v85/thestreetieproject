@@ -9,13 +9,20 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "./dogs-presence-map.css";
 
 import { createDogMarker } from "@/components/dog-map-pin-marker";
-import { DogPresencePopupCard } from "@/components/dog-presence-popup-card";
+import { DogPresenceMapInlineCard } from "@/components/dog-presence-popup-card";
 import type { DogPresenceMapPin } from "@/lib/dogs/load-dogs-presence-map";
 
 import "leaflet.markercluster";
 
 type LWithCluster = typeof L & {
-  markerClusterGroup: (options: Record<string, unknown>) => L.Layer;
+  markerClusterGroup: (options: Record<string, unknown>) => L.FeatureGroup;
+};
+
+type OpenInlineState = {
+  pinId: string;
+  pinMarker: L.Marker;
+  cardMarker: L.Marker;
+  root: Root;
 };
 
 function clusterClassForCount(count: number): "cream" | "tan" | "chocolate" {
@@ -30,7 +37,6 @@ async function loadLeafletHeat(): Promise<void> {
   const prev = w.L;
   w.L = L;
   try {
-    // npm package name is `leaflet.heat` (Leaflet.heat plugin; there is no `leaflet-heat` on npm).
     await import("leaflet.heat");
   } finally {
     if (prev !== undefined) w.L = prev;
@@ -58,7 +64,10 @@ export function DogsPresenceMap({
   const mapRef = useRef<L.Map | null>(null);
   const clusterRef = useRef<L.FeatureGroup | null>(null);
   const heatRef = useRef<L.Layer | null>(null);
-  const rootsRef = useRef<Root[]>([]);
+  const openInlineRef = useRef<OpenInlineState | null>(null);
+  const closeInlineRef = useRef<(() => void) | null>(null);
+  /** Ignore map `click` briefly after opening from a pin so the same gesture does not dismiss. */
+  const suppressMapDismissRef = useRef(0);
   const [viewMode, setViewMode] = useState<"cluster" | "heatmap">("cluster");
   const [heatReady, setHeatReady] = useState(false);
 
@@ -66,11 +75,9 @@ export function DogsPresenceMap({
     const el = containerRef.current;
     if (!el || pins.length === 0) return;
 
-    const roots: Root[] = [];
-    rootsRef.current = roots;
-
     const map = L.map(el, { scrollWheelZoom: true }).setView([12.97, 77.59], 11);
     mapRef.current = map;
+    suppressMapDismissRef.current = 0;
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -94,22 +101,121 @@ export function DogsPresenceMap({
       },
     }) as L.FeatureGroup;
 
+    function closeInlineCard() {
+      const s = openInlineRef.current;
+      if (!s) return;
+      map.removeLayer(s.cardMarker);
+      try {
+        s.root.unmount();
+      } catch {
+        /* ignore */
+      }
+      if (!group.hasLayer(s.pinMarker)) {
+        group.addLayer(s.pinMarker);
+      }
+      s.pinMarker.setOpacity(1);
+      openInlineRef.current = null;
+    }
+
+    closeInlineRef.current = closeInlineCard;
+
+    let openMountGeneration = 0;
+
+    function openInlineCard(pin: DogPresenceMapPin, pinMarker: L.Marker) {
+      closeInlineCard();
+      openMountGeneration += 1;
+      const mountGen = openMountGeneration;
+      suppressMapDismissRef.current = Date.now() + 180;
+
+      const wrap = document.createElement("div");
+      wrap.className = "streetie-presence-inline-stack flex flex-col items-center";
+      wrap.style.cssText =
+        "position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none";
+
+      document.body.appendChild(wrap);
+      const root = createRoot(wrap);
+      root.render(
+        <DogPresenceMapInlineCard pin={pin} onClose={() => closeInlineCard()} />,
+      );
+
+      const mountCardMarker = () => {
+        if (mountGen !== openMountGeneration) {
+          try {
+            root.unmount();
+          } catch {
+            /* ignore */
+          }
+          if (!group.hasLayer(pinMarker)) {
+            group.addLayer(pinMarker);
+          }
+          pinMarker.setOpacity(1);
+          if (wrap.parentNode) wrap.remove();
+          return;
+        }
+
+        const rect = wrap.getBoundingClientRect();
+        const w = Math.max(Math.ceil(rect.width), 200);
+        const h = Math.max(Math.ceil(rect.height), 100);
+
+        wrap.style.cssText = "";
+        if (wrap.parentNode === document.body) {
+          document.body.removeChild(wrap);
+        }
+
+        group.removeLayer(pinMarker);
+
+        const icon = L.divIcon({
+          className: "streetie-presence-inline-marker-root",
+          html: wrap,
+          iconSize: [w, h],
+          iconAnchor: [w / 2, h],
+        });
+
+        const cardMarker = L.marker([pin.map_lat, pin.map_lng], {
+          icon,
+          zIndexOffset: 4000,
+          interactive: true,
+        }).addTo(map);
+
+        const elCard = cardMarker.getElement();
+        if (elCard) {
+          L.DomEvent.disableClickPropagation(elCard);
+        }
+
+        openInlineRef.current = {
+          pinId: pin.id,
+          pinMarker,
+          cardMarker,
+          root,
+        };
+      };
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(mountCardMarker);
+      });
+    }
+
     for (const pin of pins) {
       const marker = L.marker([pin.map_lat, pin.map_lng], {
         icon: createDogMarker(),
       });
-
-      const wrap = document.createElement("div");
-      const root = createRoot(wrap);
-      roots.push(root);
-      root.render(<DogPresencePopupCard pin={pin} />);
-      marker.bindPopup(wrap, { maxWidth: 320, className: "streetie-presence-popup" });
-
+      marker.on("click", (e: L.LeafletMouseEvent) => {
+        if (e.originalEvent) {
+          L.DomEvent.stopPropagation(e.originalEvent);
+        }
+        openInlineCard(pin, marker);
+      });
       group.addLayer(marker);
     }
 
     clusterRef.current = group;
     map.addLayer(group);
+
+    const onMapClick = () => {
+      if (Date.now() < suppressMapDismissRef.current) return;
+      closeInlineCard();
+    };
+    map.on("click", onMapClick);
 
     const latlngs = pins.map((p) => [p.map_lat, p.map_lng] as L.LatLngTuple);
     if (latlngs.length === 1) {
@@ -155,20 +261,13 @@ export function DogsPresenceMap({
       cancelAnimationFrame(raf);
       window.clearTimeout(t1);
       window.clearTimeout(t2);
+      map.off("click", onMapClick);
+      closeInlineCard();
+      closeInlineRef.current = null;
       clusterRef.current = null;
       heatRef.current = null;
       mapRef.current = null;
-      const toUnmount = roots;
       map.remove();
-      queueMicrotask(() => {
-        for (const r of toUnmount) {
-          try {
-            r.unmount();
-          } catch {
-            /* ignore */
-          }
-        }
-      });
     };
   }, [pins, canUseHeatmap]);
 
@@ -178,6 +277,8 @@ export function DogsPresenceMap({
     const heat = heatRef.current;
     if (!map || !cluster) return;
     if (!canUseHeatmap) return;
+
+    closeInlineRef.current?.();
 
     if (viewMode === "heatmap" && heat && heatReady) {
       if (map.hasLayer(cluster)) map.removeLayer(cluster);

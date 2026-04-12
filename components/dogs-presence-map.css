@@ -33,3 +33,33 @@
   background: transparent !important;
   border: none !important;
 }
+
+/*
+ * Leaflet sets `.leaflet-container a { color: #0078A8 }` — that beats utility classes on
+ * `<Link>` inside popups. Reset links in our React popup content to site ink (buttons set
+ * their own colours via Tailwind).
+ */
+.streetie-presence-popup .leaflet-popup-content a {
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.streetie-presence-popup .leaflet-popup-content a:hover,
+.streetie-presence-popup .leaflet-popup-content a:visited {
+  color: var(--foreground);
+}
+
+/* Inline divIcon card (not a Leaflet popup) — same Leaflet default link colour override. */
+.streetie-presence-inline-marker-root a {
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.streetie-presence-inline-marker-root a:hover,
+.streetie-presence-inline-marker-root a:visited {
+  color: var(--foreground);
+}
+
+.streetie-presence-inline-marker-root {
+  pointer-events: auto;
+}
