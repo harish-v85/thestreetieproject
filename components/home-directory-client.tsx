@@ -129,7 +129,6 @@ export function HomeDirectoryClient({
   excludeDogId,
   initialDogs,
   initialHasMore,
-  showMapViewCallout = false,
 }: {
   localities: LocalityOpt[];
   neighbourhoods: NeighbourhoodOpt[];
@@ -137,8 +136,6 @@ export function HomeDirectoryClient({
   excludeDogId: string | null;
   initialDogs: HomeDogCard[];
   initialHasMore: boolean;
-  /** Temporary featurette for the dog presence map (e.g. directory page only). */
-  showMapViewCallout?: boolean;
 }) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -153,7 +150,7 @@ export function HomeDirectoryClient({
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  /** Mobile: locality / neighbourhood / gender / neutering / colour collapsed behind “Show filters”. */
+  /** Mobile: locality / neighbourhood / gender / neutering / colour collapsed behind “Show more search filters”. */
   const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -331,7 +328,7 @@ export function HomeDirectoryClient({
               aria-controls="home-directory-filters"
               className="text-sm font-medium text-[var(--accent)] underline-offset-2 hover:underline"
             >
-              {filtersExpanded ? "Hide filters" : "Show filters"}
+              {filtersExpanded ? "Hide search filters" : "Show more search filters"}
             </button>
           </div>
           <div
@@ -466,30 +463,6 @@ export function HomeDirectoryClient({
             </button>
           </div>
         )}
-
-        {showMapViewCallout ? (
-          <div
-            className="border-t border-black/5 pt-4"
-            role="note"
-            aria-label="Map view announcement"
-          >
-            <div className="rounded-xl border border-[var(--accent)]/25 bg-[var(--accent)]/[0.06] px-3 py-3 sm:px-4 sm:py-3.5">
-              <p className="text-sm leading-relaxed text-[var(--foreground)]">
-                <span className="mr-1.5 inline-flex rounded-md bg-[var(--accent)]/15 px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-[var(--accent)]">
-                  New
-                </span>
-                You can now look up dogs in your area on a map.{" "}
-                <Link
-                  href="/dogs/map"
-                  className="font-medium text-[var(--accent)] underline-offset-2 hover:underline"
-                >
-                  Check out the map view
-                </Link>{" "}
-                to try this feature.
-              </p>
-            </div>
-          </div>
-        ) : null}
       </div>
 
       {loading ? (

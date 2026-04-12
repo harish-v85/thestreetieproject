@@ -6,6 +6,10 @@ import { HomeDirectorySectionSkeleton } from "@/components/home-directory-skelet
 import { createClient } from "@/lib/supabase/server";
 import { ManagePageHeader } from "@/components/manage-page-header";
 import { DirectoryIconDog } from "@/components/manage-page-icons";
+import {
+  VisitorGuideSection,
+  visitorGuideStaffHelpRoleFromProfile,
+} from "@/components/visitor-guide-section";
 
 export const metadata: Metadata = {
   title: "All Dogs of The Streetie Project",
@@ -20,6 +24,7 @@ export default async function DogsDirectoryPage() {
   } = await supabase.auth.getUser();
 
   let isAdmin = false;
+  let staffHelpRole = null;
   if (user) {
     const { data: prof } = await supabase
       .from("profiles")
@@ -29,6 +34,7 @@ export default async function DogsDirectoryPage() {
     isAdmin =
       prof?.status === "active" &&
       (prof?.role === "admin" || prof?.role === "super_admin");
+    staffHelpRole = visitorGuideStaffHelpRoleFromProfile(prof);
   }
 
   return (
@@ -39,7 +45,7 @@ export default async function DogsDirectoryPage() {
         description={
           <>
             Browse active dog profiles in your area. Learn about them, track their care, and follow
-            updates from the community.{" "}
+            updates from the community. You can also look them up on a map using the{" "}
             <Link href="/dogs/map" className="font-medium text-[var(--accent)] underline-offset-2 hover:underline">
               Map view
             </Link>
@@ -50,6 +56,8 @@ export default async function DogsDirectoryPage() {
           </>
         }
       />
+
+      <VisitorGuideSection signedIn={Boolean(user)} staffHelpRole={staffHelpRole} />
 
       <Suspense fallback={<HomeDirectorySectionSkeleton />}>
         <DogsDirectorySection isAdmin={isAdmin} />

@@ -74,7 +74,6 @@ export async function DogsDirectorySection({ isAdmin }: { isAdmin: boolean }) {
           excludeDogId={null}
           initialDogs={initialDogs}
           initialHasMore={initialHasMore}
-          showMapViewCallout
         />
       ) : null}
     </>

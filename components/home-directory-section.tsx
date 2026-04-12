@@ -6,11 +6,7 @@ import { loadDirectoryFilterOptions } from "@/lib/dogs/load-directory-filter-opt
 import { supabaseErrorHint } from "@/lib/supabase/error-hints";
 import { createClient } from "@/lib/supabase/server";
 
-export async function HomeDirectorySection({
-  showMapViewCallout = false,
-}: {
-  showMapViewCallout?: boolean;
-}) {
+export async function HomeDirectorySection() {
   const supabase = await createClient();
   const [filterOpts, featured] = await Promise.all([
     loadDirectoryFilterOptions(supabase),
@@ -55,7 +51,6 @@ export async function HomeDirectorySection({
         excludeDogId={featured?.id ?? null}
         initialDogs={initialDogs}
         initialHasMore={initialHasMore}
-        showMapViewCallout={showMapViewCallout}
       />
     </>
   );

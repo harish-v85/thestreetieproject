@@ -5,7 +5,13 @@ import { HomeDirectorySection } from "@/components/home-directory-section";
 import { HomeDirectorySectionSkeleton } from "@/components/home-directory-skeleton";
 import { HomeFeaturedSection } from "@/components/home-featured-section";
 import { HomeFeaturedSkeleton } from "@/components/home-featured-skeleton";
+import { WhatsNewSection } from "@/components/whats-new-section";
+import {
+  VisitorGuideSection,
+  visitorGuideStaffHelpRoleFromProfile,
+} from "@/components/visitor-guide-section";
 import { getFaviconSrc, TspLogoImage, TSP_WORDMARK_TYPOGRAPHY } from "@/components/tsp-brand-logo";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Home — The Streetie Project",
@@ -53,6 +59,21 @@ export default async function Home({
     );
   }
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let staffHelpRole = null;
+  if (user) {
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("role, status")
+      .eq("id", user.id)
+      .maybeSingle();
+    staffHelpRole = visitorGuideStaffHelpRoleFromProfile(prof);
+  }
+
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <header className="mb-10 flex flex-col items-center gap-5 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left">
@@ -75,7 +96,7 @@ export default async function Home({
                 href="/about"
                 className="font-medium text-[var(--accent)] underline-offset-2 hover:underline"
               >
-                Learn more about the Streetie Project →
+                Learn about the Streetie Project →
               </Link>
               <span className="text-[var(--muted)]"> (or) </span>
               <Link
@@ -102,13 +123,17 @@ export default async function Home({
         <HomeFeaturedSection />
       </Suspense>
 
+      <WhatsNewSection />
+
+      <VisitorGuideSection signedIn={Boolean(user)} staffHelpRole={staffHelpRole} />
+
       <h2 className="mb-2 text-lg font-semibold text-[var(--foreground)]">All dogs</h2>
       <p className="mb-6 text-sm text-[var(--muted)]">
         Search and filter to find dogs by name, area, or characteristics.
       </p>
 
       <Suspense fallback={<HomeDirectorySectionSkeleton />}>
-        <HomeDirectorySection showMapViewCallout />
+        <HomeDirectorySection />
       </Suspense>
     </main>
   );
