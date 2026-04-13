@@ -45,6 +45,20 @@ export default async function NewDogPage() {
 
   const streetSuggestions = await loadDistinctStreetNames();
 
+  const { data: carerRows } = await supabase
+    .from("profiles")
+    .select("id, full_name, role, status")
+    .in("role", ["dog_feeder", "admin", "super_admin"])
+    .eq("status", "active")
+    .order("full_name", { ascending: true });
+
+  const carerOptions =
+    (carerRows ?? []).map((r) => ({
+      id: r.id,
+      name: r.full_name || "Unnamed user",
+      role: r.role as "dog_feeder" | "admin" | "super_admin",
+    })) ?? [];
+
   const { data: hangoutOptionRows } = await supabase
     .from("dogs")
     .select(
@@ -120,6 +134,7 @@ export default async function NewDogPage() {
           localities={localities ?? []}
           neighbourhoods={neighbourhoods ?? []}
           hangoutOptions={hangoutOptions}
+          carerOptions={carerOptions}
           streetSuggestions={streetSuggestions}
         />
       </div>

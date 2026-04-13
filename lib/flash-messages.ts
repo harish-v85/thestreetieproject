@@ -29,6 +29,8 @@ export const FLASH_MESSAGES = {
   access_request_approved: { message: "Access request approved." },
   access_request_rejected: { message: "Access request rejected." },
   profile_saved: { message: "Profile saved." },
+  carer_added_self: { message: "You're now listed as a carer for this dog." },
+  carer_prompt_dismissed: { message: "We won’t ask again about adding you as a carer for this dog." },
 } as const;
 
 export type FlashKey = keyof typeof FLASH_MESSAGES;

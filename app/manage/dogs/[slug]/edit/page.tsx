@@ -132,6 +132,26 @@ export default async function EditDogPage({ params }: PageProps) {
 
   const streetSuggestions = await loadDistinctStreetNames();
 
+  const { data: carerRows } = await supabase
+    .from("profiles")
+    .select("id, full_name, role, status")
+    .in("role", ["dog_feeder", "admin", "super_admin"])
+    .eq("status", "active")
+    .order("full_name", { ascending: true });
+
+  const carerOptions =
+    (carerRows ?? []).map((r) => ({
+      id: r.id,
+      name: r.full_name || "Unnamed user",
+      role: r.role as "dog_feeder" | "admin" | "super_admin",
+    })) ?? [];
+
+  const { data: existingCarers } = await supabase
+    .from("dog_carers")
+    .select("user_id")
+    .eq("dog_id", dog.id);
+  const defaultCarerUserIds = (existingCarers ?? []).map((r) => r.user_id);
+
   const { data: hangoutPairRows } = await supabase
     .from("dog_hangout_pairs")
     .select("dog_a, dog_b")
@@ -253,6 +273,8 @@ export default async function EditDogPage({ params }: PageProps) {
           neighbourhoods={neighbourhoods ?? []}
           hangoutOptions={hangoutOptions}
           defaultHangoutCompanionIds={defaultHangoutCompanionIds}
+          carerOptions={carerOptions}
+          defaultCarerUserIds={defaultCarerUserIds}
           streetSuggestions={streetSuggestions}
         />
       </div>

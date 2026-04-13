@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requirePrivileged } from "@/lib/auth/require-privileged";
 import { recordWelfareStatusChange } from "@/lib/dogs/record-welfare-status-event";
+import { syncDogCarers } from "@/lib/dogs/dog-carers-sync";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -43,10 +44,18 @@ export type BulkEditCommitPayload = {
   profile?: BulkEditProfilePatch;
   location?: BulkEditLocationPatch;
   medical?: BulkEditMedicalPatch;
+  /** When set (including `[]`), replaces carers for every selected dog. Omit to leave carers unchanged. */
+  carers?: string[];
 };
 
 export type BulkEditCommitResult =
-  | { ok: true; updated: number; medicalAdded: number; skipped: { id: string; reason: string }[] }
+  | {
+      ok: true;
+      updated: number;
+      medicalAdded: number;
+      carersSynced: number;
+      skipped: { id: string; reason: string }[];
+    }
   | { ok: false; error: string };
 
 type DogBulkRow = {
@@ -110,6 +119,18 @@ export async function commitBulkDogEdit(json: string): Promise<BulkEditCommitRes
 
   const hasProfile = !!(payload.profile && Object.keys(payload.profile).length > 0);
   const hasLocation = !!(payload.location && Object.keys(payload.location).length > 0);
+  const hasCarers = payload.carers !== undefined;
+
+  function validateCarerIds(ids: string[]): string | null {
+    for (const id of ids) {
+      if (!UUID_RE.test(id)) return "Invalid carer id.";
+    }
+    return null;
+  }
+  if (hasCarers && payload.carers) {
+    const err = validateCarerIds(payload.carers);
+    if (err) return { ok: false, error: err };
+  }
 
   if (hasProfile) {
     const err = validateProfilePatchKeys(payload.profile!);
@@ -135,6 +156,7 @@ export async function commitBulkDogEdit(json: string): Promise<BulkEditCommitRes
   const skipped: { id: string; reason: string }[] = [];
   let updated = 0;
   let medicalAdded = 0;
+  let carersSynced = 0;
   const slugsToRevalidate = new Set<string>();
 
   for (const dogId of dogIds) {
@@ -324,8 +346,22 @@ export async function commitBulkDogEdit(json: string): Promise<BulkEditCommitRes
       } else {
         medicalAdded += 1;
       }
-    } else if (payload.medical && d.status !== "active") {
+    } else     if (payload.medical && d.status !== "active") {
       skipped.push({ id: dogId, reason: "Medical skipped (dog is not active)." });
+    }
+
+    if (hasCarers && payload.carers !== undefined) {
+      const syncRes = await syncDogCarers({
+        supabase,
+        dogId,
+        actorUserId: user.id,
+        requestedCarerIds: payload.carers,
+      });
+      if (syncRes.error) {
+        skipped.push({ id: dogId, reason: `Carers: ${syncRes.error}` });
+      } else {
+        carersSynced += 1;
+      }
     }
   }
 
@@ -337,5 +373,5 @@ export async function commitBulkDogEdit(json: string): Promise<BulkEditCommitRes
     revalidatePath(`/manage/dogs/${slug}/edit`);
   }
 
-  return { ok: true, updated, medicalAdded, skipped };
+  return { ok: true, updated, medicalAdded, carersSynced, skipped };
 }

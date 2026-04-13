@@ -13,6 +13,7 @@ import {
 import { DogProfileAgeClassicRow } from "@/components/dog-profile/dog-profile-age";
 import { DogProfileCollarValue } from "@/components/dog-profile/dog-profile-collar";
 import { formatDisplayDate } from "@/lib/date/format-display-date";
+import { DogProfileCarersSection } from "@/components/dog-profile/dog-profile-carers-section";
 
 export function DogProfileClassic({
   data,
@@ -177,6 +178,7 @@ export function DogProfileClassic({
         </section>
       ) : null}
 
+      <DogProfileCarersSection data={data} variant="classic" />
       <DogProfileMedicalSection data={data} variant="classic" />
       <DogProfileFeedingSection data={data} variant="classic" />
 

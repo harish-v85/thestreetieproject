@@ -42,7 +42,7 @@ export function DogProfileMedicalSection({
     <section
       id="medical"
       className={
-        variant === "v2" ? "mb-0 scroll-mt-8" : "mb-10 scroll-mt-8"
+        variant === "v2" ? "mb-0 scroll-mt-8 pt-8" : "mb-10 scroll-mt-8"
       }
     >
       <h2 className={titleClass}>Medical records</h2>

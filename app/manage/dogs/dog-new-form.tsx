@@ -11,6 +11,7 @@ import { DogCoatFields } from "@/components/dog-coat-fields";
 import { DogNameAliasField } from "@/components/dog-name-alias-field";
 import { DogCollarFields } from "@/components/dog-collar-fields";
 import { HangoutCoordsField } from "@/components/hangout-coords-field";
+import { DogCarersField, type CarerOption } from "@/components/dog-carers-field";
 import type { DogCoatDefaults } from "@/lib/dogs/coat";
 import { todayIsoDateLocal } from "@/lib/dogs/dog-age";
 import { createDog, type DogFormState } from "./actions";
@@ -33,11 +34,13 @@ export function DogNewForm({
   localities,
   neighbourhoods,
   hangoutOptions,
+  carerOptions,
   streetSuggestions,
 }: {
   localities: { id: string; name: string }[];
   neighbourhoods: { id: string; locality_id: string; name: string }[];
   hangoutOptions: HangoutOption[];
+  carerOptions: CarerOption[];
   streetSuggestions: string[];
 }) {
   const [state, formAction, pending] = useActionState(createDog, initial);
@@ -211,6 +214,7 @@ export function DogNewForm({
             defaultCollarDescription={null}
             idPrefix="new_dog_collar"
           />
+          <DogCarersField options={carerOptions} defaultSelectedIds={[]} />
         </div>
       </section>
 

@@ -10,6 +10,7 @@ import { resolveAgeEstimatedOnForSave } from "@/lib/dogs/dog-age";
 import { isHasCollar, resolveCollarDescriptionForSave } from "@/lib/dogs/collar";
 import { recordWelfareStatusChange } from "@/lib/dogs/record-welfare-status-event";
 import { slugify } from "@/lib/dogs/slugify";
+import { syncDogCarers } from "@/lib/dogs/dog-carers-sync";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -34,6 +35,35 @@ function parseHangoutCompanionIds(formData: FormData, dogId: string): string[] {
     out.push(id);
   }
   return out;
+}
+
+function parseCarerUserIds(formData: FormData): string[] {
+  const raw = formData.getAll("carer_user_id");
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const v of raw) {
+    const id = String(v).trim();
+    if (!UUID_RE.test(id) || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out;
+}
+
+async function upsertDogProfileEditor(params: {
+  supabase: Awaited<ReturnType<typeof createClient>>;
+  dogId: string;
+  userId: string;
+}): Promise<void> {
+  const { supabase, dogId, userId } = params;
+  await supabase.from("dog_profile_editors").upsert(
+    {
+      dog_id: dogId,
+      user_id: userId,
+      last_contributed_at: new Date().toISOString(),
+    },
+    { onConflict: "dog_id,user_id" },
+  );
 }
 
 function companionIdsFromPairRows(
@@ -147,6 +177,7 @@ export async function createDog(
   const featuredValue = wantFeatured && status === "active";
 
   const name_aliases = normalizeNameAliasesJson(String(formData.get("name_aliases_json") ?? ""));
+  const carerUserIds = parseCarerUserIds(formData);
 
   const estimated_birth_year = optBirthYear(formData);
   const estimated_death_yearRaw = optDeathYear(formData);
@@ -269,6 +300,16 @@ export async function createDog(
 
   if (hangoutErr) return { error: hangoutErr.message };
 
+  const carersRes = await syncDogCarers({
+    supabase,
+    dogId: dog.id,
+    actorUserId: userId,
+    requestedCarerIds: carerUserIds,
+  });
+  if (carersRes.error) return { error: carersRes.error };
+
+  await upsertDogProfileEditor({ supabase, dogId: dog.id, userId });
+
   const revalidateIds = new Set<string>([dog.id, ...hangoutCompanionIds]);
   const { data: slugRows } = await supabase
     .from("dogs")
@@ -292,7 +333,7 @@ export async function updateDog(
   _prev: DogFormState,
   formData: FormData,
 ): Promise<DogFormState> {
-  await requirePrivileged();
+  const { userId } = await requirePrivileged();
   const supabase = await createClient();
 
   const { data: priorDog } = await supabase
@@ -351,6 +392,7 @@ export async function updateDog(
   }
 
   const name_aliases = normalizeNameAliasesJson(String(formData.get("name_aliases_json") ?? ""));
+  const carerUserIds = parseCarerUserIds(formData);
 
   const estimated_birth_year = optBirthYear(formData);
   const estimated_death_yearRaw = optDeathYear(formData);
@@ -474,6 +516,16 @@ export async function updateDog(
   });
 
   if (hangoutErr) return { error: hangoutErr.message };
+
+  const carersRes = await syncDogCarers({
+    supabase,
+    dogId,
+    actorUserId: userId,
+    requestedCarerIds: carerUserIds,
+  });
+  if (carersRes.error) return { error: carersRes.error };
+
+  await upsertDogProfileEditor({ supabase, dogId, userId });
 
   const { data: pairsAfter } = await supabase
     .from("dog_hangout_pairs")

@@ -18,6 +18,7 @@ import {
 import { DogHoverChipLink } from "@/components/hangout-buddy-chips";
 import { DogSelectListThumb } from "@/components/dog-select-list-thumb";
 import { HangoutCoordsField } from "@/components/hangout-coords-field";
+import { DogCarersField, type CarerOption } from "@/components/dog-carers-field";
 
 const btnPrimary =
   "inline-flex items-center justify-center rounded-lg bg-[var(--accent)] px-4 py-2 text-center text-sm font-medium text-white transition hover:opacity-95 disabled:opacity-50";
@@ -124,11 +125,13 @@ export function BulkEditClient({
   localities,
   neighbourhoods,
   streetSuggestions,
+  carerOptions,
 }: {
   dogs: BulkEditDogRow[];
   localities: { id: string; name: string }[];
   neighbourhoods: NeighbourhoodOption[];
   streetSuggestions: string[];
+  carerOptions: CarerOption[];
 }) {
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [pending, startTransition] = useTransition();
@@ -163,7 +166,11 @@ export function BulkEditClient({
     profile?: BulkEditProfilePatch;
     location?: BulkEditLocationPatch;
     medical?: BulkEditMedicalPatch | null;
+    carers?: string[];
   }>({});
+
+  const [bulkEditCarerIds, setBulkEditCarerIds] = useState<string[]>([]);
+  const [bulkEditCarersTouched, setBulkEditCarersTouched] = useState(false);
 
   const idsKey = useMemo(() => dogs.map((d) => d.id).join(","), [dogs]);
   const q = search.trim().toLowerCase();
@@ -181,8 +188,16 @@ export function BulkEditClient({
     const p = draft.profile && Object.keys(draft.profile).length > 0;
     const l = draft.location && Object.keys(draft.location).length > 0;
     const m = !!draft.medical;
-    return !!(p || l || m);
+    const c = draft.carers !== undefined;
+    return !!(p || l || m || c);
   }, [draft]);
+
+  useEffect(() => {
+    if (step === 2 && draft.carers !== undefined) {
+      setBulkEditCarerIds(draft.carers);
+      setBulkEditCarersTouched(true);
+    }
+  }, [step, draft.carers]);
 
   const locationFormMountKey = step === 3 ? JSON.stringify(draft.location ?? {}) : "off";
 
@@ -249,8 +264,9 @@ export function BulkEditClient({
     if (draft.profile && Object.keys(draft.profile).length > 0) payload.profile = draft.profile;
     if (draft.location && Object.keys(draft.location).length > 0) payload.location = draft.location;
     if (draft.medical) payload.medical = draft.medical;
+    if (draft.carers !== undefined) payload.carers = draft.carers;
 
-    if (!payload.profile && !payload.location && !payload.medical) {
+    if (!payload.profile && !payload.location && !payload.medical && draft.carers === undefined) {
       setFormError("Use at least one of the previous steps to set changes, or go back and fill them in.");
       return;
     }
@@ -498,6 +514,28 @@ export function BulkEditClient({
                 className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-[var(--accent)] focus:ring-2"
               />
             </div>
+            <div className="sm:col-span-2">
+              <div className="mb-1 flex flex-wrap items-center gap-2 text-sm font-medium">
+                <span>Cared for by</span>
+                <ChangeBadge updated={bulkEditCarersTouched} />
+              </div>
+              <DogCarersField
+                key={
+                  step === 2
+                    ? draft.carers !== undefined
+                      ? draft.carers.join("|")
+                      : "none"
+                    : "off"
+                }
+                options={carerOptions}
+                defaultSelectedIds={draft.carers ?? bulkEditCarerIds}
+                includeHiddenInputs={false}
+                onSelectionChange={(ids) => {
+                  setBulkEditCarerIds(ids);
+                  setBulkEditCarersTouched(true);
+                }}
+              />
+            </div>
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
             <button type="button" className={btnSecondary} onClick={() => setStep(1)}>
@@ -520,6 +558,8 @@ export function BulkEditClient({
                   const next = { ...d };
                   if (Object.keys(patch).length > 0) next.profile = patch;
                   else delete next.profile;
+                  if (bulkEditCarersTouched) next.carers = [...bulkEditCarerIds];
+                  else delete next.carers;
                   return next;
                 });
                 setStep(3);
@@ -766,6 +806,24 @@ export function BulkEditClient({
                     </div>
                   ) : null}
                 </dl>
+              </div>
+            ) : null}
+
+            {draft.carers !== undefined ? (
+              <div className="rounded-lg border border-black/5 p-4">
+                <h3 className="font-semibold text-[var(--foreground)]">Carers</h3>
+                {draft.carers.length === 0 ? (
+                  <p className="mt-2 text-sm text-[var(--muted)]">
+                    No carers — existing carer lists will be cleared for every selected dog.
+                  </p>
+                ) : (
+                  <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-[var(--muted)]">
+                    {draft.carers.map((id) => {
+                      const name = carerOptions.find((c) => c.id === id)?.name ?? id;
+                      return <li key={id}>{name}</li>;
+                    })}
+                  </ul>
+                )}
               </div>
             ) : null}
 

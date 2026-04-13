@@ -116,6 +116,8 @@ export type DogProfileData = {
   todayStr: string;
   scrollMedicalList: boolean;
   scrollFeedingList: boolean;
+  carers: { user_id: string; carer_name: string }[];
+  showSelfCarerPrompt: boolean;
 };
 
 /** Load everything needed for `/dogs/[slug]` (classic or v2). Returns null if not found. */
@@ -143,6 +145,7 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
       map_lat,
       map_lng,
       created_at,
+      created_by,
       updated_at,
       welfare_status_updated_at,
       name_aliases,
@@ -240,6 +243,12 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
   ];
   const recorderNames = await recorderNameMap(supabase, welfareActorIds);
 
+  const { data: carerRows } = await supabase
+    .from("dog_carers")
+    .select("user_id, carer_name")
+    .eq("dog_id", dog.id)
+    .order("carer_name", { ascending: true });
+
   const welfareEvents: DogProfileWelfareEvent[] = welfareEventRows.map((w) => ({
     id: w.id,
     from_status: w.from_status,
@@ -252,6 +261,64 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
 
   const staffViewer = await getActiveStaffViewer();
   const superAdminViewer = await getSuperAdminViewer();
+
+  let showSelfCarerPrompt = false;
+  if (
+    staffViewer &&
+    (staffViewer.role === "dog_feeder" || staffViewer.role === "admin")
+  ) {
+    const viewerId = staffViewer.userId;
+    const isCarer = (carerRows ?? []).some((c) => c.user_id === viewerId);
+
+    if (!isCarer) {
+      const [dismissedRes, editedRes, welfareRes, medicalRes, feedingRes] = await Promise.all([
+        supabase
+          .from("dog_carer_prompt_dismissals")
+          .select("dog_id")
+          .eq("dog_id", dog.id)
+          .eq("user_id", viewerId)
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("dog_profile_editors")
+          .select("dog_id")
+          .eq("dog_id", dog.id)
+          .eq("user_id", viewerId)
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("welfare_status_events")
+          .select("id")
+          .eq("dog_id", dog.id)
+          .eq("changed_by", viewerId)
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("medical_records")
+          .select("id")
+          .eq("dog_id", dog.id)
+          .eq("recorded_by", viewerId)
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("feeding_records")
+          .select("id")
+          .eq("dog_id", dog.id)
+          .eq("fed_by", viewerId)
+          .limit(1)
+          .maybeSingle(),
+      ]);
+
+      const hasContributed =
+        Boolean(editedRes.data) ||
+        (dog.created_by != null && dog.created_by === viewerId) ||
+        Boolean(welfareRes.data) ||
+        Boolean(medicalRes.data) ||
+        Boolean(feedingRes.data);
+
+      showSelfCarerPrompt = hasContributed && !dismissedRes.data;
+    }
+  }
 
   const feedingCount = feedings?.length ?? 0;
   const medicalCount = medical?.length ?? 0;
@@ -430,5 +497,7 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
     todayStr,
     scrollMedicalList: medicalCount > 5,
     scrollFeedingList: feedingCount > 5,
+    carers: (carerRows ?? []) as { user_id: string; carer_name: string }[],
+    showSelfCarerPrompt,
   };
 }

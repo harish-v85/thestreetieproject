@@ -11,6 +11,7 @@ import { DogCoatFields } from "@/components/dog-coat-fields";
 import { DogNameAliasField } from "@/components/dog-name-alias-field";
 import { DogCollarFields } from "@/components/dog-collar-fields";
 import { HangoutCoordsField } from "@/components/hangout-coords-field";
+import { DogCarersField, type CarerOption } from "@/components/dog-carers-field";
 import type { DogCoatDefaults } from "@/lib/dogs/coat";
 import { todayIsoDateLocal } from "@/lib/dogs/dog-age";
 import { updateDog, type DogFormState } from "./actions";
@@ -61,6 +62,8 @@ export function DogEditForm({
   neighbourhoods,
   hangoutOptions,
   defaultHangoutCompanionIds,
+  carerOptions,
+  defaultCarerUserIds,
   streetSuggestions,
 }: {
   dog: DogRow;
@@ -69,6 +72,8 @@ export function DogEditForm({
   neighbourhoods: { id: string; locality_id: string; name: string }[];
   hangoutOptions: HangoutOption[];
   defaultHangoutCompanionIds: string[];
+  carerOptions: CarerOption[];
+  defaultCarerUserIds: string[];
   streetSuggestions: string[];
 }) {
   const boundUpdate = updateDog.bind(null, dog.id, dog.slug);
@@ -247,6 +252,10 @@ export function DogEditForm({
             defaultHasCollar={dog.has_collar}
             defaultCollarDescription={dog.collar_description}
             idPrefix="edit_dog_collar"
+          />
+          <DogCarersField
+            options={carerOptions}
+            defaultSelectedIds={defaultCarerUserIds}
           />
         </div>
       </section>

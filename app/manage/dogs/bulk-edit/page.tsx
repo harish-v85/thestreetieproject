@@ -70,6 +70,20 @@ export default async function BulkEditDogsPage() {
 
   const streetSuggestions = await loadDistinctStreetNames();
 
+  const { data: carerRows } = await supabase
+    .from("profiles")
+    .select("id, full_name, role, status")
+    .in("role", ["dog_feeder", "admin", "super_admin"])
+    .eq("status", "active")
+    .order("full_name", { ascending: true });
+
+  const carerOptions =
+    (carerRows ?? []).map((r) => ({
+      id: r.id,
+      name: r.full_name || "Unnamed user",
+      role: r.role as "dog_feeder" | "admin" | "super_admin",
+    })) ?? [];
+
   const list = (rows as DogRow[] | null) ?? [];
   const activeIds = list.map((d) => d.id);
   const { data: photoRows } =
@@ -134,6 +148,7 @@ export default async function BulkEditDogsPage() {
             localities={localities ?? []}
             neighbourhoods={neighbourhoods ?? []}
             streetSuggestions={streetSuggestions}
+            carerOptions={carerOptions}
           />
         </div>
       )}
