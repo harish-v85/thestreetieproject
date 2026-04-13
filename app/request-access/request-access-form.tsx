@@ -91,7 +91,7 @@ export function RequestAccessForm() {
           className="w-full rounded-lg border border-black/10 bg-[var(--background)] px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2 disabled:opacity-60"
         />
         <p className="mt-1 text-xs text-[var(--muted)]">
-          If you're unsure about what to enter, put N/A for now and update your profile later.
+          If you&apos;re unsure about what to enter, put N/A for now and update your profile later.
         </p>
       </div>
       <div>
@@ -106,7 +106,7 @@ export function RequestAccessForm() {
           className="w-full rounded-lg border border-black/10 bg-[var(--background)] px-3 py-2 outline-none ring-[var(--accent)] focus:ring-2 disabled:opacity-60"
         />
         <p className="mt-1 text-xs text-[var(--muted)]">
-          If you're unsure about what to enter, put N/A for now and update your profile later.
+          If you&apos;re unsure about what to enter, put N/A for now and update your profile later.
         </p>
       </div>
       <div>

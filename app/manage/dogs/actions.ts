@@ -127,7 +127,7 @@ export async function createDog(
 
   if (!["male", "female", "unknown"].includes(gender)) return { error: "Invalid gender." };
   if (!["neutered", "not_neutered", "unknown"].includes(neutering_status)) {
-    return { error: "Invalid neutering status." };
+    return { error: "Invalid sterilisation status." };
   }
   if (
     !["healthy", "needs_attention", "injured", "missing", "deceased"].includes(welfare_status)
@@ -328,7 +328,7 @@ export async function updateDog(
 
   if (!["male", "female", "unknown"].includes(gender)) return { error: "Invalid gender." };
   if (!["neutered", "not_neutered", "unknown"].includes(neutering_status)) {
-    return { error: "Invalid neutering status." };
+    return { error: "Invalid sterilisation status." };
   }
   if (
     !["healthy", "needs_attention", "injured", "missing", "deceased"].includes(welfare_status)

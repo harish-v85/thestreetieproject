@@ -46,7 +46,7 @@ const NEUTER_LABEL: Record<string, string> = {
 
 const EVENT_LABEL: Record<string, string> = {
   vaccination: "Vaccination",
-  neutering: "Neutering",
+  neutering: "Sterilisation",
   vet_visit: "Vet visit",
   other: "Other",
 };
@@ -617,7 +617,7 @@ export function BulkEditClient({
               >
                 <option value="">Select Event type</option>
                 <option value="vaccination">Vaccination</option>
-                <option value="neutering">Neutering</option>
+                <option value="neutering">Sterilisation</option>
                 <option value="vet_visit">Vet visit</option>
                 <option value="other">Other</option>
               </select>

@@ -150,7 +150,7 @@ export function HomeDirectoryClient({
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  /** Mobile: locality / neighbourhood / gender / neutering / colour collapsed behind “Show more search filters”. */
+  /** Mobile: locality / neighbourhood / gender / sterilisation status / colour collapsed behind “Show more search filters”. */
   const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -370,7 +370,7 @@ export function HomeDirectoryClient({
             </div>
             <div className="min-w-0">
               <SingleSelectDropdown
-                label="Neutering"
+                label="Sterilisation Status"
                 options={NEUTERING_FILTER_OPTIONS}
                 value={neutering}
                 onChange={setNeutering}
@@ -442,7 +442,8 @@ export function HomeDirectoryClient({
                 onClick={() => setNeutering("")}
                 className="rounded-full bg-black/5 px-2 py-0.5 text-xs hover:bg-black/10"
               >
-                Neutering: {neutering} ×
+                Sterilisation Status:{" "}
+                {NEUTERING_FILTER_OPTIONS.find((o) => o.id === neutering)?.label ?? neutering} ×
               </button>
             ) : null}
             {colour ? (

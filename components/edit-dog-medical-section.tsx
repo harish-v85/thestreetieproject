@@ -9,7 +9,7 @@ const LIST_SCROLL_AFTER = 5;
 
 const eventLabel: Record<string, string> = {
   vaccination: "Vaccination",
-  neutering: "Neutering",
+  neutering: "Sterilisation",
   vet_visit: "Vet visit",
   other: "Other",
 };

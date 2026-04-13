@@ -46,7 +46,7 @@ function welfareLabel(status: string): string {
 function medicalEventLabel(t: string): string {
   const m: Record<string, string> = {
     vaccination: "Vaccination",
-    neutering: "Neutering",
+    neutering: "Sterilisation",
     vet_visit: "Vet visit",
     other: "Other",
   };

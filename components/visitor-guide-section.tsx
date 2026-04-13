@@ -70,7 +70,7 @@ export function VisitorGuideSection({
             <div>
               <p className="font-medium text-[var(--foreground)]">Narrow the list</p>
               <p className="mt-0.5 text-[var(--muted)]">
-                Use locality, neighbourhood, gender, neutering, or colour to filter.
+                Use locality, neighbourhood, gender, sterilisation status, or colour to filter.
                 <span className="block sm:hidden">
                   {" "}
                   Tap &apos;Show more search filters&apos; to open those options under the search

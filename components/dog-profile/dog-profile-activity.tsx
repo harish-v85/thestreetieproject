@@ -9,7 +9,7 @@ import { formatDisplayDateTime } from "@/lib/date/format-display-date";
 
 const eventLabel: Record<string, string> = {
   vaccination: "Vaccination",
-  neutering: "Neutering",
+  neutering: "Sterilisation",
   vet_visit: "Vet visit",
   other: "Other",
 };
@@ -231,7 +231,7 @@ export function DogProfileFeedingSection({
                       <span className="italic text-[var(--muted)]">No feeding notes</span>
                     )}
                   </p>
-                  <p className="mt-2 flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs text-[var(--muted)]">
+                  <div className="mt-2 flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs text-[var(--muted)]">
                     <span>
                       fed by{" "}
                       <span className="font-medium text-[var(--foreground)]">{feederName}</span>
@@ -247,7 +247,7 @@ export function DogProfileFeedingSection({
                         />
                       </>
                     ) : null}
-                  </p>
+                  </div>
                   {superAdminViewer ? (
                     <SuperAdminFeedingRecordActions
                       row={{

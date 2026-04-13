@@ -7,7 +7,7 @@ const initial: MedicalRecordFormState = { error: null };
 
 const eventLabel: Record<string, string> = {
   vaccination: "Vaccination",
-  neutering: "Neutering",
+  neutering: "Sterilisation",
   vet_visit: "Vet visit",
   other: "Other",
 };
