@@ -21,7 +21,7 @@ const ACTIONS = [
   },
   {
     title: "Care",
-    text: "If you already feed or look out for dogs, log feedings and share updates that help others understand their routines.",
+    text: "If you already feed or look out for dogs, log their welfare status and share updates that help others understand their routines.",
     Icon: Heart,
   },
   {

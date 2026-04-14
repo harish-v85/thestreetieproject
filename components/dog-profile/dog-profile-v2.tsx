@@ -225,7 +225,9 @@ export function DogProfileV2({
               <DogProfileCarersSection data={data} variant="v2" />
               <DogProfileWelfareSection data={data} variant="v2" />
               <DogProfileMedicalSection data={data} variant="v2" />
-              <DogProfileFeedingSection data={data} variant="v2" />
+              {data.signedInViewer ? (
+                <DogProfileFeedingSection data={data} variant="v2" />
+              ) : null}
             </div>
             <footer className="mt-auto hidden border-t border-black/10 pt-8 text-xs text-zinc-600 lg:block">
               <p>

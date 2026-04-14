@@ -104,6 +104,7 @@ export type DogProfileData = {
   feedings: DogProfileFeedingRow[];
   recorderNames: Map<string, string>;
   welfareEvents: DogProfileWelfareEvent[];
+  signedInViewer: boolean;
   staffViewer: Awaited<ReturnType<typeof getActiveStaffViewer>>;
   superAdminViewer: Awaited<ReturnType<typeof getSuperAdminViewer>>;
   hangoutBuddyPreviews: HangoutBuddyPreview[];
@@ -121,6 +122,10 @@ export type DogProfileData = {
 /** Load everything needed for `/dogs/[slug]` (classic or v2). Returns null if not found. */
 export async function loadDogProfileData(slug: string): Promise<DogProfileData | null> {
   const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+  const signedInViewer = Boolean(authUser);
 
   const { data: dog, error } = await supabase
     .from("dogs")
@@ -221,11 +226,13 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
     .eq("dog_id", dog.id)
     .order("occurred_on", { ascending: false });
 
-  const { data: feedings } = await supabase
-    .from("feeding_records")
-    .select("id, fed_at, notes, fed_by, lat, lng")
-    .eq("dog_id", dog.id)
-    .order("fed_at", { ascending: false });
+  const { data: feedings } = signedInViewer
+    ? await supabase
+        .from("feeding_records")
+        .select("id, fed_at, notes, fed_by, lat, lng")
+        .eq("dog_id", dog.id)
+        .order("fed_at", { ascending: false })
+    : { data: [] as DogProfileFeedingRow[] };
 
   const welfareRes = await supabase
     .from("welfare_status_events")
@@ -480,6 +487,7 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
     feedings: (feedings ?? []) as DogProfileFeedingRow[],
     recorderNames,
     welfareEvents,
+    signedInViewer,
     staffViewer,
     superAdminViewer,
     hangoutBuddyPreviews,

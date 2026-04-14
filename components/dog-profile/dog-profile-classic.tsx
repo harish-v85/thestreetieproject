@@ -143,7 +143,9 @@ export function DogProfileClassic({
 
       <DogProfileCarersSection data={data} variant="classic" />
       <DogProfileMedicalSection data={data} variant="classic" />
-      <DogProfileFeedingSection data={data} variant="classic" />
+      {data.signedInViewer ? (
+        <DogProfileFeedingSection data={data} variant="classic" />
+      ) : null}
 
       <footer className="border-t border-black/5 pt-6 text-xs text-[var(--muted)]">
         <p>Last updated at {formatDisplayDate(dog.updated_at)}</p>
