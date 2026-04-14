@@ -248,11 +248,13 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
   ];
   const recorderNames = await recorderNameMap(supabase, welfareActorIds);
 
-  const { data: carerRows } = await supabase
-    .from("dog_carers")
-    .select("user_id, carer_name")
-    .eq("dog_id", dog.id)
-    .order("carer_name", { ascending: true });
+  const { data: carerRows } = signedInViewer
+    ? await supabase
+        .from("dog_carers")
+        .select("user_id, carer_name")
+        .eq("dog_id", dog.id)
+        .order("carer_name", { ascending: true })
+    : { data: [] as { user_id: string; carer_name: string }[] };
 
   const welfareEvents: DogProfileWelfareEvent[] = welfareEventRows.map((w) => ({
     id: w.id,

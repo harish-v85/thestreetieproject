@@ -141,7 +141,9 @@ export function DogProfileClassic({
         </section>
       ) : null}
 
-      <DogProfileCarersSection data={data} variant="classic" />
+      {data.signedInViewer ? (
+        <DogProfileCarersSection data={data} variant="classic" />
+      ) : null}
       <DogProfileMedicalSection data={data} variant="classic" />
       {data.signedInViewer ? (
         <DogProfileFeedingSection data={data} variant="classic" />

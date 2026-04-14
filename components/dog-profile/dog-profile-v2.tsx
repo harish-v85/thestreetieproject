@@ -222,7 +222,9 @@ export function DogProfileV2({
             className={`flex min-h-full flex-col border-t border-black/10 px-4 py-8 sm:px-5 sm:py-10 lg:border-l lg:border-t-0 ${homeFeaturedSurfaceClass}`}
           >
             <div className="min-h-0 flex-1">
-              <DogProfileCarersSection data={data} variant="v2" />
+              {data.signedInViewer ? (
+                <DogProfileCarersSection data={data} variant="v2" />
+              ) : null}
               <DogProfileWelfareSection data={data} variant="v2" />
               <DogProfileMedicalSection data={data} variant="v2" />
               {data.signedInViewer ? (
