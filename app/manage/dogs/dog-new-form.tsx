@@ -162,7 +162,7 @@ export function DogNewForm({
           </div>
           <div className="flex flex-col">
             <label htmlFor="welfare_status" className="mb-1 block text-sm font-medium">
-              Welfare check
+              Welfare Check - Status
             </label>
             <select
               id="welfare_status"
@@ -180,7 +180,7 @@ export function DogNewForm({
           </div>
           <div className="flex min-h-0 flex-col">
             <label htmlFor="welfare_remarks" className="mb-1 block text-sm font-medium">
-              Welfare check — remarks
+              Welfare Check - Remarks
             </label>
             <input
               id="welfare_remarks"

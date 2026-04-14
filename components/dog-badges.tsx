@@ -246,7 +246,7 @@ export function WelfareBadge({ status }: { status: string }) {
     <Badge
       tone="custom"
       className={`font-semibold ${welfareBadgeClass(status)}`}
-      title={`Welfare check — ${label}`}
+      title={`Welfare Check — ${label}`}
       chipShape="pill"
     >
       {label}
@@ -256,4 +256,40 @@ export function WelfareBadge({ status }: { status: string }) {
 
 export function welfareStatusLabel(status: string): string {
   return welfareLabels[status] ?? status;
+}
+
+/** Coloured circle emoji for public profile / lists (semantic status at a glance). */
+export function welfareStatusEmoji(status: string): string {
+  switch (status) {
+    case "healthy":
+      return "🟢";
+    case "needs_attention":
+      return "🟡";
+    case "injured":
+      return "🟠";
+    case "missing":
+      return "🔴";
+    case "deceased":
+      return "⚫";
+    default:
+      return "⚪";
+  }
+}
+
+/** Card border aligned with welfare indicator colours. */
+export function welfareStatusBorderClass(status: string): string {
+  switch (status) {
+    case "healthy":
+      return "border-2 border-emerald-500/65";
+    case "needs_attention":
+      return "border-2 border-amber-500/65";
+    case "injured":
+      return "border-2 border-orange-500/65";
+    case "missing":
+      return "border-2 border-red-500/65";
+    case "deceased":
+      return "border-2 border-zinc-600/75";
+    default:
+      return "border-2 border-zinc-300/80";
+  }
 }

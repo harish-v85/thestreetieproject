@@ -8,6 +8,7 @@ import { recorderNameMap } from "@/lib/dogs/recorder-name-map";
 import { DogPhotosManager } from "@/components/dog-photos-manager";
 import { isCloudinaryConfigured } from "@/lib/cloudinary/dog-images";
 import { EditDogMedicalSection } from "@/components/edit-dog-medical-section";
+import { EditDogWelfareSection } from "@/components/edit-dog-welfare-section";
 import { dogRowToCoatDefaults } from "@/lib/dogs/coat";
 import { formatDogLocationLine } from "@/lib/dogs/location-line";
 import { coerceNameAliases } from "@/lib/dogs/name-aliases";
@@ -84,13 +85,17 @@ export default async function EditDogPage({ params }: PageProps) {
   if (error || !dog) notFound();
 
   let welfare_remarks: string | null = null;
+  let welfare_status_updated_at: string | null = null;
   const remarksRes = await supabase
     .from("dogs")
-    .select("welfare_remarks")
+    .select("welfare_remarks, welfare_status_updated_at")
     .eq("id", dog.id)
     .maybeSingle();
   if (!remarksRes.error && remarksRes.data) {
     welfare_remarks = remarksRes.data.welfare_remarks ?? null;
+    welfare_status_updated_at =
+      (remarksRes.data as { welfare_status_updated_at?: string | null }).welfare_status_updated_at ??
+      null;
   }
 
   const { data: photoRows } = await supabase
@@ -207,10 +212,30 @@ export default async function EditDogPage({ params }: PageProps) {
     .eq("dog_id", dog.id)
     .order("occurred_on", { ascending: false });
 
-  const recorderNames = await recorderNameMap(
-    supabase,
-    (medicalRows ?? []).map((r) => r.recorded_by),
-  );
+  const { data: welfareEventRows } = await supabase
+    .from("welfare_status_events")
+    .select("id, from_status, to_status, note, changed_at, changed_by")
+    .eq("dog_id", dog.id)
+    .order("changed_at", { ascending: false });
+
+  const welfareActorIds = [
+    ...(welfareEventRows ?? []).map((w) => w.changed_by).filter(Boolean),
+  ] as string[];
+
+  const recorderNames = await recorderNameMap(supabase, [
+    ...(medicalRows ?? []).map((r) => r.recorded_by),
+    ...welfareActorIds,
+  ]);
+
+  const welfareEventsForEdit = (welfareEventRows ?? []).map((w) => ({
+    id: w.id,
+    from_status: w.from_status,
+    to_status: w.to_status,
+    note: w.note,
+    changed_at: w.changed_at,
+    changed_by: w.changed_by,
+    changed_by_name: w.changed_by ? recorderNames.get(w.changed_by) ?? null : null,
+  }));
 
   const superAdminViewer = await getSuperAdminViewer();
 
@@ -242,44 +267,19 @@ export default async function EditDogPage({ params }: PageProps) {
       <h1 className="text-2xl font-semibold tracking-tight text-[var(--foreground)]">
         Edit {dog.name}
       </h1>
-      <nav
-        className="mt-6 flex flex-wrap gap-2"
-        aria-label="Jump to section on this page"
-      >
-        {(
-          [
-            ["#edit-section-profile", "Profile"],
-            ["#edit-section-location", "Location"],
-            ["#edit-section-buddies", "Buddies"],
-            ["#edit-section-advanced", "Advanced"],
-            ["#photos", "Photos"],
-            ["#medical", "Medical records"],
-          ] as const
-        ).map(([href, label]) => (
-          <a
-            key={href}
-            href={href}
-            className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-sm font-medium text-[var(--foreground)] shadow-sm transition hover:border-[var(--accent)]/40 hover:text-[var(--accent)]"
-          >
-            {label}
-          </a>
-        ))}
-      </nav>
-      <div className="mt-8 overflow-hidden rounded-2xl border border-black/5 bg-white p-4 shadow-sm sm:p-6">
-        <DogEditForm
-          dog={dogForForm}
-          coatDefaults={dogRowToCoatDefaults(dog)}
-          localities={localities ?? []}
-          neighbourhoods={neighbourhoods ?? []}
-          hangoutOptions={hangoutOptions}
-          defaultHangoutCompanionIds={defaultHangoutCompanionIds}
-          carerOptions={carerOptions}
-          defaultCarerUserIds={defaultCarerUserIds}
-          streetSuggestions={streetSuggestions}
-        />
-      </div>
+      <DogEditForm
+        dog={dogForForm}
+        coatDefaults={dogRowToCoatDefaults(dog)}
+        localities={localities ?? []}
+        neighbourhoods={neighbourhoods ?? []}
+        hangoutOptions={hangoutOptions}
+        defaultHangoutCompanionIds={defaultHangoutCompanionIds}
+        carerOptions={carerOptions}
+        defaultCarerUserIds={defaultCarerUserIds}
+        streetSuggestions={streetSuggestions}
+      />
 
-      <div className="mt-10">
+      <div id="photos" className="mt-10 scroll-mt-40">
         <DogPhotosManager
           dogId={dog.id}
           dogSlug={dog.slug}
@@ -288,9 +288,18 @@ export default async function EditDogPage({ params }: PageProps) {
         />
       </div>
 
+      <EditDogWelfareSection
+        dogId={dog.id}
+        dogSlug={dog.slug}
+        welfareStatus={dog.welfare_status}
+        welfareRemarks={welfare_remarks}
+        welfareStatusUpdatedAt={welfare_status_updated_at}
+        welfareEvents={welfareEventsForEdit}
+      />
+
       <section
         id="medical"
-        className="mt-10 scroll-mt-24 overflow-hidden rounded-2xl border border-black/5 bg-white p-4 shadow-sm sm:p-6"
+        className="mt-10 scroll-mt-40 overflow-hidden rounded-2xl border border-black/5 bg-white p-4 shadow-sm sm:p-6"
       >
         <h2 className="text-lg font-semibold tracking-tight -mx-4 -mt-4 rounded-t-2xl border-b border-white/15 bg-[var(--table-header-bg)] px-4 py-3 text-white sm:-mx-6 sm:-mt-6 sm:px-6">
           Medical Records

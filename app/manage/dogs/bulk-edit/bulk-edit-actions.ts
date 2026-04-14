@@ -88,7 +88,7 @@ function validateProfilePatchKeys(p: BulkEditProfilePatch): string | null {
     p.welfare_status !== undefined &&
     !["healthy", "needs_attention", "injured", "missing", "deceased"].includes(p.welfare_status)
   ) {
-    return "Invalid welfare status.";
+    return "Invalid Welfare Check - Status.";
   }
   if (p.estimated_death_year !== undefined && p.estimated_death_year != null) {
     const y = new Date().getFullYear();

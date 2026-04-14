@@ -15,9 +15,11 @@ export async function recordWelfareStatusChange(
     toStatus: string;
     note: string | null;
     changedBy: string | null;
+    /** When true, insert a history row even if status did not change (new welfare check entry). */
+    alwaysRecord?: boolean;
   },
 ): Promise<void> {
-  if (opts.fromStatus === opts.toStatus) return;
+  if (!opts.alwaysRecord && opts.fromStatus === opts.toStatus) return;
 
   const now = new Date().toISOString();
   const { error } = await supabase.from("welfare_status_events").insert({

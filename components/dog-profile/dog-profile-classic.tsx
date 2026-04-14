@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { welfareStatusLabel } from "@/components/dog-badges";
 import { DogAliasesStrip } from "@/components/dog-aliases-strip";
 import { DogPhotoCarousel } from "@/components/dog-photo-carousel";
 import { DogHangoutMapSection } from "@/components/dog-hangout-map-section";
 import { HangoutBuddyChips } from "@/components/hangout-buddy-chips";
 import type { DogProfileData } from "@/lib/dogs/load-dog-profile-data";
-import { CollapsibleUpdateWelfare } from "@/components/collapsible-update-welfare";
+import { DogProfileWelfareSection } from "@/components/dog-profile/dog-profile-welfare-section";
 import {
   DogProfileFeedingSection,
   DogProfileMedicalSection,
@@ -22,7 +21,7 @@ export function DogProfileClassic({
   data: DogProfileData;
   canEditDogProfile?: boolean;
 }) {
-  const { dog, locationHeadline, carouselPhotos, hasMap, staffViewer } = data;
+  const { dog, locationHeadline, carouselPhotos, hasMap } = data;
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
@@ -39,12 +38,6 @@ export function DogProfileClassic({
               Edit profile
             </Link>
           ) : null}
-          <Link
-            href={`/dogs/${dog.slug}`}
-            className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[var(--muted)] shadow-sm hover:border-[var(--accent)]/30 hover:text-[var(--accent)]"
-          >
-            View Profile in New Layout
-          </Link>
         </div>
       </nav>
 
@@ -106,37 +99,7 @@ export function DogProfileClassic({
               </dd>
             </div>
           </div>
-          <div id="welfare" className="scroll-mt-8">
-            <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
-              Current Welfare Status
-            </dt>
-            <dd className="mt-0.5">
-              <span
-                className={
-                  dog.welfare_status === "healthy"
-                    ? "text-sm text-[var(--foreground)]"
-                    : "text-sm font-medium text-amber-900"
-                }
-              >
-                {welfareStatusLabel(dog.welfare_status)}
-              </span>
-              {dog.welfare_remarks?.trim() ? (
-                <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--foreground)]">
-                  {dog.welfare_remarks.trim()}
-                </p>
-              ) : null}
-              {staffViewer && dog.welfare_status !== "deceased" ? (
-                <div className="mt-3">
-                  <CollapsibleUpdateWelfare
-                    dogId={dog.id}
-                    dogSlug={dog.slug}
-                    defaultWelfareStatus={dog.welfare_status}
-                    variant="classic"
-                  />
-                </div>
-              ) : null}
-            </dd>
-          </div>
+          <DogProfileWelfareSection data={data} variant="classic" />
         </dl>
       </header>
 

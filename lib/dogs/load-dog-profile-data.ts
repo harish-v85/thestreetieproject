@@ -114,8 +114,6 @@ export type DogProfileData = {
   hasMap: boolean;
   upcomingMedical: DogProfileMedicalRow[];
   todayStr: string;
-  scrollMedicalList: boolean;
-  scrollFeedingList: boolean;
   carers: { user_id: string; carer_name: string }[];
   showSelfCarerPrompt: boolean;
 };
@@ -320,9 +318,6 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
     }
   }
 
-  const feedingCount = feedings?.length ?? 0;
-  const medicalCount = medical?.length ?? 0;
-
   const genderLabel =
     dog.gender === "male" ? "Male" : dog.gender === "female" ? "Female" : "Unknown";
   const sterilisationLabel =
@@ -495,8 +490,6 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
     hasMap,
     upcomingMedical,
     todayStr,
-    scrollMedicalList: medicalCount > 5,
-    scrollFeedingList: feedingCount > 5,
     carers: (carerRows ?? []) as { user_id: string; carer_name: string }[],
     showSelfCarerPrompt,
   };

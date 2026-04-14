@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { AccessRequestsPendingRibbon } from "@/components/access-requests-pending-ribbon";
 import { AuthHashHandler } from "@/components/auth-hash-handler";
 import { FlashRibbon } from "@/components/flash-ribbon";
+import { ScrollToTopButton } from "@/components/scroll-to-top-button";
 import { SiteHeader } from "@/components/site-header";
 import { TimezoneCookieSetter } from "@/components/timezone-cookie-setter";
 import "./globals.css";
@@ -49,6 +50,7 @@ export default function RootLayout({
           <FlashRibbon />
         </Suspense>
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
+        <ScrollToTopButton />
         <footer className="mt-auto border-t border-black/5 py-6 text-xs text-[var(--muted)]">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 sm:px-6">
             <p className="min-w-0 flex-1 text-left leading-relaxed">

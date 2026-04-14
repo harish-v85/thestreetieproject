@@ -75,8 +75,8 @@ export default async function ManageActivityPage({
         title="Activity"
         description={
           <>
-            Chronological feed of dog additions, profile edits, feeding logs, welfare changes, and
-            medical records. Super admins only for now.
+            Chronological feed of dog additions, profile edits, feeding logs, Welfare Check changes,
+            and medical records. Super admins only for now.
           </>
         }
       />

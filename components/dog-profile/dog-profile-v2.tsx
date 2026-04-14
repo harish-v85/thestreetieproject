@@ -2,14 +2,12 @@ import { CompassIcon } from "@phosphor-icons/react/ssr";
 import { DogAliasesStrip } from "@/components/dog-aliases-strip";
 import Image from "next/image";
 import Link from "next/link";
-import { welfareStatusLabel } from "@/components/dog-badges";
 import { DogPhotoCarousel } from "@/components/dog-photo-carousel";
 import { DogHangoutMapSection } from "@/components/dog-hangout-map-section";
 import { HangoutBuddyChips } from "@/components/hangout-buddy-chips";
 import type { DogProfileData } from "@/lib/dogs/load-dog-profile-data";
 import { objectPositionFromFocal } from "@/lib/dogs/photo-focal";
 import { dogPhotoPlaceholder } from "@/lib/dogs/photo-placeholder";
-import { formatWelfareEventWhen } from "@/lib/dogs/dog-profile-dates";
 import { DogProfileDetailsDl } from "@/components/dog-profile/dog-profile-details";
 import {
   DogProfileFeedingSection,
@@ -18,7 +16,7 @@ import {
 import { dogProfileHeroAccent } from "@/lib/dogs/dog-profile-hero-accent";
 import { homeFeaturedSurfaceClass } from "@/components/home-featured";
 import { formatDisplayDate } from "@/lib/date/format-display-date";
-import { CollapsibleUpdateWelfare } from "@/components/collapsible-update-welfare";
+import { DogProfileWelfareSection } from "@/components/dog-profile/dog-profile-welfare-section";
 import { DogProfileCarersSection } from "@/components/dog-profile/dog-profile-carers-section";
 
 /** Match medical / feeding log column headings */
@@ -32,14 +30,9 @@ export function DogProfileV2({
   data: DogProfileData;
   canEditDogProfile?: boolean;
 }) {
-  const { dog, locationHeadline, carouselPhotos, hasMap, welfareEvents, staffViewer } = data;
+  const { dog, locationHeadline, carouselPhotos, hasMap } = data;
   const { solid, useLightText, heroOverlayGradientCss, photoTintCss } =
     dogProfileHeroAccent(dog.colour_primary);
-
-  const welfareLastUpdatedDisplay =
-    dog.welfare_status_updated_at != null
-      ? formatWelfareEventWhen(dog.welfare_status_updated_at)
-      : formatDisplayDate(dog.updated_at);
 
   const heroText = useLightText
     ? {
@@ -70,12 +63,6 @@ export function DogProfileV2({
               Edit profile
             </Link>
           ) : null}
-          <Link
-            href={`/dogs/${dog.slug}?profile=classic`}
-            className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[var(--muted)] shadow-sm hover:border-[var(--accent)]/30 hover:text-[var(--accent)]"
-          >
-            View Profile in Classic layout
-          </Link>
         </div>
       </nav>
 
@@ -175,124 +162,6 @@ export function DogProfileV2({
               </div>
             </section>
 
-            <section
-              id="welfare"
-              aria-labelledby="welfare-heading"
-              className="-mx-5 scroll-mt-8 border border-amber-200/70 bg-gradient-to-br from-amber-50/95 via-amber-50/80 to-amber-100/25 px-5 py-4 sm:-mx-8 sm:px-8 sm:py-5"
-            >
-              <h2 id="welfare-heading" className={profileSectionHeading}>
-                Current Welfare Status
-              </h2>
-              <p className="mt-1.5 text-base font-semibold text-amber-950">
-                {welfareStatusLabel(dog.welfare_status)}
-              </p>
-              {dog.welfare_remarks?.trim() ? (
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-snug text-amber-950/95">
-                  {dog.welfare_remarks.trim()}
-                </p>
-              ) : (
-                <p className="mt-1.5 text-sm text-amber-900/65">No additional welfare notes.</p>
-              )}
-              {staffViewer && dog.welfare_status !== "deceased" ? (
-                <CollapsibleUpdateWelfare
-                  dogId={dog.id}
-                  dogSlug={dog.slug}
-                  defaultWelfareStatus={dog.welfare_status}
-                  variant="v2"
-                  welfareLastUpdatedDisplay={welfareLastUpdatedDisplay}
-                />
-              ) : null}
-
-              {!staffViewer || dog.welfare_status === "deceased" ? (
-                <div className="mt-3 border-t border-amber-200/70 pt-3">
-                  <p className="text-xs text-amber-900/65">
-                    Last updated {welfareLastUpdatedDisplay}
-                  </p>
-                  {welfareEvents.length > 0 ? (
-                    <details className="group mt-2">
-                      <summary className="cursor-pointer list-none text-sm font-medium text-amber-950 underline-offset-2 hover:underline [&::-webkit-details-marker]:hidden">
-                        <span className="inline-flex items-center gap-2">
-                          Older status changes
-                          <span className="text-xs font-normal text-amber-900/55 group-open:hidden">
-                            ({welfareEvents.length} in history)
-                          </span>
-                        </span>
-                      </summary>
-                      <ul className="mt-2.5 space-y-2 border-l-2 border-amber-300/50 pl-3">
-                        {welfareEvents.map((ev) => (
-                          <li key={ev.id} className="text-sm text-amber-950">
-                            <time className="block text-xs font-medium text-amber-900/65">
-                              {formatWelfareEventWhen(ev.changed_at)}
-                            </time>
-                            <p className="mt-1">
-                              {ev.from_status ? (
-                                <>
-                                  <span className="text-amber-900/75">
-                                    {welfareStatusLabel(ev.from_status)}
-                                  </span>
-                                  <span className="mx-1 text-amber-800/50">→</span>
-                                </>
-                              ) : null}
-                              <span className="font-medium">{welfareStatusLabel(ev.to_status)}</span>
-                            </p>
-                            {ev.note?.trim() ? (
-                              <p className="mt-1 whitespace-pre-wrap text-amber-900/90">
-                                {ev.note.trim()}
-                              </p>
-                            ) : null}
-                            {ev.changed_by_name ? (
-                              <p className="mt-1 text-xs text-amber-900/60">By {ev.changed_by_name}</p>
-                            ) : null}
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
-                  ) : null}
-                </div>
-              ) : welfareEvents.length > 0 ? (
-                <div className="mt-3 border-t border-amber-200/70 pt-3">
-                  <details className="group">
-                    <summary className="cursor-pointer list-none text-sm font-medium text-amber-950 underline-offset-2 hover:underline [&::-webkit-details-marker]:hidden">
-                      <span className="inline-flex items-center gap-2">
-                        Older status changes
-                        <span className="text-xs font-normal text-amber-900/55 group-open:hidden">
-                          ({welfareEvents.length} in history)
-                        </span>
-                      </span>
-                    </summary>
-                    <ul className="mt-2.5 space-y-2 border-l-2 border-amber-300/50 pl-3">
-                      {welfareEvents.map((ev) => (
-                        <li key={ev.id} className="text-sm text-amber-950">
-                          <time className="block text-xs font-medium text-amber-900/65">
-                            {formatWelfareEventWhen(ev.changed_at)}
-                          </time>
-                          <p className="mt-1">
-                            {ev.from_status ? (
-                              <>
-                                <span className="text-amber-900/75">
-                                  {welfareStatusLabel(ev.from_status)}
-                                </span>
-                                <span className="mx-1 text-amber-800/50">→</span>
-                              </>
-                            ) : null}
-                            <span className="font-medium">{welfareStatusLabel(ev.to_status)}</span>
-                          </p>
-                          {ev.note?.trim() ? (
-                            <p className="mt-1 whitespace-pre-wrap text-amber-900/90">
-                              {ev.note.trim()}
-                            </p>
-                          ) : null}
-                          {ev.changed_by_name ? (
-                            <p className="mt-1 text-xs text-amber-900/60">By {ev.changed_by_name}</p>
-                          ) : null}
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                </div>
-              ) : null}
-            </section>
-
             {carouselPhotos.length > 0 ? (
               <section aria-labelledby="photos-heading">
                 <h2 id="photos-heading" className={profileSectionHeading}>
@@ -354,6 +223,7 @@ export function DogProfileV2({
           >
             <div className="min-h-0 flex-1">
               <DogProfileCarersSection data={data} variant="v2" />
+              <DogProfileWelfareSection data={data} variant="v2" />
               <DogProfileMedicalSection data={data} variant="v2" />
               <DogProfileFeedingSection data={data} variant="v2" />
             </div>

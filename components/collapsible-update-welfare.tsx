@@ -13,14 +13,11 @@ export function CollapsibleUpdateWelfare({
   dogSlug,
   defaultWelfareStatus,
   variant = "classic",
-  welfareLastUpdatedDisplay,
 }: {
   dogId: string;
   dogSlug: string;
   defaultWelfareStatus: string;
   variant?: "classic" | "v2";
-  /** v2: show “Last updated …” on the same row as the trigger button. */
-  welfareLastUpdatedDisplay?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState("");
@@ -51,36 +48,10 @@ export function CollapsibleUpdateWelfare({
 
   const closedButtonClass =
     variant === "v2"
-      ? "shrink-0 rounded-lg border border-amber-300/80 bg-white/80 px-3 py-1.5 text-xs font-medium text-amber-950 shadow-sm hover:bg-white sm:text-sm"
+      ? "mb-6 flex w-full items-center justify-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/50 px-4 py-3 text-sm font-medium text-[var(--foreground)] shadow-sm hover:bg-amber-50"
       : "mb-4 flex w-full items-center justify-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/50 px-4 py-3 text-sm font-medium text-[var(--foreground)] shadow-sm hover:bg-amber-50";
 
   if (!open) {
-    if (variant === "v2" && welfareLastUpdatedDisplay != null) {
-      return (
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-amber-200/70 pt-3">
-          <p className="text-xs text-amber-900/65">
-            Last updated {welfareLastUpdatedDisplay}
-          </p>
-          <button type="button" onClick={() => setOpen(true)} className={closedButtonClass}>
-            <span className="inline-flex items-center gap-1.5">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="h-4 w-4 shrink-0 sm:h-5 sm:w-5"
-                aria-hidden
-              >
-                <path d="M12 5v14M5 12h14" strokeLinecap="round" />
-              </svg>
-              Update latest welfare status
-            </span>
-          </button>
-        </div>
-      );
-    }
-
     return (
       <button type="button" onClick={() => setOpen(true)} className={closedButtonClass}>
         <svg
@@ -94,7 +65,7 @@ export function CollapsibleUpdateWelfare({
         >
           <path d="M12 5v14M5 12h14" strokeLinecap="round" />
         </svg>
-        Update latest welfare status
+        Add latest Welfare Check
       </button>
     );
   }
@@ -105,7 +76,7 @@ export function CollapsibleUpdateWelfare({
       : "rounded-xl border border-amber-200/80 bg-amber-50/50 p-4";
 
   return (
-    <div className={`mb-4 ${variant === "v2" ? "mt-3" : ""}`}>
+    <div className={variant === "v2" ? "mb-6" : "mb-4"}>
       <div className="mb-2 flex justify-end">
         <button
           type="button"
@@ -117,14 +88,14 @@ export function CollapsibleUpdateWelfare({
       </div>
       <form action={formAction} className={formShell}>
         <input type="hidden" name="welfare_status_fallback" value={defaultWelfareStatus} />
-        <h3 className="text-sm font-semibold text-[var(--foreground)]">Update welfare</h3>
+        <h3 className="text-sm font-semibold text-[var(--foreground)]">Add Welfare Check</h3>
         <p className="mt-1 text-xs text-[var(--muted)]">
-          Choose a status and/or add remarks, then save.
+          Creates a new entry in history and updates what visitors see on the public profile.
         </p>
         <div className="mt-4 grid gap-4">
           <div>
             <label htmlFor={statusId} className="mb-1 block text-xs font-medium text-[var(--muted)]">
-              Welfare check
+              Welfare Check - Status
             </label>
             <select
               id={statusId}
@@ -134,7 +105,7 @@ export function CollapsibleUpdateWelfare({
               className="w-full max-w-md rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-[var(--accent)] focus:ring-2"
             >
               <option value="" disabled>
-                Select welfare status
+                Select status
               </option>
               <option value="healthy">Healthy</option>
               <option value="needs_attention">Needs attention</option>
@@ -145,7 +116,7 @@ export function CollapsibleUpdateWelfare({
           </div>
           <div>
             <label htmlFor={remarksId} className="mb-1 block text-xs font-medium text-[var(--muted)]">
-              Welfare check — remarks
+              Welfare Check - Remarks
             </label>
             <textarea
               id={remarksId}
@@ -191,7 +162,7 @@ export function CollapsibleUpdateWelfare({
           disabled={pending || !canSubmit}
           className="mt-4 rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
         >
-          {pending ? "Updating…" : "Update welfare status"}
+          {pending ? "Saving…" : "Save Welfare Check"}
         </button>
       </form>
     </div>

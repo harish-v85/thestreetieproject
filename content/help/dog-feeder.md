@@ -14,13 +14,13 @@
 4. Fill in **When**, **Notes**, and optionally **Feeding location** using **Add map location** or **Add coordinates** (same as logging for one dog). You can leave location empty.
 5. Click **Save feeding for selected dogs** — one entry is stored per selected dog for the same time and notes.
 
-## How to update welfare check status from a dog’s profile page
+## How to add a Welfare Check from a dog’s profile page
 
 1. Open **Dogs**, then click the dog to open their profile.
-2. Scroll to **Current Welfare Status**.
-3. Click **Update latest welfare status**. 
-4. In the form, open **Welfare check** and choose a status, and add any text under **Welfare check — remarks**. The **Update welfare status** button stays disabled until you enter something in at least one of these fields.
-5. Click **Update welfare status** to save. The public profile updates with the new status and remarks.
+2. Scroll to **Welfare Check**.
+3. Click **Add latest Welfare Check**.
+4. In the form, open **Welfare Check - Status** and choose a status, and add any text under **Welfare Check - Remarks**. The **Save Welfare Check** button stays disabled until you enter something in at least one of these fields.
+5. Click **Save Welfare Check** to save. The public profile updates with the new status and remarks.
 
 ## How to add a medical record from a dog’s profile page
 

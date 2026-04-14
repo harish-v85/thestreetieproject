@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { AddMedicalRecordForm } from "@/app/manage/dogs/add-medical-record-form";
 import { SuperAdminMedicalRecordActions } from "@/components/super-admin-medical-record-actions";
+import { ProfileHistoryDrawer } from "@/components/dog-profile/profile-history-drawer";
 import { formatDisplayIsoDateOnly } from "@/lib/date/format-display-date";
-
-const LIST_SCROLL_AFTER = 5;
 
 const eventLabel: Record<string, string> = {
   vaccination: "Vaccination",
@@ -43,17 +42,15 @@ export function EditDogMedicalSection({
   superAdmin?: boolean;
 }) {
   const [showAdd, setShowAdd] = useState(false);
-  const scroll = medicalRows.length > LIST_SCROLL_AFTER;
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const latest = medicalRows.length > 0 ? medicalRows[0] : null;
+  const showHistoryLink = medicalRows.length > 0;
 
   return (
     <>
-      <div
-        className={
-          scroll
-            ? "mt-4 max-h-[min(28rem,55vh)] overflow-y-auto [scrollbar-gutter:stable] pr-1"
-            : "mt-4"
-        }
-      >
+      <div className="mt-4">
         {medicalRows.length === 0 ? (
           <div className="rounded-xl border border-black/5 bg-[var(--background)]/40 px-4 py-6 text-center shadow-sm">
             <p className="text-sm font-medium text-[var(--foreground)]">No medical records yet</p>
@@ -63,32 +60,39 @@ export function EditDogMedicalSection({
             </p>
           </div>
         ) : (
-          <ul className="divide-y divide-black/5 rounded-xl border border-black/5">
-            {medicalRows.map((row) => (
-              <li key={row.id} className="px-4 py-3 text-sm">
+          <ul className="space-y-3">
+            {latest ? (
+              <li className="rounded-xl border border-black/5 bg-[var(--background)]/40 px-4 py-3 shadow-sm">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className="font-medium text-[var(--foreground)]">
-                    {eventLabel[row.event_type] ?? row.event_type}
+                    {eventLabel[latest.event_type] ?? latest.event_type}
                   </span>
-                  <span className="text-[var(--muted)]">{formatRecordDate(row.occurred_on)}</span>
+                  <span className="text-[var(--muted)]">{formatRecordDate(latest.occurred_on)}</span>
                 </div>
-                {row.description ? (
-                  <p className="mt-1 text-[var(--foreground)]">{row.description}</p>
+                {latest.description ? (
+                  <p className="mt-1 text-sm text-[var(--foreground)]">{latest.description}</p>
                 ) : null}
                 <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--muted)]">
-                  <span>Logged by {recorderNames[row.recorded_by] ?? "—"}</span>
-                  {row.next_due_date ? (
-                    <span>Next due {formatRecordDate(row.next_due_date)}</span>
+                  <span>Logged by {recorderNames[latest.recorded_by] ?? "—"}</span>
+                  {latest.next_due_date ? (
+                    <span
+                      className={
+                        latest.next_due_date < todayStr ? "font-medium text-red-800" : undefined
+                      }
+                    >
+                      Next due {formatRecordDate(latest.next_due_date)}
+                      {latest.next_due_date < todayStr ? " (overdue)" : null}
+                    </span>
                   ) : null}
                 </div>
                 {superAdmin ? (
                   <SuperAdminMedicalRecordActions
                     row={{
-                      id: row.id,
-                      event_type: row.event_type,
-                      occurred_on: row.occurred_on,
-                      description: row.description,
-                      next_due_date: row.next_due_date,
+                      id: latest.id,
+                      event_type: latest.event_type,
+                      occurred_on: latest.occurred_on,
+                      description: latest.description,
+                      next_due_date: latest.next_due_date,
                     }}
                     dogId={dogId}
                     dogSlug={dogSlug}
@@ -96,10 +100,71 @@ export function EditDogMedicalSection({
                   />
                 ) : null}
               </li>
-            ))}
+            ) : null}
           </ul>
         )}
+        {showHistoryLink ? (
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={() => setHistoryOpen(true)}
+              className="text-sm font-medium text-[var(--accent)] underline-offset-2 hover:underline"
+            >
+              See Full History
+            </button>
+          </div>
+        ) : null}
       </div>
+
+      <ProfileHistoryDrawer
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        title="Medical records — full history"
+      >
+        <ul className="space-y-3">
+          {medicalRows.map((row) => (
+            <li
+              key={row.id}
+              className="rounded-xl border border-black/5 bg-[var(--background)]/40 px-4 py-3 text-sm shadow-sm"
+            >
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <span className="font-medium text-[var(--foreground)]">
+                  {eventLabel[row.event_type] ?? row.event_type}
+                </span>
+                <span className="text-[var(--muted)]">{formatRecordDate(row.occurred_on)}</span>
+              </div>
+              {row.description ? <p className="mt-1 text-[var(--foreground)]">{row.description}</p> : null}
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--muted)]">
+                <span>Logged by {recorderNames[row.recorded_by] ?? "—"}</span>
+                {row.next_due_date ? (
+                  <span
+                    className={
+                      row.next_due_date < todayStr ? "font-medium text-red-800" : undefined
+                    }
+                  >
+                    Next due {formatRecordDate(row.next_due_date)}
+                    {row.next_due_date < todayStr ? " (overdue)" : null}
+                  </span>
+                ) : null}
+              </div>
+              {superAdmin ? (
+                <SuperAdminMedicalRecordActions
+                  row={{
+                    id: row.id,
+                    event_type: row.event_type,
+                    occurred_on: row.occurred_on,
+                    description: row.description,
+                    next_due_date: row.next_due_date,
+                  }}
+                  dogId={dogId}
+                  dogSlug={dogSlug}
+                  returnTo="edit"
+                />
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      </ProfileHistoryDrawer>
 
       <div className="mt-6 border-t border-black/5 pt-6">
         {!showAdd ? (

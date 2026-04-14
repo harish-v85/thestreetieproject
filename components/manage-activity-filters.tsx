@@ -13,7 +13,7 @@ const KIND_LABEL: Record<ActivityKind, string> = {
   dog_added: "Dog added",
   dog_profile_updated: "Profile updated",
   feeding_logged: "Feeding logged",
-  welfare_updated: "Welfare updated",
+  welfare_updated: "Welfare Check updated",
   medical_added: "Medical added",
   medical_updated: "Medical updated",
 };

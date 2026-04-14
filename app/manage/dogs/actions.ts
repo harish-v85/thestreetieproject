@@ -8,7 +8,6 @@ import { parseCoatFromFormData } from "@/lib/dogs/coat";
 import { normalizeNameAliasesJson } from "@/lib/dogs/name-aliases";
 import { resolveAgeEstimatedOnForSave } from "@/lib/dogs/dog-age";
 import { isHasCollar, resolveCollarDescriptionForSave } from "@/lib/dogs/collar";
-import { recordWelfareStatusChange } from "@/lib/dogs/record-welfare-status-event";
 import { slugify } from "@/lib/dogs/slugify";
 import { syncDogCarers } from "@/lib/dogs/dog-carers-sync";
 
@@ -162,7 +161,7 @@ export async function createDog(
   if (
     !["healthy", "needs_attention", "injured", "missing", "deceased"].includes(welfare_status)
   ) {
-    return { error: "Invalid welfare status." };
+    return { error: "Invalid Welfare Check - Status." };
   }
 
   const description = String(formData.get("description") ?? "").trim() || null;
@@ -200,7 +199,7 @@ export async function createDog(
     }
   }
   if (welfare_status === "deceased" && estimated_death_year == null) {
-    return { error: "Estimated death year is required when welfare status is deceased." };
+    return { error: "Estimated death year is required when Welfare Check - Status is Deceased." };
   }
   if (estimated_death_year != null) {
     if (estimated_death_year < 1980 || estimated_death_year > currentYear) {
@@ -338,10 +337,12 @@ export async function updateDog(
 
   const { data: priorDog } = await supabase
     .from("dogs")
-    .select("welfare_status")
+    .select("welfare_status, welfare_remarks, estimated_death_year")
     .eq("id", dogId)
     .maybeSingle();
-  const priorWelfareStatus = priorDog?.welfare_status ?? "healthy";
+  const welfare_status = priorDog?.welfare_status ?? "healthy";
+  const welfare_remarks = priorDog?.welfare_remarks ?? null;
+  const estimated_death_year = priorDog?.estimated_death_year ?? null;
 
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return { error: "Name is required." };
@@ -364,22 +365,15 @@ export async function updateDog(
 
   const gender = String(formData.get("gender") ?? "unknown");
   const neutering_status = String(formData.get("neutering_status") ?? "unknown");
-  const welfare_status = String(formData.get("welfare_status") ?? "healthy");
   const status = String(formData.get("status") ?? "active");
 
   if (!["male", "female", "unknown"].includes(gender)) return { error: "Invalid gender." };
   if (!["neutered", "not_neutered", "unknown"].includes(neutering_status)) {
     return { error: "Invalid sterilisation status." };
   }
-  if (
-    !["healthy", "needs_attention", "injured", "missing", "deceased"].includes(welfare_status)
-  ) {
-    return { error: "Invalid welfare status." };
-  }
   if (!["active", "archived"].includes(status)) return { error: "Invalid status." };
 
   const description = String(formData.get("description") ?? "").trim() || null;
-  const welfare_remarks = String(formData.get("welfare_remarks") ?? "").trim() || null;
   const coatParsed = parseCoatFromFormData(formData);
   if ("error" in coatParsed) return { error: coatParsed.error };
   const map_lat = optFloat(formData, "map_lat");
@@ -395,9 +389,6 @@ export async function updateDog(
   const carerUserIds = parseCarerUserIds(formData);
 
   const estimated_birth_year = optBirthYear(formData);
-  const estimated_death_yearRaw = optDeathYear(formData);
-  const estimated_death_year =
-    welfare_status === "deceased" ? estimated_death_yearRaw : null;
   const age_estimated_on = resolveAgeEstimatedOnForSave(
     estimated_birth_year,
     optDateString(formData, "age_estimated_on"),
@@ -411,21 +402,6 @@ export async function updateDog(
     if (estimated_birth_year < 1980 || estimated_birth_year > currentYear) {
       return {
         error: "Estimated birth year must be between 1980 and the current year.",
-      };
-    }
-  }
-  if (welfare_status === "deceased" && estimated_death_year == null) {
-    return { error: "Estimated death year is required when welfare status is deceased." };
-  }
-  if (estimated_death_year != null) {
-    if (estimated_death_year < 1980 || estimated_death_year > currentYear) {
-      return {
-        error: "Estimated death year must be between 1980 and the current year.",
-      };
-    }
-    if (estimated_birth_year != null && estimated_death_year < estimated_birth_year) {
-      return {
-        error: "Estimated death year cannot be earlier than estimated birth year.",
       };
     }
   }
@@ -489,17 +465,6 @@ export async function updateDog(
   }
 
   if (error) return { error: error.message };
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  await recordWelfareStatusChange(supabase, {
-    dogId,
-    fromStatus: priorWelfareStatus,
-    toStatus: welfare_status,
-    note: welfare_remarks,
-    changedBy: user?.id ?? null,
-  });
 
   const hangoutCompanionIds = parseHangoutCompanionIds(formData, dogId);
 

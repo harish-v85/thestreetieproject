@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirectWithFlash } from "@/lib/redirect-with-flash";
 import { createClient } from "@/lib/supabase/server";
-import { requireActiveStaff } from "@/lib/auth/require-active-staff";
+import { requirePrivileged } from "@/lib/auth/require-privileged";
 import { recordWelfareStatusChange } from "@/lib/dogs/record-welfare-status-event";
 
 function missingWelfareRemarksColumn(err: { message?: string }): boolean {
@@ -21,16 +21,16 @@ function optDeathYear(formData: FormData): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-export type WelfareUpdateFormState = { error: string | null };
+export type WelfareCheckFormState = { error: string | null };
 
-/** Update welfare status and remarks from the public dog profile (active staff, including feeders). */
-export async function updateDogWelfareFromProfile(
+/** Add a new welfare check from the edit page (append-only history + update dog row). */
+export async function addWelfareCheckFromEdit(
   dogId: string,
   dogSlug: string,
-  _prev: WelfareUpdateFormState,
+  _prev: WelfareCheckFormState,
   formData: FormData,
-): Promise<WelfareUpdateFormState> {
-  await requireActiveStaff(`/dogs/${dogSlug}`);
+): Promise<WelfareCheckFormState> {
+  await requirePrivileged(`/manage/dogs/${dogSlug}/edit`);
   const supabase = await createClient();
 
   const { data: dog } = await supabase
@@ -41,12 +41,10 @@ export async function updateDogWelfareFromProfile(
   if (!dog) return { error: "Dog not found." };
   const previousWelfareStatus = dog.welfare_status;
   if (dog.status !== "active") {
-    return { error: "Welfare Check can only be updated for active dogs." };
+    return { error: "Welfare Check entries can only be added for active dogs." };
   }
 
-  const rawStatus = String(formData.get("welfare_status") ?? "").trim();
-  const fallbackStatus = String(formData.get("welfare_status_fallback") ?? "healthy").trim();
-  const welfare_status = rawStatus || fallbackStatus;
+  const welfare_status = String(formData.get("welfare_status") ?? "").trim();
   if (!["healthy", "needs_attention", "injured", "missing", "deceased"].includes(welfare_status)) {
     return { error: "Invalid Welfare Check - Status." };
   }
@@ -116,5 +114,5 @@ export async function updateDogWelfareFromProfile(
   revalidatePath(`/manage/dogs/${dogSlug}/edit`);
   revalidatePath("/manage/activity");
 
-  redirectWithFlash(`/dogs/${dogSlug}#welfare`, "welfare_updated");
+  redirectWithFlash(`/manage/dogs/${dogSlug}/edit#edit-section-welfare`, "welfare_check_added");
 }

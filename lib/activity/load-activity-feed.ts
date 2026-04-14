@@ -209,7 +209,6 @@ export async function loadActivityFeed(
       const slug = dog?.slug;
       const name = dog?.name ?? "Dog";
       if (!slug) continue;
-      const fromL = w.from_status ? welfareLabel(w.from_status) : "—";
       const toL = welfareLabel(w.to_status);
       items.push({
         id: `welfare-${w.id}`,
@@ -220,8 +219,8 @@ export async function loadActivityFeed(
         dogName: name,
         actorId: w.changed_by,
         actorName: null,
-        title: "Welfare updated",
-        detail: `${fromL} → ${toL}${w.note ? ` — ${w.note.slice(0, 120)}${w.note.length > 120 ? "…" : ""}` : ""}`,
+        title: "Welfare Check updated",
+        detail: `${toL}${w.note ? ` — ${w.note.slice(0, 120)}${w.note.length > 120 ? "…" : ""}` : ""}`,
         href: `/dogs/${slug}#welfare`,
       });
     }

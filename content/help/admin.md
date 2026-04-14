@@ -26,13 +26,13 @@
 3. Move between the sections — Profile, Location, Buddies, Photos, Medical, and so on — and change what you need.
 4. Save the page so the public dog profile stays up to date.
 
-## How to update welfare check status from a dog’s profile page
+## How to add a Welfare Check from a dog’s profile page
 
 1. Open **Dogs**, then click the dog to open their public profile.
-2. Scroll to **Current Welfare Status**.
-3. Click **Update latest welfare status**. 
-4. In the form, open **Welfare check** and choose a status, and add any text under **Welfare check — remarks**. The **Update welfare status** button stays disabled until you enter something in at least one of these fields.
-5. Click **Update welfare status** to save.
+2. Scroll to **Welfare Check**.
+3. Click **Add latest Welfare Check**.
+4. In the form, open **Welfare Check - Status** and choose a status, and add any text under **Welfare Check - Remarks**. The **Save Welfare Check** button stays disabled until you enter something in at least one of these fields.
+5. Click **Save Welfare Check** to save.
 
 ## How to add a medical record from a dog’s profile page
 
@@ -41,11 +41,11 @@
 3. Click **Add a new medical record**.
 4. Fill in **Event type**, **Date of event**, optional **Next due**, and **Notes**, then click **Add medical record**.
 
-## How to add a Welfare check for a dog (from Manage → Dogs)
+## How to add a Welfare Check for a dog (from Manage → Dogs)
 
 1. Edit the dog from **Manage** → **Dogs** as above.
-2. In **Profile**, find **Welfare check** (status) and **Welfare check — remarks**.
-3. Update them to match the latest visit, then save. Visitors see this on the dog’s public profile.
+2. Scroll to the **Welfare Check** section.
+3. Click **Add latest Welfare Check**, fill in **Welfare Check - Status** and **Welfare Check - Remarks**, then **Save Welfare Check**. Each save adds a new history entry and updates what visitors see on the public profile.
 
 ## How to update Medical records for a dog (from Manage → Dogs)
 
@@ -96,4 +96,3 @@
 2. Scroll to the **Authentication** section (the steps below are the same on desktop and mobile).
 3. Enter your new password in **New password** (at least 8 characters). Leave the field empty if you only want to update your profile details and keep your current password.
 4. Click **Save changes**. When the password is updated, you stay signed in with the new password.
-
