@@ -54,6 +54,7 @@ type DogRow = {
   age_confidence: string;
   has_collar: string;
   collar_description: string | null;
+  known_issues_disabilities: string | null;
 };
 
 export function DogEditForm({
@@ -130,6 +131,22 @@ export function DogEditForm({
                   <option value="neutered">Neutered</option>
                   <option value="not_neutered">Not neutered</option>
                 </select>
+              </div>
+              <div className="sm:col-span-2">
+                <label
+                  htmlFor="known_issues_disabilities"
+                  className="mb-1 block text-sm font-medium"
+                >
+                  Known issues or disabilities
+                </label>
+                <textarea
+                  id="known_issues_disabilities"
+                  name="known_issues_disabilities"
+                  rows={3}
+                  placeholder="Optional — shown on the public profile when filled."
+                  defaultValue={dog.known_issues_disabilities ?? ""}
+                  className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-[var(--accent)] focus:ring-2"
+                />
               </div>
               <div className="sm:col-span-2 rounded-xl border border-black/5 bg-[var(--background)]/50 p-4">
                 <h3 className="text-sm font-semibold text-[var(--foreground)]">Age (estimate)</h3>

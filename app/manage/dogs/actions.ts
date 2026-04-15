@@ -222,6 +222,9 @@ export async function createDog(
     parseCollarDescriptionRaw(formData),
   );
 
+  const known_issues_disabilities =
+    String(formData.get("known_issues_disabilities") ?? "").trim() || null;
+
   const insertBase = {
     slug,
     name,
@@ -248,6 +251,7 @@ export async function createDog(
     age_confidence,
     has_collar,
     collar_description,
+    known_issues_disabilities,
   };
 
   let { data: dog, error } = await supabase
@@ -420,6 +424,9 @@ export async function updateDog(
     parseCollarDescriptionRaw(formData),
   );
 
+  const known_issues_disabilities =
+    String(formData.get("known_issues_disabilities") ?? "").trim() || null;
+
   const updateBase = {
     slug,
     name,
@@ -445,6 +452,7 @@ export async function updateDog(
     age_confidence,
     has_collar,
     collar_description,
+    known_issues_disabilities,
   };
 
   let { error } = await supabase

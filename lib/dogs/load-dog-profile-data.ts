@@ -76,6 +76,7 @@ export type DogProfileData = {
     welfare_remarks: string | null;
     street_name: string | null;
     landmark: string | null;
+    known_issues_disabilities: string | null;
     map_lat: number | null;
     map_lng: number | null;
     created_at: string;
@@ -145,6 +146,7 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
       welfare_remarks,
       street_name,
       landmark,
+      known_issues_disabilities,
       map_lat,
       map_lng,
       created_at,
@@ -462,6 +464,8 @@ export async function loadDogProfileData(slug: string): Promise<DogProfileData |
       welfare_remarks: dog.welfare_remarks,
       street_name: dog.street_name,
       landmark: dog.landmark,
+      known_issues_disabilities:
+        (dog as { known_issues_disabilities?: string | null }).known_issues_disabilities ?? null,
       map_lat: dog.map_lat,
       map_lng: dog.map_lng,
       created_at: dog.created_at,

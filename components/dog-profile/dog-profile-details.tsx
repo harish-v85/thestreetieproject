@@ -19,6 +19,7 @@ import {
   type CoatColour,
 } from "@/lib/dogs/coat";
 import { HoverTooltip } from "@/components/ui/hover-tooltip";
+import { DogProfileKnownIssuesNote } from "@/components/dog-profile/dog-profile-known-issues-note";
 
 const statBoxClass =
   "relative rounded-xl border border-black/5 bg-white px-4 py-3.5 shadow-sm";
@@ -170,6 +171,11 @@ export function DogProfileDetailsDl({ data }: { data: DogProfileData }) {
           {dog.landmark?.trim() ? dog.landmark : "No landmark noted"}
         </dd>
       </div>
+      {dog.known_issues_disabilities?.trim() ? (
+        <div className="col-span-full mt-2">
+          <DogProfileKnownIssuesNote text={dog.known_issues_disabilities.trim()} />
+        </div>
+      ) : null}
     </dl>
   );
 }

@@ -13,6 +13,7 @@ import { DogProfileAgeClassicRow } from "@/components/dog-profile/dog-profile-ag
 import { DogProfileCollarValue } from "@/components/dog-profile/dog-profile-collar";
 import { formatDisplayDate } from "@/lib/date/format-display-date";
 import { DogProfileCarersSection } from "@/components/dog-profile/dog-profile-carers-section";
+import { DogProfileKnownIssuesNote } from "@/components/dog-profile/dog-profile-known-issues-note";
 
 export function DogProfileClassic({
   data,
@@ -61,6 +62,11 @@ export function DogProfileClassic({
             {dog.landmark?.trim() ? dog.landmark : "No landmark noted"}
           </p>
         </div>
+        {dog.known_issues_disabilities?.trim() ? (
+          <div className="mt-3">
+            <DogProfileKnownIssuesNote text={dog.known_issues_disabilities.trim()} />
+          </div>
+        ) : null}
         <dl className="mt-4 space-y-3">
           <div className="grid gap-3 sm:grid-cols-3">
             <div>

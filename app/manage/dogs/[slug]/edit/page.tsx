@@ -76,7 +76,8 @@ export default async function EditDogPage({ params }: PageProps) {
       age_estimated_on,
       age_confidence,
       has_collar,
-      collar_description
+      collar_description,
+      known_issues_disabilities
     `,
     )
     .eq("slug", slug)
@@ -255,6 +256,8 @@ export default async function EditDogPage({ params }: PageProps) {
     has_collar: (dog as { has_collar?: string }).has_collar ?? "unsure",
     collar_description:
       (dog as { collar_description?: string | null }).collar_description ?? null,
+    known_issues_disabilities:
+      (dog as { known_issues_disabilities?: string | null }).known_issues_disabilities ?? null,
   };
 
   return (
