@@ -2,11 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { DogCardInlineNameWithAliases } from "@/components/dog-aliases-strip";
-import { HoverTooltip } from "@/components/ui/hover-tooltip";
 import { formatDisplayDate } from "@/lib/date/format-display-date";
-import { GenderBadge, NeuterBadge } from "@/components/dog-badges";
+import { AgeBadge, GenderBadge, NeuterBadge } from "@/components/dog-badges";
 import { objectPositionFromFocal } from "@/lib/dogs/photo-focal";
 import { dogPhotoPlaceholder } from "@/lib/dogs/photo-placeholder";
 import { useHoverPreviewDismiss } from "@/lib/hooks/use-hover-preview-dismiss";
@@ -21,10 +20,66 @@ export type ManageDogTableRow = {
   locationLine: string;
   gender: string;
   neutering_status: string;
+  welfare_status: string;
+  estimated_birth_year: number | null;
+  estimated_death_year: number | null;
   thumb_url: string | null;
   thumb_focal_x: number;
   thumb_focal_y: number;
 };
+
+const mobileFieldLabelClass =
+  "text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]";
+
+function ManageDogLocationMarquee({ text }: { text: string }) {
+  const outerRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLSpanElement>(null);
+  const [useMarquee, setUseMarquee] = useState(false);
+
+  const update = useCallback(() => {
+    const outer = outerRef.current;
+    const measure = measureRef.current;
+    if (!outer || !measure) return;
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setUseMarquee(false);
+      return;
+    }
+    setUseMarquee(measure.scrollWidth > outer.clientWidth + 2);
+  }, []);
+
+  useLayoutEffect(() => {
+    update();
+    const outer = outerRef.current;
+    if (!outer) return;
+    const ro = new ResizeObserver(() => update());
+    ro.observe(outer);
+    return () => ro.disconnect();
+  }, [text, update]);
+
+  return (
+    <div ref={outerRef} className="relative min-w-0 w-full">
+      <span
+        ref={measureRef}
+        className="pointer-events-none absolute left-0 top-0 -z-10 whitespace-nowrap opacity-0"
+        aria-hidden
+      >
+        {text}
+      </span>
+      {useMarquee ? (
+        <div className="overflow-hidden text-[11px] leading-snug text-[var(--muted)]">
+          <div className="streetie-location-marquee-track flex w-max">
+            <span className="whitespace-nowrap pr-10">{text}</span>
+            <span className="whitespace-nowrap pr-10" aria-hidden>
+              {text}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <p className="text-[11px] leading-snug text-[var(--muted)] break-words">{text}</p>
+      )}
+    </div>
+  );
+}
 
 function ManageDogNameCell({ row }: { row: ManageDogTableRow }) {
   const { visible, panelClassName, onOpen, onClose } = useHoverPreviewDismiss();
@@ -150,82 +205,100 @@ export function ManageDogsTable({
             {filtered.map((d) => (
               <li
                 key={d.id}
-                className="grid grid-cols-[4.5rem_1fr] gap-x-3 gap-y-2 rounded-2xl border border-black/5 bg-white p-4 shadow-sm"
+                className="flex flex-col gap-2 rounded-2xl border border-black/5 bg-white px-4 pb-2 pt-4 shadow-sm"
               >
-                <div className="relative col-start-1 row-start-1 row-span-3 aspect-square w-full min-h-0 self-start overflow-hidden rounded-lg bg-[var(--background)]">
-                  {d.thumb_url ? (
-                    <Image
-                      src={d.thumb_url}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      style={{
-                        objectPosition: objectPositionFromFocal(
-                          d.thumb_focal_x,
-                          d.thumb_focal_y,
-                        ),
-                      }}
-                      sizes="72px"
-                      unoptimized
-                    />
-                  ) : (
-                    <Image
-                      src={dogPhotoPlaceholder}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="72px"
-                    />
-                  )}
+                <div className="flex min-h-0 gap-3">
+                  <div className="relative h-[4.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-lg bg-[var(--background)]">
+                    {d.thumb_url ? (
+                      <Image
+                        src={d.thumb_url}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        style={{
+                          objectPosition: objectPositionFromFocal(
+                            d.thumb_focal_x,
+                            d.thumb_focal_y,
+                          ),
+                        }}
+                        sizes="72px"
+                        unoptimized
+                      />
+                    ) : (
+                      <Image
+                        src={dogPhotoPlaceholder}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="72px"
+                      />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                      <Link
+                        href={`/manage/dogs/${d.slug}/edit`}
+                        className="min-w-0 flex-1 text-base font-semibold leading-snug text-[var(--foreground)] hover:text-[var(--accent)]"
+                      >
+                        <DogCardInlineNameWithAliases
+                          name={d.name}
+                          aliases={d.name_aliases}
+                          variant="card"
+                        />
+                      </Link>
+                      <span className={`shrink-0 ${dogStatusClass(d.status)}`}>{d.status}</span>
+                    </div>
+                    <div className="mt-1">
+                      <ManageDogLocationMarquee text={d.locationLine} />
+                    </div>
+                    <div className="mt-2">
+                      <GenderBadge gender={d.gender} unknownLabel="Gender Unknown" />
+                    </div>
+                  </div>
                 </div>
-                <div className="col-start-2 row-start-1 row-span-2 flex min-w-0 flex-col justify-center gap-1.5">
+                <dl className="grid grid-cols-2 gap-x-3 gap-y-1 border-t border-black/5 pt-2">
+                  <div className="min-w-0">
+                    <dt className={mobileFieldLabelClass}>Sterilisation</dt>
+                    <dd className="mt-0.5 flex flex-wrap">
+                      <NeuterBadge status={d.neutering_status} />
+                    </dd>
+                  </div>
+                  <div className="min-w-0">
+                    <dt className={mobileFieldLabelClass}>Age</dt>
+                    <dd className="mt-0.5 flex flex-wrap">
+                      <AgeBadge
+                        estimatedBirthYear={d.estimated_birth_year}
+                        estimatedDeathYear={d.estimated_death_year}
+                        welfareStatus={d.welfare_status}
+                      />
+                    </dd>
+                  </div>
+                </dl>
+                <div className="flex flex-col gap-1">
                   <Link
                     href={`/manage/dogs/${d.slug}/edit`}
-                    className="block min-w-0 text-base font-semibold text-[var(--foreground)] hover:text-[var(--accent)]"
+                    className="flex w-full items-center justify-center rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/12 px-3 py-2 text-sm font-medium text-[var(--accent)] transition hover:bg-[var(--accent)]/22"
                   >
-                    <DogCardInlineNameWithAliases
-                      name={d.name}
-                      aliases={d.name_aliases}
-                      variant="card"
-                    />
+                    Edit
                   </Link>
-                  <HoverTooltip content={d.locationLine} className="inline-block max-w-full">
-                    <span className="text-[11px] leading-snug text-[var(--muted)]">{d.locationLine}</span>
-                  </HoverTooltip>
+                  <p className="text-center text-[10px] leading-tight text-[var(--muted)]">
+                    Updated {formatDisplayDate(d.updated_at)}
+                  </p>
                 </div>
-                <div className="col-span-2 col-start-1 row-start-3 grid grid-cols-3 gap-x-3">
-                  <div className="flex min-w-0 items-center justify-start">
-                    <GenderBadge gender={d.gender} />
-                  </div>
-                  <div className="flex min-w-0 items-center justify-start">
-                    <NeuterBadge status={d.neutering_status} />
-                  </div>
-                  <div className="flex min-w-0 items-center justify-start">
-                    <span className={dogStatusClass(d.status)}>{d.status}</span>
-                  </div>
-                </div>
-                <p className="col-span-2 col-start-1 row-start-4 text-xs text-[var(--muted)]">
-                  Updated {formatDisplayDate(d.updated_at)}
-                </p>
-                <Link
-                  href={`/manage/dogs/${d.slug}/edit`}
-                  className="col-span-2 col-start-1 row-start-5 flex w-full items-center justify-center rounded-lg border border-black/10 px-3 py-2 text-sm font-medium text-[var(--accent)] transition hover:bg-[var(--background)]"
-                >
-                  Edit
-                </Link>
               </li>
             ))}
           </ul>
 
           <div className="hidden sm:block">
             <div className={tableScrollClass}>
-              <table className="w-full min-w-[40rem] text-left text-sm">
+              <table className="w-full min-w-[46rem] text-left text-sm">
                 <thead className="border-b border-white/15 bg-[var(--table-header-bg)] text-xs font-semibold uppercase tracking-wide text-white">
                   <tr>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">Location</th>
                     <th className="px-4 py-3">Gender</th>
                     <th className="px-4 py-3">Sterilisation</th>
+                    <th className="px-4 py-3">Age</th>
                     <th className="px-4 py-3">Status</th>
                     <th className="px-4 py-3">Updated</th>
                     <th className="px-4 py-3" />
@@ -241,6 +314,13 @@ export function ManageDogsTable({
                       </td>
                       <td className="px-4 py-3">
                         <NeuterBadge status={d.neutering_status} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <AgeBadge
+                          estimatedBirthYear={d.estimated_birth_year}
+                          estimatedDeathYear={d.estimated_death_year}
+                          welfareStatus={d.welfare_status}
+                        />
                       </td>
                       <td className="px-4 py-3">
                         <span className={dogStatusClass(d.status)}>{d.status}</span>

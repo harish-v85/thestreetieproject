@@ -17,6 +17,7 @@ export function DogPhotoFramingControls({
   imageUrl,
   focalX: initialFx,
   focalY: initialFy,
+  returnTo,
   onCancel,
 }: {
   dogId: string;
@@ -25,6 +26,7 @@ export function DogPhotoFramingControls({
   imageUrl: string;
   focalX: number;
   focalY: number;
+  returnTo?: string;
   onCancel: () => void;
 }) {
   const [state, formAction, pending] = useActionState(updateDogPhotoFocalAction, initial);
@@ -128,6 +130,7 @@ export function DogPhotoFramingControls({
           <input type="hidden" name="dog_id" value={dogId} />
           <input type="hidden" name="dog_slug" value={dogSlug} />
           <input type="hidden" name="photo_id" value={photoId} />
+          {returnTo ? <input type="hidden" name="return_to" value={returnTo} /> : null}
           <input type="hidden" name="focal_x" value={String(fx)} />
           <input type="hidden" name="focal_y" value={String(fy)} />
           <button

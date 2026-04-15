@@ -10,6 +10,7 @@ import {
   isCloudinaryConfigured,
   uploadDogImageFromBuffer,
 } from "@/lib/cloudinary/dog-images";
+import { safePhotoRedirectAfter } from "@/lib/dogs/safe-photo-redirect-after";
 
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
@@ -65,6 +66,7 @@ function revalidateDogPhotoPaths(dogSlug: string) {
   revalidatePath("/dogs");
   revalidatePath(`/dogs/${dogSlug}`);
   revalidatePath("/manage/dogs");
+  revalidatePath("/manage/dogs/new");
   revalidatePath(`/manage/dogs/${dogSlug}/edit`);
 }
 
@@ -105,7 +107,7 @@ export async function addDogPhoto(
   if (error) return { error: error.message };
 
   revalidateDogPhotoPaths(dogSlug);
-  redirectWithFlash(`/manage/dogs/${dogSlug}/edit#photos`, "photo_added");
+  redirectWithFlash(safePhotoRedirectAfter(dogSlug, formData), "photo_added");
 }
 
 export async function uploadDogPhoto(
@@ -182,7 +184,7 @@ export async function uploadDogPhoto(
   }
 
   revalidateDogPhotoPaths(dogSlug);
-  redirectWithFlash(`/manage/dogs/${dogSlug}/edit#photos`, "photo_added");
+  redirectWithFlash(safePhotoRedirectAfter(dogSlug, formData), "photo_added");
 }
 
 export async function setPrimaryDogPhotoAction(formData: FormData) {
@@ -195,6 +197,7 @@ export async function setPrimaryDogPhotoAction(formData: FormData) {
   }
 
   const supabase = await createClient();
+  const after = safePhotoRedirectAfter(dogSlug, formData);
 
   const { data: row } = await supabase
     .from("dog_photos")
@@ -202,7 +205,7 @@ export async function setPrimaryDogPhotoAction(formData: FormData) {
     .eq("id", photoId)
     .maybeSingle();
   if (!row || row.dog_id !== dogId) {
-    redirect(`/manage/dogs/${dogSlug}/edit#photos`);
+    redirect(after);
   }
 
   await supabase.from("dog_photos").update({ is_primary: false }).eq("dog_id", dogId);
@@ -212,11 +215,11 @@ export async function setPrimaryDogPhotoAction(formData: FormData) {
     .eq("id", photoId);
 
   if (error) {
-    redirect(`/manage/dogs/${dogSlug}/edit#photos`);
+    redirect(after);
   }
 
   revalidateDogPhotoPaths(dogSlug);
-  redirectWithFlash(`/manage/dogs/${dogSlug}/edit#photos`, "photo_card_updated");
+  redirectWithFlash(after, "photo_card_updated");
 }
 
 function clamp01(n: number): number {
@@ -259,7 +262,7 @@ export async function updateDogPhotoFocalAction(
   if (error) return { error: error.message };
 
   revalidateDogPhotoPaths(dogSlug);
-  redirectWithFlash(`/manage/dogs/${dogSlug}/edit#photos`, "photo_framing_saved");
+  redirectWithFlash(safePhotoRedirectAfter(dogSlug, formData), "photo_framing_saved");
 }
 
 export async function deleteDogPhotoAction(formData: FormData) {
@@ -272,6 +275,7 @@ export async function deleteDogPhotoAction(formData: FormData) {
   }
 
   const supabase = await createClient();
+  const after = safePhotoRedirectAfter(dogSlug, formData);
 
   const { data: row } = await supabase
     .from("dog_photos")
@@ -279,14 +283,14 @@ export async function deleteDogPhotoAction(formData: FormData) {
     .eq("id", photoId)
     .maybeSingle();
   if (!row || row.dog_id !== dogId) {
-    redirect(`/manage/dogs/${dogSlug}/edit#photos`);
+    redirect(after);
   }
 
   const cloudId = row.cloudinary_public_id;
 
   const { error } = await supabase.from("dog_photos").delete().eq("id", photoId);
   if (error) {
-    redirect(`/manage/dogs/${dogSlug}/edit#photos`);
+    redirect(after);
   }
 
   if (cloudId && isCloudinaryConfigured()) {
@@ -298,5 +302,5 @@ export async function deleteDogPhotoAction(formData: FormData) {
   }
 
   revalidateDogPhotoPaths(dogSlug);
-  redirectWithFlash(`/manage/dogs/${dogSlug}/edit#photos`, "photo_removed");
+  redirectWithFlash(after, "photo_removed");
 }

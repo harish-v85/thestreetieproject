@@ -1,5 +1,6 @@
 "use client";
 
+import { Camera } from "@phosphor-icons/react";
 import Image from "next/image";
 import { useActionState, useRef, useState } from "react";
 import {
@@ -36,11 +37,14 @@ export function DogPhotosManager({
   dogSlug,
   photos,
   canUploadToCloudinary,
+  /** When set, photo actions redirect here (e.g. stay on Add dog after upload). */
+  redirectAfterPhotoMutation,
 }: {
   dogId: string;
   dogSlug: string;
   photos: ManagedPhoto[];
   canUploadToCloudinary: boolean;
+  redirectAfterPhotoMutation?: string;
 }) {
   const boundAdd = addDogPhoto.bind(null, dogId, dogSlug);
   const [urlState, urlFormAction, urlPending] = useActionState(boundAdd, initial);
@@ -87,6 +91,14 @@ export function DogPhotosManager({
         is cropped on cards and the profile. Admins and super admins can upload here (same as other
         dog edits).
       </p>
+      <div className="mt-4 flex gap-3 rounded-lg border border-amber-200/90 bg-amber-50 px-3 py-2.5 text-sm text-amber-950 shadow-sm">
+        <Camera className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" weight="regular" aria-hidden />
+        <p className="min-w-0 leading-relaxed">
+          Please ensure photos do not show identifiable landmarks, house numbers, vehicle number
+          plates, or faces of people who haven&apos;t consented to being photographed. Photos should
+          focus on the dog.
+        </p>
+      </div>
 
       {photos.length > 0 ? (
         <ul className="mt-6 space-y-4">
@@ -134,6 +146,9 @@ export function DogPhotosManager({
                       <input type="hidden" name="dog_id" value={dogId} />
                       <input type="hidden" name="dog_slug" value={dogSlug} />
                       <input type="hidden" name="photo_id" value={p.id} />
+                      {redirectAfterPhotoMutation ? (
+                        <input type="hidden" name="return_to" value={redirectAfterPhotoMutation} />
+                      ) : null}
                       <button
                         type="submit"
                         className="rounded-lg border border-black/10 bg-white px-3 py-1.5 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--background)]"
@@ -166,6 +181,9 @@ export function DogPhotosManager({
                     <input type="hidden" name="dog_id" value={dogId} />
                     <input type="hidden" name="dog_slug" value={dogSlug} />
                     <input type="hidden" name="photo_id" value={p.id} />
+                    {redirectAfterPhotoMutation ? (
+                      <input type="hidden" name="return_to" value={redirectAfterPhotoMutation} />
+                    ) : null}
                     <button
                       type="submit"
                       className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-800 hover:bg-red-100"
@@ -186,6 +204,7 @@ export function DogPhotosManager({
                     imageUrl={p.url}
                     focalX={p.focal_x}
                     focalY={p.focal_y}
+                    returnTo={redirectAfterPhotoMutation}
                     onCancel={() => setReframePhotoId(null)}
                   />
                 ) : null}
@@ -270,6 +289,9 @@ export function DogPhotosManager({
                   <span className="font-mono">streetie/dogs</span>.
                 </p>
                 <form action={uploadFormAction} className="mt-4 space-y-3">
+                  {redirectAfterPhotoMutation ? (
+                    <input type="hidden" name="return_to" value={redirectAfterPhotoMutation} />
+                  ) : null}
                   <div>
                     <label className="mb-1 block text-sm font-medium">
                       File <span className="text-red-600">*</span>
@@ -351,6 +373,9 @@ export function DogPhotosManager({
               <div>
                 <p className="text-xs text-[var(--muted)]">Use this for images already hosted elsewhere.</p>
                 <form action={urlFormAction} className="mt-4 space-y-3">
+                  {redirectAfterPhotoMutation ? (
+                    <input type="hidden" name="return_to" value={redirectAfterPhotoMutation} />
+                  ) : null}
                   <div>
                     <label htmlFor="new_photo_url" className="mb-1 block text-sm font-medium">
                       Image URL <span className="text-red-600">*</span>

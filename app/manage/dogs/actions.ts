@@ -323,7 +323,13 @@ export async function createDog(
   revalidatePath("/");
   revalidatePath("/dogs");
   revalidatePath("/manage/dogs");
-  redirectWithFlash(`/dogs/${dog.slug}`, "dog_created");
+  revalidatePath("/manage/dogs/new");
+  revalidatePath(`/manage/dogs/${dog.slug}/edit`);
+
+  redirectWithFlash(
+    `/manage/dogs/new?dogSlug=${encodeURIComponent(dog.slug)}#add-section-photos`,
+    "dog_created",
+  );
 }
 
 export async function updateDog(

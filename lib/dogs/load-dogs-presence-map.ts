@@ -16,6 +16,8 @@ type DogRow = {
   gender: string;
   neutering_status: string;
   welfare_status: string;
+  estimated_birth_year: number | null;
+  estimated_death_year: number | null;
   street_name: string | null;
   map_lat: number | null;
   map_lng: number | null;
@@ -61,6 +63,8 @@ export async function loadDogsForPresenceMap(
       gender,
       neutering_status,
       welfare_status,
+      estimated_birth_year,
+      estimated_death_year,
       street_name,
       map_lat,
       map_lng,
@@ -251,6 +255,15 @@ export async function loadDogsForPresenceMap(
       locationLine: locLabel(d),
       gender: d.gender,
       neutering_status: d.neutering_status,
+      welfare_status: d.welfare_status,
+      estimated_birth_year:
+        d.estimated_birth_year != null && Number.isFinite(Number(d.estimated_birth_year))
+          ? Number(d.estimated_birth_year)
+          : null,
+      estimated_death_year:
+        d.estimated_death_year != null && Number.isFinite(Number(d.estimated_death_year))
+          ? Number(d.estimated_death_year)
+          : null,
       thumb_url: picked?.url ?? null,
       thumb_focal_x: Number(picked?.focal_x ?? 0.5),
       thumb_focal_y: Number(picked?.focal_y ?? 0.5),

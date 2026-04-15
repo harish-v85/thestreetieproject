@@ -1,5 +1,6 @@
 "use client";
 
+import { MapPin } from "@phosphor-icons/react";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useId, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
@@ -126,6 +127,16 @@ export function HangoutCoordsField({
         {titleAddon}
       </div>
       <p className="mt-1 text-xs text-[var(--muted)]">{description}</p>
+      {variant === "hangout" ? (
+        <div className="mt-3 flex gap-2.5 rounded-lg border border-amber-200/90 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-950 shadow-sm">
+          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" weight="regular" aria-hidden />
+          <p className="min-w-0">
+            The location you pin here will be visible to the public. Pin the dog&apos;s general area
+            — a street or junction — rather than a specific address, doorstep, or private property.
+            Avoid pinning locations that could identify a private residence.
+          </p>
+        </div>
+      ) : null}
 
       <input type="hidden" name={hiddenLatName} value={hasPin ? String(lat) : ""} readOnly />
       <input type="hidden" name={hiddenLngName} value={hasPin ? String(lng) : ""} readOnly />

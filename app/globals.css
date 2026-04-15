@@ -172,3 +172,23 @@ body::before {
   }
 }
 
+/* Manage dogs — long location line on narrow cards */
+@keyframes streetie-location-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.streetie-location-marquee-track {
+  animation: streetie-location-marquee 22s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streetie-location-marquee-track {
+    animation: none;
+  }
+}
+

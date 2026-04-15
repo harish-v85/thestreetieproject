@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ShieldWarning } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
@@ -24,6 +25,9 @@ type DogRow = {
   updated_at: string;
   gender: string;
   neutering_status: string;
+  welfare_status: string;
+  estimated_birth_year: number | null;
+  estimated_death_year: number | null;
   street_name: string | null;
   localities: { name: string } | { name: string }[] | null;
   neighbourhoods: { name: string } | { name: string }[] | null;
@@ -53,6 +57,9 @@ export default async function ManageDogsPage() {
       updated_at,
       gender,
       neutering_status,
+      welfare_status,
+      estimated_birth_year,
+      estimated_death_year,
       street_name,
       name_aliases,
       localities ( name ),
@@ -93,6 +100,15 @@ export default async function ManageDogsPage() {
       locationLine: locLabel(d),
       gender: d.gender,
       neutering_status: d.neutering_status,
+      welfare_status: d.welfare_status,
+      estimated_birth_year:
+        d.estimated_birth_year != null && Number.isFinite(Number(d.estimated_birth_year))
+          ? Number(d.estimated_birth_year)
+          : null,
+      estimated_death_year:
+        d.estimated_death_year != null && Number.isFinite(Number(d.estimated_death_year))
+          ? Number(d.estimated_death_year)
+          : null,
       thumb_url: picked?.url ?? null,
       thumb_focal_x: Number(picked?.focal_x ?? 0.5),
       thumb_focal_y: Number(picked?.focal_y ?? 0.5),
@@ -111,6 +127,19 @@ export default async function ManageDogsPage() {
           </>
         }
       />
+
+      <div className="mb-6 flex gap-3 rounded-xl border border-amber-200/90 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-950 shadow-sm">
+        <ShieldWarning
+          className="h-6 w-6 shrink-0 text-amber-700"
+          weight="regular"
+          aria-hidden
+        />
+        <p className="min-w-0">
+          Information and photos published here are publicly visible. Please be thoughtful about what
+          you share — avoid content that could identify private residences, expose personal details of
+          caregivers, or put the safety of dogs or people at risk.
+        </p>
+      </div>
 
       {error ? (
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800">{error.message}</p>

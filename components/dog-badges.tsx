@@ -110,10 +110,19 @@ function Badge({
   );
 }
 
-export function GenderBadge({ gender }: { gender: string }) {
+export function GenderBadge({
+  gender,
+  unknownLabel,
+}: {
+  gender: string;
+  /** Shown in the chip when gender is unknown (default: "Unknown"). */
+  unknownLabel?: string;
+}) {
   const label =
+    gender === "male" ? "Male" : gender === "female" ? "Female" : (unknownLabel ?? "Unknown");
+  const titleShort =
     gender === "male" ? "Male" : gender === "female" ? "Female" : "Unknown";
-  const title = `Gender — ${label}`;
+  const title = `Gender — ${titleShort}`;
   const icon =
     gender === "male" ? (
       <MaleIcon />
@@ -185,7 +194,7 @@ export function AgeBadge({
     estimatedBirthYear != null && Number.isFinite(estimatedBirthYear)
       ? baseYear - estimatedBirthYear
       : null;
-  const label = y == null ? "N/A" : formatTentativeAgeYearsLabel(y);
+  const label = y == null ? "Unknown" : formatTentativeAgeYearsLabel(y);
   const title =
     y == null
       ? "Age unknown — no estimated birth year"

@@ -1,5 +1,6 @@
 "use client";
 
+import { Camera } from "@phosphor-icons/react";
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { DogLocationFields } from "@/components/dog-location-fields";
@@ -291,6 +292,26 @@ export function DogNewForm({
               <option value="archived">Archived</option>
             </select>
           </div>
+        </div>
+      </section>
+
+      <section
+        id="add-section-photos-info"
+        className="scroll-mt-24 mt-10 border-t border-black/10 pt-10"
+      >
+        <h2 className={sectionTitleClass}>Photos</h2>
+        <p className="mt-4 text-sm text-[var(--muted)]">
+          You can add images <strong>after</strong> you click <strong>Create dog</strong> — the
+          next screen allows you to add photos. <br /><br />Alternatively, you can skip that step and add photos later from{" "}
+          <strong>Edit profile</strong> if you prefer.
+        </p>
+        <div className="mt-4 flex gap-3 rounded-lg border border-amber-200/90 bg-amber-50 px-3 py-2.5 text-sm text-amber-950 shadow-sm">
+          <Camera className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" weight="regular" aria-hidden />
+          <p className="min-w-0 leading-relaxed">
+            Please ensure photos do not show identifiable landmarks, house numbers, vehicle number
+            plates, or faces of people who haven&apos;t consented to being photographed. Photos should
+            focus on the dog.
+          </p>
         </div>
       </section>
 
