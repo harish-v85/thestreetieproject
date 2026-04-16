@@ -28,6 +28,7 @@ export type AboutDogCarouselItem = {
   neuterStatus: string;
   estimatedBirthYear: number | null;
   estimatedDeathYear: number | null;
+  ageConfidence: string | null;
   welfareStatus: string;
 };
 
@@ -155,6 +156,7 @@ export function AboutDogCarousel({ dogs }: { dogs: AboutDogCarouselItem[] }) {
                 estimatedBirthYear={active.estimatedBirthYear}
                 estimatedDeathYear={active.estimatedDeathYear}
                 welfareStatus={active.welfareStatus}
+                ageConfidence={active.ageConfidence}
               />
             </div>
           </div>

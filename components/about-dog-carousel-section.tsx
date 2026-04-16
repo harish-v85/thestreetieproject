@@ -49,6 +49,7 @@ type DogInfo = {
   neutering_status: string | null;
   estimated_birth_year: number | null;
   estimated_death_year: number | null;
+  age_confidence: string | null;
   street_name: string | null;
   localities: { name: string } | { name: string }[] | null;
   neighbourhoods: { name: string } | { name: string }[] | null;
@@ -63,7 +64,7 @@ async function AboutDogCarouselContent() {
   const supabase = await createClient();
 
   const dogSelect =
-    "id, slug, name, name_aliases, welfare_status, gender, neutering_status, estimated_birth_year, estimated_death_year, street_name, localities(name), neighbourhoods(name)";
+    "id, slug, name, name_aliases, welfare_status, gender, neutering_status, estimated_birth_year, estimated_death_year, age_confidence, street_name, localities(name), neighbourhoods(name)";
 
   const [featured, poolRes] = await Promise.all([
     loadFeaturedDogPayload(supabase),
@@ -85,12 +86,15 @@ async function AboutDogCarouselContent() {
     neutering_status: string | null;
     estimated_birth_year: number | null;
     estimated_death_year: number | null;
+    age_confidence: string | null;
     welfare_status: string | null;
   } | null = null;
   if (featured) {
     const { data } = await supabase
       .from("dogs")
-      .select("gender, neutering_status, estimated_birth_year, estimated_death_year, welfare_status")
+      .select(
+        "gender, neutering_status, estimated_birth_year, estimated_death_year, age_confidence, welfare_status",
+      )
       .eq("id", featured.id)
       .maybeSingle();
     featuredProfile = data;
@@ -131,6 +135,7 @@ async function AboutDogCarouselContent() {
         neuterStatus: d.neutering_status ?? "unknown",
         estimatedBirthYear: d.estimated_birth_year,
         estimatedDeathYear: d.estimated_death_year,
+        ageConfidence: d.age_confidence,
         welfareStatus: d.welfare_status ?? "healthy",
         locationLine: formatDogLocationLine(
           embedName(d.localities) ?? "—",
@@ -154,6 +159,7 @@ async function AboutDogCarouselContent() {
       neuterStatus: featuredProfile?.neutering_status ?? "unknown",
       estimatedBirthYear: featuredProfile?.estimated_birth_year ?? null,
       estimatedDeathYear: featuredProfile?.estimated_death_year ?? null,
+      ageConfidence: featuredProfile?.age_confidence ?? null,
       welfareStatus: featuredProfile?.welfare_status ?? "healthy",
     });
   }

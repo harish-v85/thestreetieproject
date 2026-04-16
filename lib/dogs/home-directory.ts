@@ -34,4 +34,5 @@ export type HomeDogCard = {
   thumb_focal_y: number;
   estimated_birth_year: number | null;
   estimated_death_year: number | null;
+  age_confidence: string | null;
 };

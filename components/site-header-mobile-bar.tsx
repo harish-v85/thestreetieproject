@@ -16,12 +16,12 @@ import {
   UserCircleGear,
   X,
 } from "@phosphor-icons/react";
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { computeHeaderAccountInitials } from "@/components/header-user-menu";
 import { ManageIconDogs } from "@/components/manage-icon-dogs";
 import { FeedIconDogFood } from "@/components/manage-page-icons";
+import { PendingNavLink } from "@/components/pending-nav-link";
 import { TspSiteLogo } from "@/components/tsp-brand-logo";
 
 export type MobileNavProps = {
@@ -67,66 +67,116 @@ function MobileDrawerNav({
   return (
     <>
       <p className={sectionTitleClass()}>Browse</p>
-      <Link href="/" className={drawerLinkClass()} onClick={onNavigate}>
+      <PendingNavLink href="/" className={drawerLinkClass()} onClick={onNavigate} pendingLabel="Opening…">
         <House className={drawerIconClass} weight="regular" aria-hidden />
         Home
-      </Link>
-      <Link href="/dogs" className={drawerLinkClass()} onClick={onNavigate}>
+      </PendingNavLink>
+      <PendingNavLink href="/dogs" className={drawerLinkClass()} onClick={onNavigate} pendingLabel="Opening…">
         <Dog className={drawerIconClass} weight="regular" aria-hidden />
         Dogs
-      </Link>
-      <Link href="/dogs/map" className={drawerLinkClass()} onClick={onNavigate}>
+      </PendingNavLink>
+      <PendingNavLink
+        href="/dogs/map"
+        className={drawerLinkClass()}
+        onClick={onNavigate}
+        pendingLabel="Opening…"
+      >
         <MapTrifold className={drawerIconClass} weight="regular" aria-hidden />
         Map
-      </Link>
+      </PendingNavLink>
       {isActiveStaff ? (
-        <Link href="/dogs/feed" className={drawerLinkClass()} onClick={onNavigate}>
+        <PendingNavLink
+          href="/dogs/feed"
+          className={drawerLinkClass()}
+          onClick={onNavigate}
+          pendingLabel="Opening…"
+        >
           <FeedIconDogFood className={drawerIconClass} />
           Log Feeding
-        </Link>
+        </PendingNavLink>
       ) : null}
-      <Link href="/about" className={drawerLinkClass()} onClick={onNavigate}>
+      <PendingNavLink
+        href="/about"
+        className={drawerLinkClass()}
+        onClick={onNavigate}
+        pendingLabel="Opening…"
+      >
         <BookOpenText className={drawerIconClass} weight="regular" aria-hidden />
         About
-      </Link>
+      </PendingNavLink>
 
       {canManage ? (
         <>
           <div className={browseManageDividerClass()} role="separator" aria-hidden />
           <p className={sectionTitleClass()}>Manage</p>
-          <Link href="/manage/dogs" className={drawerLinkClass()} onClick={onNavigate}>
+          <PendingNavLink
+            href="/manage/dogs"
+            className={drawerLinkClass()}
+            onClick={onNavigate}
+            pendingLabel="Opening…"
+          >
             <ManageIconDogs className={drawerIconClass} />
             Dogs
-          </Link>
+          </PendingNavLink>
           <div className={manageSubsectionDividerClass()} role="separator" aria-hidden />
-          <Link href="/manage/localities" className={drawerLinkClass()} onClick={onNavigate}>
+          <PendingNavLink
+            href="/manage/localities"
+            className={drawerLinkClass()}
+            onClick={onNavigate}
+            pendingLabel="Opening…"
+          >
             <MapPinArea className={drawerIconClass} weight="regular" aria-hidden />
             Localities
-          </Link>
-          <Link href="/manage/neighbourhoods" className={drawerLinkClass()} onClick={onNavigate}>
+          </PendingNavLink>
+          <PendingNavLink
+            href="/manage/neighbourhoods"
+            className={drawerLinkClass()}
+            onClick={onNavigate}
+            pendingLabel="Opening…"
+          >
             <Park className={drawerIconClass} weight="regular" aria-hidden />
             Neighbourhoods
-          </Link>
+          </PendingNavLink>
           {isSuperAdmin ? (
             <>
               <div className={manageSubsectionDividerClass()} role="separator" aria-hidden />
-              <Link href="/manage/analytics" className={drawerLinkClass()} onClick={onNavigate}>
+              <PendingNavLink
+                href="/manage/analytics"
+                className={drawerLinkClass()}
+                onClick={onNavigate}
+                pendingLabel="Opening…"
+              >
                 <ChartBar className={drawerIconClass} weight="regular" aria-hidden />
                 Login Analytics
-              </Link>
-              <Link href="/manage/activity" className={drawerLinkClass()} onClick={onNavigate}>
+              </PendingNavLink>
+              <PendingNavLink
+                href="/manage/activity"
+                className={drawerLinkClass()}
+                onClick={onNavigate}
+                pendingLabel="Opening…"
+              >
                 <Pulse className={drawerIconClass} weight="regular" aria-hidden />
                 Activity
-              </Link>
+              </PendingNavLink>
               <div className={manageSubsectionDividerClass()} role="separator" aria-hidden />
-              <Link href="/manage/users" className={drawerLinkClass()} onClick={onNavigate}>
+              <PendingNavLink
+                href="/manage/users"
+                className={drawerLinkClass()}
+                onClick={onNavigate}
+                pendingLabel="Opening…"
+              >
                 <UserCircleGear className={drawerIconClass} weight="regular" aria-hidden />
                 Users
-              </Link>
-              <Link href="/manage/access-requests" className={drawerLinkClass()} onClick={onNavigate}>
+              </PendingNavLink>
+              <PendingNavLink
+                href="/manage/access-requests"
+                className={drawerLinkClass()}
+                onClick={onNavigate}
+                pendingLabel="Opening…"
+              >
                 <UserCircleCheck className={drawerIconClass} weight="regular" aria-hidden />
                 Access Requests
-              </Link>
+              </PendingNavLink>
             </>
           ) : null}
         </>
@@ -236,14 +286,15 @@ export function SiteHeaderMobileBar({
                 <MobileDrawerNav navProps={navProps} onNavigate={close} />
               </nav>
               <div className="shrink-0 border-t border-black/10 px-2 py-3">
-                <Link
+                <PendingNavLink
                   href="/profile"
                   className="mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--background)]"
                   onClick={close}
+                  pendingLabel="Opening…"
                 >
                   <User className={drawerIconClass} weight="regular" aria-hidden />
                   My profile
-                </Link>
+                </PendingNavLink>
                 <form action="/auth/signout" method="post">
                   <button
                     type="submit"

@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { AccessRequestsPendingRibbon } from "@/components/access-requests-pending-ribbon";
 import { AuthHashHandler } from "@/components/auth-hash-handler";
 import { FlashRibbon } from "@/components/flash-ribbon";
+import { RouteTransitionIndicator } from "@/components/route-transition-indicator";
 import { ScrollToTopButton } from "@/components/scroll-to-top-button";
 import { SiteHeader } from "@/components/site-header";
 import { TimezoneCookieSetter } from "@/components/timezone-cookie-setter";
@@ -41,6 +42,7 @@ export default function RootLayout({
         className={`${dmSans.className} flex min-h-screen flex-col overflow-x-hidden antialiased [padding:env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]`}
       >
         <AuthHashHandler />
+        <RouteTransitionIndicator />
         <TimezoneCookieSetter />
         <SiteHeader />
         <Suspense fallback={null}>

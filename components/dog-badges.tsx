@@ -178,10 +178,12 @@ export function AgeBadge({
   estimatedBirthYear,
   estimatedDeathYear,
   welfareStatus,
+  ageConfidence,
 }: {
   estimatedBirthYear: number | null;
   estimatedDeathYear?: number | null;
   welfareStatus?: string | null;
+  ageConfidence?: string | null;
 }) {
   const cy = new Date().getFullYear();
   const baseYear =
@@ -195,12 +197,18 @@ export function AgeBadge({
       ? baseYear - estimatedBirthYear
       : null;
   const label = y == null ? "Unknown" : formatTentativeAgeYearsLabel(y);
+  const confidenceSuffix =
+    ageConfidence === "vet_assessed"
+      ? "(vet-assessed)"
+      : ageConfidence === "best_guess"
+        ? "(best guess)"
+        : "(not too sure)";
   const title =
     y == null
-      ? "Age unknown — no estimated birth year"
+      ? "Age unknown"
       : welfareStatus === "deceased" && estimatedDeathYear != null
-        ? `Approximate age at death: ${formatTentativeAgeYearsLabel(y)} (estimated death year − estimated birth year)`
-        : `Approximate age: ${formatTentativeAgeYearsLabel(y)} (from estimated birth year)`;
+        ? `Approximate age at death: ${formatTentativeAgeYearsLabel(y)} ${confidenceSuffix}`
+        : `Approximate age: ${formatTentativeAgeYearsLabel(y)} ${confidenceSuffix}`;
   return (
     <Badge tone="neutral" icon={<CalendarIcon />} title={title} chipShape="rect">
       {label}

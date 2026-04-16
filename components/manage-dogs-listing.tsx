@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { ManageListingToolbar } from "@/components/manage-listing-toolbar";
 import { ManageDogsTable, type ManageDogTableRow } from "@/components/manage-dogs-table";
+import { PendingNavLink } from "@/components/pending-nav-link";
 
 const addDogButtonClass =
   "inline-flex items-center justify-center rounded-lg bg-[var(--accent)] px-4 py-2 text-center text-sm font-medium text-white transition hover:opacity-95";
@@ -29,17 +29,29 @@ export function ManageDogsListing({
       onChange={setQ}
       action={
         <div className="flex flex-wrap items-center justify-end gap-2">
-          <Link href="/manage/dogs/bulk-edit" className={bulkAddButtonClass}>
+          <PendingNavLink
+            href="/manage/dogs/bulk-edit"
+            className={bulkAddButtonClass}
+            pendingLabel="Opening…"
+          >
             Bulk edit
-          </Link>
+          </PendingNavLink>
           {isSuperAdmin ? (
-            <Link href="/manage/dogs/bulk-add" className={bulkAddButtonClass}>
+            <PendingNavLink
+              href="/manage/dogs/bulk-add"
+              className={bulkAddButtonClass}
+              pendingLabel="Opening…"
+            >
               Bulk add
-            </Link>
+            </PendingNavLink>
           ) : null}
-          <Link href="/manage/dogs/new" className={addDogButtonClass}>
+          <PendingNavLink
+            href="/manage/dogs/new"
+            className={addDogButtonClass}
+            pendingLabel="Opening…"
+          >
             + Add dog
-          </Link>
+          </PendingNavLink>
         </div>
       }
     >

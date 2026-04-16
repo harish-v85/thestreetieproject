@@ -1,8 +1,8 @@
 "use client";
 
 import { SignOut, User } from "@phosphor-icons/react";
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { PendingNavLink } from "@/components/pending-nav-link";
 import { HoverTooltip } from "@/components/ui/hover-tooltip";
 
 export function computeHeaderAccountInitials(displayName: string, email: string): string {
@@ -103,15 +103,16 @@ export function HeaderUserMenu({
             ) : null}
           </div>
           <div className="space-y-0.5 p-2">
-            <Link
+            <PendingNavLink
               href="/profile"
               className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--background)]"
               role="menuitem"
               onClick={close}
+              pendingLabel="Opening…"
             >
               <User className="h-4 w-4 shrink-0 text-[var(--foreground)]/85" weight="regular" aria-hidden />
               My profile
-            </Link>
+            </PendingNavLink>
             <form action="/auth/signout" method="post">
               <button
                 type="submit"

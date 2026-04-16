@@ -13,10 +13,10 @@ import {
   UserCircleCheck,
   UserCircleGear,
 } from "@phosphor-icons/react";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ManageIconDogs } from "@/components/manage-icon-dogs";
 import { FeedIconDogFood } from "@/components/manage-page-icons";
+import { PendingNavLink } from "@/components/pending-nav-link";
 
 const navIconClass = "h-4 w-4 shrink-0 text-[var(--foreground)]/85";
 
@@ -84,23 +84,23 @@ export function HeaderNavGroups({
       aria-label="Main"
       onBlur={onNavBlur}
     >
-      <Link href="/" className={topLinkClass()}>
+      <PendingNavLink href="/" className={topLinkClass()} pendingLabel="Opening…">
         <House className={navIconClass} weight="regular" aria-hidden />
         Home
-      </Link>
-      <Link href="/dogs" className={topLinkClass()}>
+      </PendingNavLink>
+      <PendingNavLink href="/dogs" className={topLinkClass()} pendingLabel="Opening…">
         <Dog className={navIconClass} weight="regular" aria-hidden />
         Dogs
-      </Link>
-      <Link href="/dogs/map" className={topLinkClass()}>
+      </PendingNavLink>
+      <PendingNavLink href="/dogs/map" className={topLinkClass()} pendingLabel="Opening…">
         <MapTrifold className={navIconClass} weight="regular" aria-hidden />
         Map
-      </Link>
+      </PendingNavLink>
       {isActiveStaff ? (
-        <Link href="/dogs/feed" className={topLinkClass()}>
+        <PendingNavLink href="/dogs/feed" className={topLinkClass()} pendingLabel="Opening…">
           <FeedIconDogFood className={navIconClass} />
           Log Feeding
-        </Link>
+        </PendingNavLink>
       ) : null}
       {canManage ? (
         <div className="relative">
@@ -119,59 +119,91 @@ export function HeaderNavGroups({
           </button>
           {manageOpen ? (
             <div className={panelClass()} role="menu">
-              <Link href="/manage/dogs" className={linkClass()} role="menuitem" onClick={close}>
+              <PendingNavLink
+                href="/manage/dogs"
+                className={linkClass()}
+                role="menuitem"
+                onClick={close}
+                pendingLabel="Opening…"
+              >
                 <ManageIconDogs className={navIconClass} />
                 Dogs
-              </Link>
+              </PendingNavLink>
               <div className="my-1 border-t border-black/10" role="separator" aria-hidden />
-              <Link href="/manage/localities" className={linkClass()} role="menuitem" onClick={close}>
+              <PendingNavLink
+                href="/manage/localities"
+                className={linkClass()}
+                role="menuitem"
+                onClick={close}
+                pendingLabel="Opening…"
+              >
                 <MapPinArea className={navIconClass} weight="regular" aria-hidden />
                 Localities
-              </Link>
-              <Link
+              </PendingNavLink>
+              <PendingNavLink
                 href="/manage/neighbourhoods"
                 className={linkClass()}
                 role="menuitem"
                 onClick={close}
+                pendingLabel="Opening…"
               >
                 <Park className={navIconClass} weight="regular" aria-hidden />
                 Neighbourhoods
-              </Link>
+              </PendingNavLink>
               {isSuperAdmin ? (
                 <>
                   <div className="my-1 border-t border-black/10" role="separator" aria-hidden />
-                  <Link href="/manage/analytics" className={linkClass()} role="menuitem" onClick={close}>
+                  <PendingNavLink
+                    href="/manage/analytics"
+                    className={linkClass()}
+                    role="menuitem"
+                    onClick={close}
+                    pendingLabel="Opening…"
+                  >
                     <ChartBar className={navIconClass} weight="regular" aria-hidden />
                     Login Analytics
-                  </Link>
-                  <Link href="/manage/activity" className={linkClass()} role="menuitem" onClick={close}>
+                  </PendingNavLink>
+                  <PendingNavLink
+                    href="/manage/activity"
+                    className={linkClass()}
+                    role="menuitem"
+                    onClick={close}
+                    pendingLabel="Opening…"
+                  >
                     <Pulse className={navIconClass} weight="regular" aria-hidden />
                     Activity
-                  </Link>
+                  </PendingNavLink>
                   <div className="my-1 border-t border-black/10" role="separator" aria-hidden />
-                  <Link href="/manage/users" className={linkClass()} role="menuitem" onClick={close}>
+                  <PendingNavLink
+                    href="/manage/users"
+                    className={linkClass()}
+                    role="menuitem"
+                    onClick={close}
+                    pendingLabel="Opening…"
+                  >
                     <UserCircleGear className={navIconClass} weight="regular" aria-hidden />
                     Users
-                  </Link>
-                  <Link
+                  </PendingNavLink>
+                  <PendingNavLink
                     href="/manage/access-requests"
                     className={linkClass()}
                     role="menuitem"
                     onClick={close}
+                    pendingLabel="Opening…"
                   >
                     <UserCircleCheck className={navIconClass} weight="regular" aria-hidden />
                     Access Requests
-                  </Link>
+                  </PendingNavLink>
                 </>
               ) : null}
             </div>
           ) : null}
         </div>
       ) : null}
-      <Link href="/about" className={topLinkClass()}>
+      <PendingNavLink href="/about" className={topLinkClass()} pendingLabel="Opening…">
         <BookOpenText className={navIconClass} weight="regular" aria-hidden />
         About
-      </Link>
+      </PendingNavLink>
     </nav>
   );
 }

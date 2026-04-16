@@ -28,6 +28,7 @@ type DogRow = {
   welfare_status: string;
   estimated_birth_year: number | null;
   estimated_death_year: number | null;
+  age_confidence: string | null;
   street_name: string | null;
   localities: { name: string } | { name: string }[] | null;
   neighbourhoods: { name: string } | { name: string }[] | null;
@@ -60,6 +61,7 @@ export default async function ManageDogsPage() {
       welfare_status,
       estimated_birth_year,
       estimated_death_year,
+      age_confidence,
       street_name,
       name_aliases,
       localities ( name ),
@@ -108,6 +110,10 @@ export default async function ManageDogsPage() {
       estimated_death_year:
         d.estimated_death_year != null && Number.isFinite(Number(d.estimated_death_year))
           ? Number(d.estimated_death_year)
+          : null,
+      age_confidence:
+        typeof d.age_confidence === "string" && d.age_confidence.trim() !== ""
+          ? d.age_confidence
           : null,
       thumb_url: picked?.url ?? null,
       thumb_focal_x: Number(picked?.focal_x ?? 0.5),

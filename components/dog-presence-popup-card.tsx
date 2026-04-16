@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { DogCardInlineNameWithAliases } from "@/components/dog-aliases-strip";
 import { GenderBadge, NeuterBadge } from "@/components/dog-badges";
 import type { DogPresenceMapPin } from "@/lib/dogs/load-dogs-presence-map";
 import { objectPositionFromFocal } from "@/lib/dogs/photo-focal";
 import { dogPhotoPlaceholder } from "@/lib/dogs/photo-placeholder";
+import { PendingNavLink } from "@/components/pending-nav-link";
 
 export function DogPresencePopupCard({ pin }: { pin: DogPresenceMapPin }) {
   return (
@@ -51,12 +51,13 @@ export function DogPresencePopupCard({ pin }: { pin: DogPresenceMapPin }) {
           </div>
         </div>
         <div className="mt-auto border-t border-black/5 p-3">
-          <Link
+          <PendingNavLink
             href={`/dogs/${pin.slug}`}
             className="flex w-full items-center justify-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/50 px-4 py-3 text-center text-sm font-medium text-[var(--foreground)] no-underline shadow-sm hover:bg-amber-50 hover:text-[var(--foreground)]"
+            pendingLabel="Opening…"
           >
             View full profile
-          </Link>
+          </PendingNavLink>
         </div>
       </div>
     </div>

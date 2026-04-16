@@ -192,3 +192,24 @@ body::before {
   }
 }
 
+@keyframes streetie-route-progress-indeterminate {
+  0% {
+    transform: translateX(-120%);
+  }
+  45% {
+    transform: translateX(25%);
+  }
+  100% {
+    transform: translateX(260%);
+  }
+}
+
+.streetie-route-progress-indeterminate {
+  animation: streetie-route-progress-indeterminate 1.15s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(196, 92, 38, 0.55);
+}
+
+body.streetie-route-pending {
+  cursor: progress;
+}
+

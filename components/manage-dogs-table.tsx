@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { DogCardInlineNameWithAliases } from "@/components/dog-aliases-strip";
 import { formatDisplayDate } from "@/lib/date/format-display-date";
@@ -9,6 +8,7 @@ import { AgeBadge, GenderBadge, NeuterBadge } from "@/components/dog-badges";
 import { objectPositionFromFocal } from "@/lib/dogs/photo-focal";
 import { dogPhotoPlaceholder } from "@/lib/dogs/photo-placeholder";
 import { useHoverPreviewDismiss } from "@/lib/hooks/use-hover-preview-dismiss";
+import { PendingNavLink } from "@/components/pending-nav-link";
 
 export type ManageDogTableRow = {
   id: string;
@@ -23,6 +23,7 @@ export type ManageDogTableRow = {
   welfare_status: string;
   estimated_birth_year: number | null;
   estimated_death_year: number | null;
+  age_confidence: string | null;
   thumb_url: string | null;
   thumb_focal_x: number;
   thumb_focal_y: number;
@@ -91,14 +92,15 @@ function ManageDogNameCell({ row }: { row: ManageDogTableRow }) {
         onMouseEnter={onOpen}
         onMouseLeave={onClose}
       >
-        <Link
+        <PendingNavLink
           href={`/manage/dogs/${row.slug}/edit`}
           className="text-[var(--foreground)] underline-offset-2 hover:text-[var(--accent)] hover:underline"
           onFocus={onOpen}
           onBlur={onClose}
+          pendingLabel="Opening…"
         >
           {row.name}
-        </Link>
+        </PendingNavLink>
         {visible ? (
           <div
             className="absolute left-0 top-full z-50 -mt-2 w-[min(calc(100vw-2rem),16rem)] pt-2"
@@ -236,16 +238,17 @@ export function ManageDogsTable({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                      <Link
+                      <PendingNavLink
                         href={`/manage/dogs/${d.slug}/edit`}
                         className="min-w-0 flex-1 text-base font-semibold leading-snug text-[var(--foreground)] hover:text-[var(--accent)]"
+                        pendingLabel="Opening…"
                       >
                         <DogCardInlineNameWithAliases
                           name={d.name}
                           aliases={d.name_aliases}
                           variant="card"
                         />
-                      </Link>
+                      </PendingNavLink>
                       <span className={`shrink-0 ${dogStatusClass(d.status)}`}>{d.status}</span>
                     </div>
                     <div className="mt-1">
@@ -270,17 +273,19 @@ export function ManageDogsTable({
                         estimatedBirthYear={d.estimated_birth_year}
                         estimatedDeathYear={d.estimated_death_year}
                         welfareStatus={d.welfare_status}
+                        ageConfidence={d.age_confidence}
                       />
                     </dd>
                   </div>
                 </dl>
                 <div className="flex flex-col gap-1">
-                  <Link
+                  <PendingNavLink
                     href={`/manage/dogs/${d.slug}/edit`}
                     className="flex w-full items-center justify-center rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/12 px-3 py-2 text-sm font-medium text-[var(--accent)] transition hover:bg-[var(--accent)]/22"
+                    pendingLabel="Opening…"
                   >
                     Edit
-                  </Link>
+                  </PendingNavLink>
                   <p className="text-center text-[10px] leading-tight text-[var(--muted)]">
                     Updated {formatDisplayDate(d.updated_at)}
                   </p>
@@ -320,6 +325,7 @@ export function ManageDogsTable({
                           estimatedBirthYear={d.estimated_birth_year}
                           estimatedDeathYear={d.estimated_death_year}
                           welfareStatus={d.welfare_status}
+                          ageConfidence={d.age_confidence}
                         />
                       </td>
                       <td className="px-4 py-3">
@@ -329,12 +335,13 @@ export function ManageDogsTable({
                         {formatDisplayDate(d.updated_at)}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <Link
+                        <PendingNavLink
                           href={`/manage/dogs/${d.slug}/edit`}
                           className="font-medium text-[var(--accent)]"
+                          pendingLabel="Opening…"
                         >
                           Edit
-                        </Link>
+                        </PendingNavLink>
                       </td>
                     </tr>
                   ))}

@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useId } from "react";
+import { PendingNavLink } from "@/components/pending-nav-link";
 
 const SECTIONS: { id: string; label: string }[] = [
   { id: "edit-section-profile", label: "Profile" },
@@ -62,12 +62,13 @@ export function EditDogFormToolbar({
         >
           {pending ? "Saving…" : "Save changes"}
         </button>
-        <Link
+        <PendingNavLink
           href={`/dogs/${dogSlug}`}
           className="rounded-lg border border-black/10 bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] shadow-sm"
+          pendingLabel="Opening…"
         >
           View public page
-        </Link>
+        </PendingNavLink>
       </div>
     </div>
   );

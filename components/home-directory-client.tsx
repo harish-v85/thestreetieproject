@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { PendingNavLink } from "@/components/pending-nav-link";
 import { fetchHomeDogsPage } from "@/app/actions/home-dogs";
 import {
   MIN_DIRECTORY_SEARCH_CHARS,
@@ -46,8 +46,9 @@ function DogMiniCard({ dog }: { dog: HomeDogCard }) {
   const hasWelfareFlag = dog.welfare_status !== "healthy";
   const welfareTintRgb = welfareImageTintColor(dog.welfare_status);
   return (
-    <Link
+    <PendingNavLink
       href={`/dogs/${dog.slug}`}
+      pendingLabel="Opening…"
       className="group block overflow-hidden rounded-2xl border border-black/5 bg-white shadow-sm transition hover:border-black/10 hover:shadow-md"
     >
       <div className="relative aspect-[4/3] bg-[var(--background)]">
@@ -111,10 +112,11 @@ function DogMiniCard({ dog }: { dog: HomeDogCard }) {
             estimatedBirthYear={dog.estimated_birth_year}
             estimatedDeathYear={dog.estimated_death_year}
             welfareStatus={dog.welfare_status}
+            ageConfidence={dog.age_confidence}
           />
         </div>
       </div>
-    </Link>
+    </PendingNavLink>
   );
 }
 
